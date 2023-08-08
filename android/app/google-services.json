@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "635148394294",
+    "project_id": "prezenty-65dea",
+    "storage_bucket": "prezenty-65dea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635148394294:android:1784e7273f4725a11a9d97",
+        "android_client_info": {
+          "package_name": "com.cocoalabs.event_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "635148394294-6tj0kpkigt2b24fh0faromhghv01bf71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbdhPDV6WOO7bQGQWR9jC3NIqYI9Zkw70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "635148394294-6tj0kpkigt2b24fh0faromhghv01bf71.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

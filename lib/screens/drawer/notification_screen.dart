@@ -157,7 +157,6 @@ class _NotificationScreenState extends State<NotificationScreen>
                               notificationItem.description) :
                       Get.to(() => BidNotificationScreen(
                         isFromNotification: true,
-
                         title:  notificationItem.message,
                         imageUrl: notificationItem.imageUrl,
                         url: notificationItem.url,

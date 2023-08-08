@@ -149,6 +149,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                       ? null
                       : () {
 
+
                     notificationItem.type == "participated" ?
                           _gotoScreen(
                               notificationItem.type,

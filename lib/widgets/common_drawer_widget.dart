@@ -6,6 +6,7 @@ import 'package:event_app/screens/drawer/my_events_list_screen.dart';
 import 'package:event_app/screens/drawer/my_vouchers/my_vouchers_screen.dart';
 import 'package:event_app/screens/drawer/notification_screen.dart';
 import 'package:event_app/screens/drawer/spin_voucher_list_screen.dart';
+import 'package:event_app/screens/drawer/tambola_game_screen.dart';
 import 'package:event_app/screens/event/event_video_wish_list_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/faq_screen.dart';
 import 'package:event_app/util/app_helper.dart';
@@ -73,8 +74,7 @@ class _CommonDrawerWidgetState extends State<CommonDrawerWidget> {
                                     height: double.infinity,
                                     width: double.infinity,
                                   ),
-                                ),
-                              ),
+                                ),),
                             )),
                         SizedBox(width: 12),
                         Expanded(
@@ -118,6 +118,11 @@ class _CommonDrawerWidgetState extends State<CommonDrawerWidget> {
                         Image.asset('assets/images/hi_icon.png'),
                         'H! Rewards', ()  {
                        Get.to(() => HappyMomentsScreen());
+                    }),
+                    _drawerMenuItem(
+                        Image.asset('assets/images/ic_nav_tambola.png'),
+                        'Tambola game', ()  {
+                      Get.to(() => TambolaGameScreen());
                     }),
                     _drawerMenuItem(
                         Image.asset('assets/images/ic_nav_my_events.png'),

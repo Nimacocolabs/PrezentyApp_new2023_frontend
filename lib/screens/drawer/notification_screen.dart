@@ -137,7 +137,7 @@ class _NotificationScreenState extends State<NotificationScreen>
             itemCount: itemsList.length,
             itemBuilder: (context, index) {
               ListItem notificationItem = itemsList[index];
-              print("fjgg${notificationItem.url}");
+              print("Notification Url--->${notificationItem.url}");
               return Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
@@ -148,8 +148,6 @@ class _NotificationScreenState extends State<NotificationScreen>
                           notificationItem.eventId == null
                       ? null
                       : () {
-
-
                     notificationItem.type == "participated" ?
                           _gotoScreen(
                               notificationItem.type,
@@ -170,19 +168,16 @@ class _NotificationScreenState extends State<NotificationScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-
                         Row(children: [
-                          GestureDetector(
-                            onTap: (){
-                           //   notificationItem.status==1?EventRepository().getNotificationStatus(notificationItem.id):
-                            },
-                            child: Text.rich(TextSpan(children: [
-                              TextSpan(
-                              text: '${notificationItem.message}',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600)),
-                            ])),
-
+                          //   notificationItem.status==1?EventRepository().getNotificationStatus(notificationItem.id):
+                          Flexible(
+                            child: Text(
+                              '${notificationItem.message}',
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.justify,
+                              maxLines: 2,
+                              softWrap: false,
+                            ),
                           ),
                          Spacer(),
                        notificationItem.status==1?Icon(Icons.circle,color: Colors.green,size: 13,)  :Icon(Icons.check,color: Colors.blue,size: 18,)

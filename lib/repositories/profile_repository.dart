@@ -494,8 +494,6 @@ class ProfileRepository {
       String accountId) async {
     try {
       Response response = await apiProviderPPCards.getMultipartInstance().post(Apis.homeScreenCommonApi, data: FormData.fromMap({'account_id': accountId}));
-      print("Vdfvdf==>${response.data}");
-
       print("Unreadcount-<${unreadCount}");
       return HomscreenCommonApisModel.fromJson(jsonDecode(response.data));
     } catch (e, s) {

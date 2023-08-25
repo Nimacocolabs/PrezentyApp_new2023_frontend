@@ -14,7 +14,7 @@ import 'package:event_app/widgets/common_appbar_widget.dart';
 import 'package:event_app/widgets/title_with_see_all.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:http/http.dart' as http;
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key }) : super(key: key);
 
@@ -31,8 +31,9 @@ class _NotificationScreenState extends State<NotificationScreen>
   @override
   void initState() {
     super.initState();
-
-    _itemsScrollController = ScrollController();
+print("fsdfvsdfsgsdgsd");
+    getCardList();
+  _itemsScrollController = ScrollController();
     _itemsScrollController.addListener(_scrollListener);
     _notificationListBloc = NotificationListBloc(this);
     _notificationListBloc.getList(false);
@@ -46,7 +47,28 @@ class _NotificationScreenState extends State<NotificationScreen>
       });
     }
   }
-
+  Future getCardList() async {
+    print("Get order");
+    final response = await http.get(Uri.parse('https://fd57-117-193-35-89.ngrok-free.app/api/tambolas/game'));
+    print("Response${response.body}");
+    //var res = json.decode(response.body);
+    //tambolaId_response= res;
+  //  print("Get tambola id-->${res}");
+   // tamboola_id= tambolaId_response["tombala_id"];
+  //  print("Tambola Id-->${tamboola_id}");
+    if (response.statusCode == 200) {
+      print("Get order");
+     // _buildGameDemo(tamboola_id);
+      // final response = await http.get(Uri.parse('https://fd57-117-193-35-89.ngrok-free.app/api/tambolas/6/get-card?user_id=1710'));
+      // print("Response${response.body}");
+      // var join_response = json.decode(response.body);
+      // print("JoinResponse--->${join_response}");
+    }
+    else{
+      throw Exception('Failed');
+    }
+    return response;
+  }
   void _scrollListener() {
     if (_itemsScrollController.offset >=
             _itemsScrollController.position.maxScrollExtent &&
@@ -72,6 +94,7 @@ class _NotificationScreenState extends State<NotificationScreen>
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         // CommonMethods().userFavouritesUpdated();
@@ -174,7 +197,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                             child: Text(
                               '${notificationItem.message}',
                               overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.justify,
+                              // textAlign: TextAlign.right,
                               maxLines: 2,
                               softWrap: false,
                             ),

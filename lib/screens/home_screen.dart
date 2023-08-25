@@ -12,6 +12,7 @@ import 'package:event_app/models/user_sign_up_response.dart';
 import 'package:event_app/network/api_response.dart';
 import 'package:event_app/screens/deals_for_you_details_screen.dart';
 import 'package:event_app/screens/drawer/happy_moments_screen.dart';
+import 'package:event_app/screens/drawer/tambola_game_screen.dart';
 import 'package:event_app/screens/event/create_new_event_screen.dart';
 import 'package:event_app/screens/event/my_events_and_invites_screen.dart';
 import 'package:event_app/screens/gifting_screen.dart';
@@ -167,6 +168,10 @@ class _HomeScreenState extends State<HomeScreen>
         // SizedBox(
         //   height:10
         // ),
+        tambolaJoinWidget(),
+        SizedBox(
+          height: 10,
+        ),
         newPrePaidCardWdiget(),
         SizedBox(
           height: 10,
@@ -374,6 +379,73 @@ class _HomeScreenState extends State<HomeScreen>
                       },
                       child: Text(
                         "Gift Now!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      )),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tambolaJoinWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0,left: 12,right: 12,bottom: 12),
+      child: InkWell(
+        onTap: () {
+          Get.to(() => TambolaGameScreen());
+        },
+        child: Card(
+          elevation: 2,
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Color.fromRGBO(230, 228, 253, 3),
+                Color.fromRGBO(241, 206, 228, 3)
+              ]),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            height: 70,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 5,
+                ),
+                Image.asset('assets/images/ic_nav_tambola.png'),
+                SizedBox(
+                  width: 15,
+                ),
+                Text(
+                  "Inviting all to \nEnjoy the game",
+                      // "\nyour loved ones.",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontFamily: "KaushanScript-Regular",
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  height: 45,
+                  width: 150,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white),
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      onPressed: () {
+                        Get.to(() => TambolaGameScreen());
+                      },
+                      child: Text(
+                        "Join Now!",
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 16, color: Colors.black),
                       )),

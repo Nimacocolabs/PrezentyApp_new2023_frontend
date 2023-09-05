@@ -94,7 +94,6 @@ print("fsdfvsdfsgsdgsd");
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () async {
         // CommonMethods().userFavouritesUpdated();

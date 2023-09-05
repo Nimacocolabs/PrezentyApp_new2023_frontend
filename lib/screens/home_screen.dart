@@ -400,59 +400,85 @@ class _HomeScreenState extends State<HomeScreen>
         },
         child: Card(
           elevation: 2,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Container(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child:Container(
+            height: 150,
+            width: 360,
+            // padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                Color.fromRGBO(230, 228, 253, 3),
-                Color.fromRGBO(241, 206, 228, 3)
-              ]),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
+              image: DecorationImage(
+                image: AssetImage('assets/images/tambola_game.png'),
+                fit: BoxFit.cover,
+              ),
             ),
-            height: 70,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 5,
-                ),
-                Image.asset('assets/images/ic_nav_tambola.png'),
-                SizedBox(
-                  width: 15,
-                ),
-                Text(
-                  "Inviting all to \nEnjoy the game",
-                      // "\nyour loved ones.",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontFamily: "KaushanScript-Regular",
-                  ),
-                ),
-                Spacer(),
-                Container(
-                  height: 45,
-                  width: 150,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white),
-                  child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12))),
-                      onPressed: () {
-                        Get.to(() => TambolaGameScreen());
-                      },
-                      child: Text(
-                        "Join Now!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.black),
-                      )),
-                ),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Align(
+                   alignment: Alignment.bottomLeft,
+                  child: InkWell(
+                    onTap: (){
+                      Get.to(() => TambolaGameScreen());
+                    },
+                    child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text("Join Now", style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black),),
+                        )),
+                  )),
             ),
           ),
+          // Container(
+          //   decoration: BoxDecoration(
+          //     gradient: LinearGradient(colors: [
+          //       Color.fromRGBO(230, 228, 253, 3),
+          //       Color.fromRGBO(241, 206, 228, 3)
+          //     ]),
+          //     borderRadius: BorderRadius.circular(12),
+          //   ),
+          //   height: 70,
+          //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
+          //   child: Row(
+          //     children: [
+          //       SizedBox(
+          //         width: 5,
+          //       ),
+          //       Image.asset('assets/images/ic_nav_tambola.png'),
+          //       SizedBox(
+          //         width: 15,
+          //       ),
+          //       Text(
+          //         "Inviting all to \nEnjoy the game",
+          //             // "\nyour loved ones.",
+          //         style: TextStyle(
+          //           color: Colors.black,
+          //           fontSize: 18,
+          //           fontFamily: "KaushanScript-Regular",
+          //         ),
+          //       ),
+          //       Spacer(),
+          //       Container(
+          //         height: 45,
+          //         width: 150,
+          //         decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(15),
+          //             color: Colors.white),
+          //         child: OutlinedButton(
+          //             style: OutlinedButton.styleFrom(
+          //                 shape: RoundedRectangleBorder(
+          //                     borderRadius: BorderRadius.circular(12))),
+          //             onPressed: () {
+          //               Get.to(() => TambolaGameScreen());
+          //             },
+          //             child: Text(
+          //               "Join Now!",
+          //               textAlign: TextAlign.center,
+          //               style: TextStyle(fontSize: 16, color: Colors.black),
+          //             )),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ),
       ),
     );

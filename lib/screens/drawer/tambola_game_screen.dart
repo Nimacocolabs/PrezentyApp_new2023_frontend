@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:event_app/screens/drawer/prizes_tambola_screen.dart';
@@ -9,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:http/http.dart' as http;
+import 'package:timer_builder/timer_builder.dart';
 
 class TambolaGameScreen extends StatefulWidget {
   const TambolaGameScreen({Key? key}) : super(key: key);
@@ -27,13 +29,16 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
   Map lottery_response = {};
   String success_msg = "";
   int tambola_id = 0;
-  int card_id=0;
+  int card_id = 0;
+  int num = 0;
   Map marked_api = {};
+  String tambola_baseUrl = "https://www.prezenty.in/prezentycards-live/public";
+  int marked_eachnumber = 0;
   bool isMarked = false;
   late List<dynamic> cardnumbers;
   // List MarkedNumbers_List = [];
   late List<dynamic> MarkedNumbers_List;
-  @override
+  List<dynamic> matchingNumbers = [];
   void initState() {
     super.initState();
     print("initState called");
@@ -48,18 +53,20 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
   Future getCardList() async {
     print("Get order");
     final response = await http.get(
-      Uri.parse('https://b07d-117-201-128-139.ngrok-free.app/api/tambolas/game'),
+      Uri.parse(
+          'https://www.prezenty.in/prezentycards-live/public/api/tambolas/game'),
       headers: <String, String>{
         'Accept': "appilication/json",
       },
     );
+
     var res = json.decode(response.body);
     tambolaId_response = res;
     success_msg = tambolaId_response["message"];
     tambola_id = tambolaId_response["tombala_id"];
     if (success_msg == "New tambola game Id") {
       final joinresponse = await http.get(Uri.parse(
-          'https://b07d-117-201-128-139.ngrok-free.app/api/tambolas/${tambola_id}/get-card?user_id=${User.userId}'));
+          'https://www.prezenty.in/prezentycards-live/public/api/tambolas/${tambola_id}/get-card?user_id=${User.userId}'));
       print("Response${joinresponse.body}");
       var join_response = json.decode(joinresponse.body);
       GameCard = join_response;
@@ -67,9 +74,11 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
       cardnumbers = GameCard["card"];
       card_id = GameCard["card_id"];
       MarkedNumbers_List = GameCard["marked_numbers"];
-      print("JoinResponse--->${cardnumbers}");
+      print("JoinResponse--->${MarkedNumbers_List}");
       if (GameCard['message'] == "Your tammbola card") {
-        _buildGameBoard(cardnumbers, MarkedNumbers_List);
+        _buildGameBoard(
+          cardnumbers,
+        );
       }
     } else {
       throw Exception('Failed');
@@ -81,7 +90,7 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
     print("Get order");
     final response = await http.get(
       Uri.parse(
-          'https://b07d-117-201-128-139.ngrok-free.app/api/tambolas/get-lottery-numbers'),
+          'https://www.prezenty.in/prezentycards-live/public/api/tambolas/get-lottery-numbers'),
       headers: <String, String>{
         'Accept': "appilication/json",
       },
@@ -96,6 +105,34 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
     }
     return response;
   }
+
+  // Future claim_row() async {
+  //   Map<String, dynamic> myParameters = {
+  //     'type': 'row',
+  //     'win_numbers': '[18,14,13,15,18,16]',
+  //     'user_id': '${User.userId}',
+  //     'tambola_id': '${tambola_id}',
+  //     'tambola_card_id': '${card_id}'
+  //   };
+  //   String jsonString = json.encode(myParameters);
+  //
+  //   final response = await http.post(
+  //     Uri.parse(
+  //         'https://c7f7-61-3-117-253.ngrok-free.app/api/tambolas/prizes/claim-row-prize'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     },
+  //     body: jsonString,
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     print('Response data: ${response.body}');
+  //     print("Success");
+  //     Fluttertoast.showToast(msg: "You win");
+  //   } else {
+  //     print('Request failed with status code: ${response.statusCode}');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +215,9 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
                           flex: 1,
                         );
                       } else {
-                        return _buildGameBoard(cardnumbers, MarkedNumbers_List);
+                        return _buildGameBoard(
+                          cardnumbers,
+                        );
                       }
                     }
                   }),
@@ -189,101 +228,105 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
     );
   }
 
-  Widget _buildGameBoard(List cardNumbers, List MarkedNumbers) {
-    return Card(
-      elevation: 2,
-      shadowColor: Colors.black,
-      color: Colors.grey[100],
-      shape: RoundedRectangleBorder(
-        side: BorderSide(
-          color: Colors.black38,
-        ),
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: [
-            for (var row in cardNumbers)
-              GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: row.length,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                ),
-                itemCount: row.length,
-                shrinkWrap: true,
-                itemBuilder: (BuildContext context, int index) {
-                  int number = row[index];
-                  print("number${number}");
-                  bool isMarked = markedNumbers.contains(number);
-                  int marked = MarkedNumbers[index];
-                  print("marked${marked}");
-                   bool isAlreadyMarked = markedNumbers.contains(marked);
-                    isAlreadyMarked = true;
-                    markedNumbers.add(marked);
-                  List<int> combinedArray = [];
-                  for (List<int> nestedArray in cardNumbers) {
-                    combinedArray.addAll(nestedArray);
-                    print("CardNumbers--->${combinedArray}");
-                  }
-                  bool allNumbersPresent = markedNumbers.every((number) {
-                    return cardNumbers.any((cardList) => cardList.contains(number));
-                  });
-                  if (allNumbersPresent) {
-                    print("All marked numbers are present in cardNumbers.");
-                  } else {
-                    print("Not all marked numbers are present in cardNumbers.");
-                  }
-                  return GestureDetector(
-                    onTap: () async {
-                      final String apiUrl =
-                          'https://b07d-117-201-128-139.ngrok-free.app/api/tambolas/mark-numbers?tambola_id=${tambola_id}&user_id=${User.userId}&marked_number=${number}&card_id=${card_id}';
-                      print("Url-->${apiUrl}");
-                      var response = await http.post(
-                        Uri.parse(apiUrl),
-                      );
-                      if (response.statusCode == 200) {
-                        Fluttertoast.showToast(msg: "Number Marked");
-                        var res = json.decode(response.body);
-                        marked_api = res;
-                        setState(() {
-                          isMarked = true;
-                          markedNumbers.add(number);
-                        });
-                        // isMarked = markedNumbers.contains(number);
-                        // if (!isMarked) {
-                        //   markNumber(number);
-                        // }
-                        print('Marked successfully');
-                      } else {
-                        Fluttertoast.showToast(msg: "It is not match");
-                        print('Failed marked');
-                      }
+  bool isRowCompleted(List<dynamic> row, Set<dynamic> markedNumbers) {
+    // Check if all numbers in the row are marked with a primary color
+    return row.every((number) => markedNumbers.contains(number));
+  }
+  Widget _buildGameBoard(List <dynamic>cardNumbers) {
+   List<dynamic> primaryColorRows = [];
+    return Column(
+      children: [
+        Card(
+          elevation: 2,
+          shadowColor: Colors.black,
+          color: Colors.grey[100],
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Colors.black38,
+            ),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                for (var row in cardNumbers)
 
-                    },
-                    child:
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black),
-                        color:(isMarked || marked== number)? primaryColor :Colors.white
-                          // int.parse(MarkedNumbers[index])== number
-                        // isMarked  ? primaryColor : Colors.white ||
-                        //color     MarkedNumbers.length==0 ? Colors.white : primaryColor,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        number.toString(),
-                        style: TextStyle(fontSize: 18),
-                      ),
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: row.length,
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0,
                     ),
-                  );
-                },
-              ),
-          ],
+                    itemCount: row.length,
+                    shrinkWrap: true,
+                    itemBuilder: (BuildContext context, int index) {
+                      int number = row[index];
+                      bool isMarked = markedNumbers.contains(number);
+                      List<dynamic> combinedArray = [];
+                      for (List<dynamic> nestedArray in cardNumbers) {
+                        combinedArray.addAll(nestedArray);
+                      }
+                      bool isPrimaryColor = matchingNumbers.contains(number);
+
+                      // If the number is a matching number, add it to an array
+                      if (isPrimaryColor) {
+                        primaryColorRows.add(number);
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          final String apiUrl =
+                              'https://www.prezenty.in/prezentycards-live/public/api/tambolas/mark-numbers?tambola_id=${tambola_id}&user_id=${User.userId}&marked_number=${number}&card_id=${card_id}';
+                          print("Url-->${apiUrl}");
+                          var response = await http.post(
+                            Uri.parse(apiUrl),
+                          );
+                          if (response.statusCode == 200) {
+                            Fluttertoast.showToast(msg: "Number Marked");
+                            var res = json.decode(response.body);
+                            marked_api = res;
+                            setState(() {
+                              isMarked = true;
+                              markedNumbers.add(number);
+                            });
+                            isMarked = markedNumbers.contains(number);
+                            if (!isMarked) {
+                              markNumber(number);
+                            }
+                            print('Marked successfully');
+                          } else {
+                            Fluttertoast.showToast(msg: "It is not match");
+                            print('Failed marked');
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            color: matchingNumbers.contains(number)
+                                ? primaryColor
+                                : (isMarked ? primaryColor : Colors.white),
+                            // Change the color to red if the number is in matchingNumbers
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            number.toString(),
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+              ],
+            ),
+          ),
         ),
-      ),
+        TextButton(onPressed: (){
+          showAlertDialog(context,cardNumbers);
+        }, child: Text("Claim Row"))
+      ],
     );
+
   }
 
 
@@ -324,6 +367,123 @@ class _TambolaGameScreenState extends State<TambolaGameScreen> {
           },
         ),
       ),
+    );
+  }
+  showAlertDialog(BuildContext context, List cardNumbers,) {
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () { },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Claim Your Prize"),
+      content: SizedBox(
+        height: 150,
+        child: Column(
+          children: [
+            TextButton(onPressed: () async{
+                Map<String, dynamic> myParameters = {
+                  'type': 'row',
+                  'win_numbers': '${cardnumbers[0]}',
+                  'user_id': '${User.userId}',
+                  'tambola_id': '${tambola_id}',
+                  'tambola_card_id': '${card_id}'
+                };
+                String jsonString = json.encode(myParameters);
+                 print("json=>${jsonString}");
+                final response = await http.post(
+                  Uri.parse(
+                      '${tambola_baseUrl}/api/tambolas/prizes/claim-row-prize'),
+                  headers: <String, String>{
+                    'Content-Type': 'application/json',
+                  },
+                  body: jsonString,
+                );
+
+
+                if (response.statusCode == 200) {
+                  print('Response data: ${response.body}');
+                  print("Success");
+                  Fluttertoast.showToast(msg: "You win");
+                } else {
+                  print('Request failed with status code: ${response.statusCode}');
+                }
+            },child: Text("First Row Claim")),
+            TextButton(onPressed: () async{
+        Map<String, dynamic> myParameters = {
+          'type': 'row',
+          'win_numbers': '${cardnumbers[1]}',
+          'user_id': '${User.userId}',
+          'tambola_id': '${tambola_id}',
+          'tambola_card_id': '${card_id}'
+        };
+        String jsonString = json.encode(myParameters);
+        print("json=>${jsonString}");
+        final response = await http.post(
+          Uri.parse(
+              '${tambola_baseUrl}/api/tambolas/prizes/claim-row-prize'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: jsonString,
+        );
+
+
+        if (response.statusCode == 200) {
+          print('Response data: ${response.body}');
+          print("Success");
+          Fluttertoast.showToast(msg: "You win");
+        } else {
+          print('Request failed with status code: ${response.statusCode}');
+        }
+    },child: Text("Second Row Claim")),
+            TextButton(onPressed: () async{
+    Map<String, dynamic> myParameters = {
+    'type': 'row',
+    'win_numbers': '${cardnumbers[2]}',
+    'user_id': '${User.userId}',
+    'tambola_id': '${tambola_id}',
+    'tambola_card_id': '${card_id}'
+    };
+    String jsonString = json.encode(myParameters);
+    print("json=>${jsonString}");
+    final response = await http.post(
+    Uri.parse(
+    '${tambola_baseUrl}/api/tambolas/prizes/claim-row-prize'),
+    headers: <String, String>{
+    'Content-Type': 'application/json',
+    },
+    body: jsonString,
+    );
+
+
+    if (response.statusCode == 200) {
+    print('Response data: ${response.body}');
+    print("Success");
+    Fluttertoast.showToast(msg: "You win");
+    } else {
+    print('Request failed with status code: ${response.statusCode}');
+    }
+    },child: Text("Third Row Claim")),
+
+
+          ],
+        ),
+      ),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

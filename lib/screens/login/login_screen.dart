@@ -57,58 +57,65 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-
-                  flexibleSpace: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [primaryColor,secondaryColor],
-                      ),
-                    ),
-                  ),
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  leading:BackButton(color: Colors.white),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [primaryColor, secondaryColor],
+              ),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: BackButton(color: Colors.white),
         ),
-
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.max,
             children: [
-             Stack(
-              clipBehavior: Clip.none,
-              children: [
- Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(50),
+                        bottomRight: Radius.circular(50),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.topLeft,
+                        colors: [primaryColor, secondaryColor],
+                      ),
+                    ),
+                    padding: EdgeInsets.only(top: 0, left: 15, right: 15),
+                    width: screenWidth,
+                    height: screenHeight * 0.2,
                   ),
-                  gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.topLeft,
-                    colors: [primaryColor, secondaryColor],
+                  Positioned(
+                    left: 80,
+                    top: 20,
+                    child: Text("PREZENTY APP",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30)),
                   ),
-                ),
-                padding: EdgeInsets.only(top: 0, left: 15, right: 15),
-                width: screenWidth,
-                height: screenHeight * 0.2,),
-                Positioned(
-                  left: 80,
-                  top: 20,
-                  child: Text("PREZENTY APP",style:TextStyle(color: Colors.white,fontWeight: FontWeight.bold,
-                  fontSize: 30)),),
-
-                Positioned(
-                  left: 150,
-                  bottom: -15,
-                  child: Container(
-                  
-                child: Image(image: AssetImage("assets/images/ic_logo.png"),width: 60,height: 60,),))
-             ],),
-             Expanded(
+                  Positioned(
+                      left: 150,
+                      bottom: -15,
+                      child: Container(
+                        child: Image(
+                          image: AssetImage("assets/images/ic_logo.png"),
+                          width: 60,
+                          height: 60,
+                        ),
+                      ))
+                ],
+              ),
+              Expanded(
                 child: ListView(
                   shrinkWrap: true,
                   physics: BouncingScrollPhysics(),
@@ -223,8 +230,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Center(
                         child: InkWell(
                           onTap: () async {
-                            if (await canLaunchUrl(Uri.parse(termsAndConditionsCardUrl))) {
-                              await launchUrl(Uri.parse(termsAndConditionsCardUrl),mode: LaunchMode.externalApplication);
+                            if (await canLaunchUrl(
+                                Uri.parse(termsAndConditionsCardUrl))) {
+                              await launchUrl(
+                                  Uri.parse(termsAndConditionsCardUrl),
+                                  mode: LaunchMode.externalApplication);
                             } else {
                               toastMessage(
                                   'Unable to open url $termsAndConditionsUrl');
@@ -331,7 +341,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     //                   style: TextStyle(color: Colors.white))
                     //             ])),
                     //   ),
-
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       child: InkWell(
@@ -417,7 +426,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (widget.isFromWoohoo) {
           Get.close(1);
         } else {
-          goToHomeScreen(showCheckMpin:false);
+          goToHomeScreen(showCheckMpin: false);
           // Get.offAll(() => MainScreen());
         }
       } else {

@@ -7,8 +7,9 @@ import 'package:event_app/screens/login/reset_password_update_password.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:otp_text_field/otp_text_field.dart';
+import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
+
 
 class ResetPasswordOtpScreen extends StatefulWidget {
   final bool isFromProfile;

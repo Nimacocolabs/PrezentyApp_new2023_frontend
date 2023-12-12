@@ -41,12 +41,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   WalletBloc _walletBloc = WalletBloc();
 
   final TextEditingController firstNameControl = TextEditingController();
+  final TextEditingController middleNameControl = TextEditingController();
   final TextEditingController lastNameControl = TextEditingController();
   final TextEditingController phoneNumberControl = TextEditingController();
   final TextEditingController emailIdControl = TextEditingController();
   final TextEditingController panNumberControl = TextEditingController();
 
   //final TextEditingController aadhaarControl = TextEditingController();
+
   final TextEditingController dobControl = TextEditingController();
   final TextEditingController addressControl = TextEditingController();
   final TextEditingController permanentAddressControl = TextEditingController();
@@ -55,16 +57,25 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       TextEditingController();
   final TextEditingController cityControl = TextEditingController();
   final TextEditingController referredByControl = TextEditingController();
-
+  int isNricustomer=0;
+  int IsMinor=0;
   String? addressType;
   States? selectedState;
   String? birthDateInString;
   DateTime? birthDate;
   bool? isDateSelected;
+  String title = "title";
+  int _titleValue = 0;
   String gender = "select";
   int _genderValue = 0;
+  String marital_status = "select";
+  int _maritalStatusValue = 0;
   RxBool isChecked = false.obs;
   TermsAndConditionsData? terms_Conditions;
+  int _employmentIndustryValue=0;
+  String employmentIndustry="Select";
+  int _employmentTypeValue=0;
+  String employmentType="Select";
 
   final _formKey = GlobalKey<FormState>();
   FormatAndValidate formatAndValidate = FormatAndValidate();
@@ -146,6 +157,60 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 SizedBox(
                   height: 30,
                 ),
+                Container(
+                  height: 48,
+                  width: screenWidth - 20,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: primaryColor,
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      alignment: AlignmentDirectional.centerEnd,
+                      underline: Container(),
+                      elevation: 0,
+                      // isDense: true,
+                      iconSize: 30,
+                      //  icon: Icon(Icons.arrow_downward_rounded),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16),
+                      value: _titleValue,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text("Title"),
+                          value: 0,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Mr"),
+                          value: 1,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Ms"),
+                          value: 2,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Mrs"),
+                          value: 3,
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _titleValue = value as int;
+                          value == 1
+                              ? title = "Mr"
+                              : value == 2
+                              ? title = "Ms"
+                              : title = "Mrs";
+                        });
+                        print(_titleValue.toString);
+                      },
+                    ),
+                  ),
+                ),
                 kycDataWidget(
                   // focus,
                   field: "First Name",
@@ -154,7 +219,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   validate: formatAndValidate.validateName,
                   format: formatAndValidate.formatName(),
                 ),
-
+                kycDataWidget(
+                  //focus,
+                  field: "Middle Name",
+                  labelText: "middle Name",
+                  control: middleNameControl,
+                  validate: formatAndValidate.validateName,
+                  format: formatAndValidate.formatName(),
+                ),
                 kycDataWidget(
                   //focus,
                   field: "Last Name",
@@ -276,10 +348,333 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   ),
                 ),
                 SizedBox(
+                  height: 30,
+                ),
+                Text(
+                  "Marital",
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                SizedBox(
                   height: 10,
+                ),
+                Container(
+                  height: 48,
+                  width: screenWidth - 20,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: primaryColor,
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      alignment: AlignmentDirectional.centerEnd,
+                      underline: Container(),
+                      elevation: 0,
+                      // isDense: true,
+                      iconSize: 30,
+                      //  icon: Icon(Icons.arrow_downward_rounded),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16),
+                      value: _maritalStatusValue,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text("select"),
+                          value: 0,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Single"),
+                          value: 1,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Married"),
+                          value: 2,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("Others"),
+                          value: 3,
+                        )
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _maritalStatusValue = value as int;
+                          value == 1
+                              ? marital_status = "Single"
+                              : value == 2
+                              ? marital_status = "Married"
+                              : marital_status = "Others";
+                        });
+                        print(_maritalStatusValue.toString);
+                      },
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: 30,
+                ),
+                Row(
+                  children: [
+                    Text("NRI Customer"),
+                    Spacer(),
+                    SizedBox(
+                      height: 50,
+                      width: 60,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Switch(
+                          value: isNricustomer == 1,
+                          activeColor: primaryColor,
+                          activeTrackColor: Colors.grey[350],
+                          inactiveThumbColor: Colors.grey,
+                          inactiveTrackColor: Colors.grey[350],
+                          onChanged: (check) {
+                            setState(() {
+                              isNricustomer = check ? 1 : 0;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  "Employment Industry",
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 48,
+                  width: screenWidth - 20,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: primaryColor,
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      alignment: AlignmentDirectional.centerEnd,
+                      underline: Container(),
+                      elevation: 0,
+                      // isDense: true,
+                      iconSize: 30,
+                      //  icon: Icon(Icons.arrow_downward_rounded),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16),
+                      value: _employmentIndustryValue,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text("select"),
+                          value: 0,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("AGRICULTURE FOOD NATURAL RESOURCES"),
+                          value: 1,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("ARCHITECTURE AND CONSTRUCTION"),
+                          value: 2,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"),
+                          value: 3,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("BUSINESS MANAGEMENT AND ADMINISTRATION"),
+                          value: 4,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("EDUCATION AND TRAINING"),
+                          value: 5,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("FINANCE"),
+                          value: 6,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("GOVERNMENT AND PUBLIC ADMINISTRATION"),
+                          value: 7,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("HEALTH SCIENCE"),
+                          value: 8,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("HOSPITALITY AND TOURISM"),
+                          value: 9,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("HUMAN SERVICES"),
+                          value: 10,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("INFORMATION TECHNOLOGY"),
+                          value: 11,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"),
+                          value: 12,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("MANUFACTURING"),
+                          value: 13,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("MARKETING SALES AND SERVICE"),
+                          value: 14,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"),
+                          value: 15,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("TRANSPORTATION DISTRIBUTION AND LOGISTICS"),
+                          value: 16,
+                        )
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _employmentIndustryValue = value as int;
+                          value == 1
+                              ? employmentIndustry = "AGRICULTURE FOOD NATURAL RESOURCES"
+                              : value == 2
+                              ? employmentIndustry = "ARCHITECTURE AND CONSTRUCTION"
+                              : value == 3 ? employmentIndustry = "ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"
+                              : value == 4 ? employmentIndustry = "BUSINESS MANAGEMENT AND ADMINISTRATION"
+                              : value == 5 ? employmentIndustry ="EDUCATION AND TRAINING"
+                              : value == 6 ? employmentIndustry = "FINANCE"
+                              : value == 7 ? employmentIndustry="GOVERNMENT AND PUBLIC ADMINISTRATION"
+                              : value == 8 ? employmentIndustry= "HEALTH SCIENCE"
+                              : value == 9 ? employmentIndustry = "HOSPITALITY AND TOURISM"
+                              : value == 10 ? employmentIndustry ="HUMAN SERVICES"
+                              : value == 11 ? employmentIndustry = "INFORMATION TECHNOLOGY"
+                              : value == 12 ? employmentIndustry = "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"
+                              : value == 13 ? employmentIndustry = "MANUFACTURING"
+                              : value == 14 ? employmentIndustry = "MARKETING SALES AND SERVICE"
+                              : value == 15 ? employmentIndustry = "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"
+                              : employmentIndustry == "TRANSPORTATION DISTRIBUTION AND LOGISTICS";
+                        });
+                        print(_employmentIndustryValue.toString);
+                      },
+                    ),
+                  ),
+                ),
+                Text(
+                  "Employment Type",
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 48,
+                  width: screenWidth - 20,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: primaryColor,
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      alignment: AlignmentDirectional.centerEnd,
+                      underline: Container(),
+                      elevation: 0,
+                      // isDense: true,
+                      iconSize: 30,
+                      //  icon: Icon(Icons.arrow_downward_rounded),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16),
+                      value: _employmentTypeValue,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text("select"),
+                          value: 0,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("EMPLOYED"),
+                          value: 1,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("UNEMPLOYED"),
+                          value: 2,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("ENTREPRENEUR"),
+                          value: 3,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("PUBLIC SECTOR EMPLOYEE"),
+                          value: 4,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("FREELANCER"),
+                          value: 5,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("HOUSEWORK"),
+                          value: 6,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("APPRENTICE"),
+                          value: 7,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("RETIRED"),
+                          value: 8,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("STUDENT"),
+                          value: 9,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("SELF EMPLOYED"),
+                          value: 10,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("MILITARY OR COMMUNITY SERVICE"),
+                          value: 11,
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _employmentTypeValue = value as int;
+                          value == 1
+                              ? employmentType = "EMPLOYED"
+                              : value == 2
+                              ? employmentType = "UNEMPLOYED"
+                              : value == 3 ? employmentType = "ENTREPRENEUR"
+                              : value == 4 ? employmentType = "PUBLIC SECTOR EMPLOYEE"
+                              : value == 5 ? employmentType ="FREELANCER"
+                              : value == 6 ? employmentType = "HOUSEWORK"
+                              : value == 7 ? employmentType="APPRENTICE"
+                              : value == 8 ? employmentType= "RETIRED"
+                              : value == 9 ? employmentType = "STUDENT"
+                              : value == 10 ? employmentType ="SELF EMPLOYED"
+                              : employmentType = "MILITARY OR COMMUNITY SERVICE";
+
+                        });
+                        print(_employmentIndustryValue.toString);
+                      },
+                    ),
+                  ),
                 ),
                 kycDataWidget(
                     //focus,

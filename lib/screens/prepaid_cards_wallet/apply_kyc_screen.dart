@@ -3,6 +3,7 @@ import 'package:event_app/models/wallet&prepaid_cards/register_wallet_response.d
 import 'package:event_app/models/wallet&prepaid_cards/state_data_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/terms_and_conditions_model.dart';
 import 'package:event_app/network/api_response.dart';
+import 'package:event_app/screens/login/select_country_dialog_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_verify_otp_screen.dart';
 import 'package:event_app/screens/splash_screen.dart';
@@ -57,8 +58,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       TextEditingController();
   final TextEditingController cityControl = TextEditingController();
   final TextEditingController referredByControl = TextEditingController();
-  int isNricustomer=0;
-  int IsMinor=0;
+  bool isNricustomer=false;
+  bool isMinor=false;
+  bool isDependant=false;
   String? addressType;
   States? selectedState;
   String? birthDateInString;
@@ -76,6 +78,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   String employmentIndustry="Select";
   int _employmentTypeValue=0;
   String employmentType="Select";
+
+  Country _country = Country(
+    isoCode: "IN",
+    phoneCode: "91",
+    name: "India",
+    iso3Code: "IND",
+  );
+
 
   final _formKey = GlobalKey<FormState>();
   FormatAndValidate formatAndValidate = FormatAndValidate();
@@ -112,7 +122,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     panNumberControl.text = widget.panNumber;
 
     emailIdControl.text = User.userEmail;
-    phoneNumberControl.text = User.userMobile;
+    phoneNumberControl.text = _country.phoneCode+User.userMobile;
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getStateList();
@@ -123,7 +133,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   @override
   void dispose() {
     _walletBloc.dispose();
-//focus.dispose();
+    //focus.dispose();
     super.dispose();
   }
 
@@ -427,14 +437,39 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       child: FittedBox(
                         fit: BoxFit.fill,
                         child: Switch(
-                          value: isNricustomer == 1,
+                          value: isNricustomer,
                           activeColor: primaryColor,
                           activeTrackColor: Colors.grey[350],
                           inactiveThumbColor: Colors.grey,
                           inactiveTrackColor: Colors.grey[350],
                           onChanged: (check) {
                             setState(() {
-                              isNricustomer = check ? 1 : 0;
+                              isNricustomer =check ;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text("Minor"),
+                    Spacer(),
+                    SizedBox(
+                      height: 50,
+                      width: 60,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Switch(
+                          value: isMinor,
+                          activeColor: primaryColor,
+                          activeTrackColor: Colors.grey[350],
+                          inactiveThumbColor: Colors.grey,
+                          inactiveTrackColor: Colors.grey[350],
+                          onChanged: (check) {
+                            setState(() {
+                              isMinor =check ;
                             });
                           },
                         ),
@@ -675,6 +710,31 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       },
                     ),
                   ),
+                ),
+                Row(
+                  children: [
+                    Text("Dependant"),
+                    Spacer(),
+                    SizedBox(
+                      height: 50,
+                      width: 60,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Switch(
+                          value: isDependant,
+                          activeColor: primaryColor,
+                          activeTrackColor: Colors.grey[350],
+                          inactiveThumbColor: Colors.grey,
+                          inactiveTrackColor: Colors.grey[350],
+                          onChanged: (check) {
+                            setState(() {
+                              isDependant =check ;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 kycDataWidget(
                     //focus,

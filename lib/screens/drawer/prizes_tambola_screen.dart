@@ -20,7 +20,7 @@ class _PrizesTambolaScreenState extends State<PrizesTambolaScreen> {
 
 
   Future getPrizesList() async {
-    final response = await http.get(Uri.parse('https://b07d-117-201-128-139.ngrok-free.app/api/tambolas/prizes/${widget.tambola_id}/list'));
+    final response = await http.get(Uri.parse('https://www.prezenty.in/prezentycards-live/public/api/tambolas/prizes/${widget.tambola_id}/list'));
     print("Response${response.body}");
     var res = json.decode(response.body);
     reponse_prizes= res;

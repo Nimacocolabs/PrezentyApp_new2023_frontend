@@ -21,9 +21,7 @@ import 'package:event_app/util/user.dart';
 import 'package:event_app/widgets/app_dialogs.dart';
 
 import 'package:get/get.dart';
-
 import 'package:package_info_plus/package_info_plus.dart';
-
 import '../models/app_version_check_response.dart';
 import '../models/send_mobile_email_otp_response.dart';
 import '../models/send_sms_email_account_verification_signup_model.dart';

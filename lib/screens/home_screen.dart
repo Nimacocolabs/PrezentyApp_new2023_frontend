@@ -77,11 +77,9 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
       getData();
-
       await _profileBloc.getProfileInfo();
       Notifications.setUserId(User.userEmail);
       ChatData.chatUserEmail = User.userEmail;
-
       CommonMethods().setFavouritesUpdatedListener(this);
     });
   }
@@ -176,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen>
         SizedBox(
           height: 10,
         ),
-
         moreOptionsWidget(),
         SizedBox(
           height: 10,
@@ -186,7 +183,6 @@ class _HomeScreenState extends State<HomeScreen>
           height: 13,
         ),
         hotDealsAndPromotionsWidget(),
-
         SizedBox(
           height: 10,
         ),
@@ -211,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen>
         // SizedBox(
         //   height: 13,
         // ),
-
         // backToCampusWidget(),
 
         // backToCampusWidget(),
@@ -402,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen>
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child:Container(
-            height: 150,
+            height: 200,
             width: 360,
             // padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(

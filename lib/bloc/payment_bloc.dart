@@ -22,7 +22,7 @@ class PaymentBloc {
   }
 
   Future<String> getPaymentUpiLink(PaymentData paymentData) async {
-    try {
+    try {    
       Map<String, dynamic> body = {
         "reference_id":
             "${paymentData.eventId}-${paymentData.paymentType!.name}-${DateTime.now().millisecondsSinceEpoch}",
@@ -37,7 +37,7 @@ class PaymentBloc {
       if (paymentData.paymentType == PaymentType.GIFT) {
         // body = {
         //   "reference_id": "${paymentData.eventId}-${paymentData.paymentType!.name}-${DateTime.now().millisecondsSinceEpoch}",
-        //   "payee_account": "${paymentData.account}",
+        //   "payee_account": "${paymentData.account}
         //   "amount": "${paymentData.amount}",
         //   "purpose_message": "${paymentData.purpose}",
         //   "event_id": "${paymentData.eventId}",

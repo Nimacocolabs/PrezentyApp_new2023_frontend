@@ -93,6 +93,7 @@ flutter:
     - assets/images/event_tile_bg/
     - assets/images/template/
     - assets/images/template/preview/
+    - assets/images/you_win.gif
 
   fonts:
     - family: Akronim

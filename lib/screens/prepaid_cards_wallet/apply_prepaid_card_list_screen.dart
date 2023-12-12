@@ -408,7 +408,8 @@ class _ApplyPrepaidCardListScreenState
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {
                         selectedCard = cardDetailsData;
-                        _applyCardCheckWalletCreationAndPayment();
+                        // _applyCardCheckWalletCreationAndPayment();
+                        Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
                       }
                     },
                     child: Container(
@@ -641,7 +642,7 @@ class _ApplyPrepaidCardListScreenState
     );
   }
 
-  _applyCardApplyCouponCode({String? enteredCouponCode,String? enteredReferralCode}) {
+   _applyCardApplyCouponCode({String? enteredCouponCode,String? enteredReferralCode}) {
     final TextFieldControl _textFieldControlEmail = TextFieldControl();
     final Rx<TextFieldControl> _textFieldControlFirstName =
         TextFieldControl().obs;
@@ -1666,6 +1667,7 @@ _upgradeCardGetTaxInfo();
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () {
+
                               _upgradeInitPayment(
                                   couponCode, taxData.amount.toString());
                             },

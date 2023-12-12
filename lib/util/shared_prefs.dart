@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:event_app/models/user_details.dart';
 import 'package:event_app/models/user_sign_up_response.dart';
-import 'package:event_app/screens/splash_screen.dart';
 import 'package:event_app/screens/without_login_home_screen.dart';
 import 'package:event_app/util/user.dart';
 import 'package:freshchat_sdk/freshchat_sdk.dart';

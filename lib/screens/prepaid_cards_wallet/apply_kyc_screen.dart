@@ -12,6 +12,7 @@ import 'package:event_app/util/user.dart';
 import 'package:event_app/widgets/CommonApiErrorWidget.dart';
 import 'package:event_app/widgets/CommonApiLoader.dart';
 import 'package:event_app/widgets/app_dialogs.dart';
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -40,26 +41,49 @@ class ApplyKycScreen extends StatefulWidget {
 
 class _ApplyKycScreenState extends State<ApplyKycScreen> {
   WalletBloc _walletBloc = WalletBloc();
-
+  Set<String> selectedCategories = {};
   final TextEditingController firstNameControl = TextEditingController();
   final TextEditingController middleNameControl = TextEditingController();
   final TextEditingController lastNameControl = TextEditingController();
   final TextEditingController phoneNumberControl = TextEditingController();
   final TextEditingController emailIdControl = TextEditingController();
   final TextEditingController panNumberControl = TextEditingController();
-  final TextEditingController addressCategoryControl = TextEditingController();
-
-
-  //final TextEditingController aadhaarControl = TextEditingController();
-
+  final TextEditingController countryControl = TextEditingController();
   final TextEditingController dobControl = TextEditingController();
   final TextEditingController address1Control = TextEditingController();
   final TextEditingController address2Control = TextEditingController();
-  final TextEditingController permanentAddressControl = TextEditingController();
-  final TextEditingController pinNumberControl = TextEditingController();
-  final TextEditingController permanentPinNumberControl =
-      TextEditingController();
-  final TextEditingController cityControl = TextEditingController();
+  final TextEditingController address3Control = TextEditingController();
+
+  final TextEditingController permanentAddress1Control = TextEditingController();
+  final TextEditingController permanentAddress2Control = TextEditingController();
+  final TextEditingController permanentAddress3Control = TextEditingController();
+  final TextEditingController permanentpinNumberControl = TextEditingController();
+  final TextEditingController permanentcityControl = TextEditingController();
+
+  final TextEditingController homeAddress1Control = TextEditingController();
+  final TextEditingController homeAddress2Control = TextEditingController();
+  final TextEditingController homeAddress3Control = TextEditingController();
+  final TextEditingController homepinNumberControl = TextEditingController();
+  final TextEditingController homecityControl = TextEditingController();
+
+  final TextEditingController officeAddress1Control = TextEditingController();
+  final TextEditingController officeAddress2Control = TextEditingController();
+  final TextEditingController officeAddress3Control = TextEditingController();
+  final TextEditingController officepinNumberControl = TextEditingController();
+  final TextEditingController officecityControl = TextEditingController();
+
+  final TextEditingController deliveryAddress1Control = TextEditingController();
+  final TextEditingController deliveryAddress2Control = TextEditingController();
+  final TextEditingController deliveryAddress3Control = TextEditingController();
+  final TextEditingController deliverypinNumberControl = TextEditingController();
+  final TextEditingController deliverycityControl = TextEditingController();
+
+  final TextEditingController communicationAddress1Control = TextEditingController();
+  final TextEditingController communicationAddress2Control = TextEditingController();
+  final TextEditingController communicationAddress3Control = TextEditingController();
+  final TextEditingController communicationpinNumberControl = TextEditingController();
+  final TextEditingController communicationcityControl = TextEditingController();
+
   final TextEditingController referredByControl = TextEditingController();
   bool isNricustomer=false;
   bool isMinor=false;
@@ -128,6 +152,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
 
     emailIdControl.text = User.userEmail;
     phoneNumberControl.text ="${_country.phoneCode}-${User.userMobile}";
+    countryControl.text=_country.name;
 
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -287,15 +312,6 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   format: formatAndValidate.formatDateOfBirth(),
                   suffixWid: _calenderDatePick(),
                 ),
-                // kycDataWidget(
-                //   //focus,
-                //   field: "Aadhaar number",
-                //   control: aadhaarControl,
-                //   keyboardInputType: TextInputType.number,
-                //   labelText: "Aadhaar Card Number",
-                //   validate: formatAndValidate.validateAadhaar,
-                //   format: formatAndValidate.formatAadhaar(),
-                // ),
                 kycDataWidget(
                   // focus,
                   field: "PAN number",
@@ -755,138 +771,467 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   ),
                 ),
                 SizedBox(height: 10,),
-                kycDataWidget(
-                  //focus,
-                    field: "Permanent Address",
-                    labelText: "Enter",
-                    control: address1Control,
-                    validate: formatAndValidate.validateAddress,
-                    format: formatAndValidate.formatAddress()),
-                Text("Select addrees type",style: TextStyle(
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: primaryColor), // Outer border styling
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ExpansionTileCard(
+                    shadowColor:primaryColor,
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(10),
+                    baseColor: Colors.grey[300],
+                    // leading: CircleAvatar(backgroundColor: ColorConstant.green6320,
+                    //     child: Text(numbering[index],style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white),)),
+                    title: Text("Permanent Address",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10), // Adjust the padding for the children
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Divider(
+                              thickness: 1.5,
+                              height: 1.0,
+                            ),
+                            kycDataWidget(
+                              //focus,
+                                field: "Address 1",
+                                labelText: "Enter",
+                                control: permanentAddress1Control,
+                                validate: formatAndValidate.validateAddress,
+                                format: formatAndValidate.formatAddress()),
+                            kycDataWidget(
+                              //focus,
+                                field: "Address 2",
+                                labelText: "Enter",
+                                control: permanentAddress2Control,
+                                validate: formatAndValidate.validateAddress,
+                                format: formatAndValidate.formatAddress()),
+                            kycDataWidget(
+                              //focus,
+                                field: "Address 3",
+                                labelText: "Enter",
+                                control: permanentAddress3Control,
+                                validate: formatAndValidate.validateAddress,
+                                format: formatAndValidate.formatAddress()),
+                            kycDataWidget(
+                              //focus,
+                                field: "City",
+                                labelText: "Enter",
+                                control: permanentcityControl,
+                                validate: formatAndValidate.validateName,
+                                keyboardInputType: TextInputType.name),
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
+                              child: Text(
+                                "State",
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _stateList(),
+                            kycDataWidget(
+                              //focus,
+                              field: "Country",
+                              labelText: "Enter",
+                              control: countryControl,
+                              keyboardInputType: TextInputType.text,
+                              validate: formatAndValidate.formatName,
+                              format: formatAndValidate.formatName(),
+                              enabled: false,
+                            ),
+                            kycDataWidget(
+                              //focus,
+                                field: "Pin Code",
+                                labelText: "Enter",
+                                control: permanentpinNumberControl,
+                                keyboardInputType: TextInputType.number,
+                                validate: formatAndValidate.validatePinCode,
+                                format: formatAndValidate.formatPinCode()),
+                          ],
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10,),
+                Text("Add another address",style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54)),
                 SizedBox(height: 10,),
                 Container(
-                  height: 48,
-                  width: screenWidth - 20,
                   decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: primaryColor,
+                    border: Border.all(width: 2, color: primaryColor), // Outer border styling
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ExpansionTileCard(
+                    shadowColor:primaryColor,
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(10),
+                    baseColor: Colors.grey[300],
+                    title: Text("Address",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10), // Adjust the padding for the children
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Divider(
+                              thickness: 1.5,
+                              height: 1.0,
+                            ),
+                            SizedBox(height: 10,),
+                            // Container(
+                            //   height: 48,
+                            //   width: screenWidth - 20,
+                            //   decoration: BoxDecoration(
+                            //       border: Border.all(
+                            //         width: 2,
+                            //         color: primaryColor,
+                            //       ),
+                            //       borderRadius: BorderRadius.circular(8)),
+                            //   child: DropdownButtonHideUnderline(
+                            //     child: DropdownButton(
+                            //       alignment: Alignment.centerLeft,
+                            //       underline: Container(),
+                            //       elevation: 0,
+                            //       // isDense: true,
+                            //       iconSize: 30,
+                            //       //  icon: Icon(Icons.arrow_downward_rounded),
+                            //       style: TextStyle(
+                            //           fontWeight: FontWeight.bold,
+                            //           color: Colors.black54,
+                            //           fontSize: 16),
+                            //       value: _addressValue,
+                            //       items: [
+                            //         DropdownMenuItem(
+                            //           child: Text("select"),
+                            //           value: 0,
+                            //         ),
+                            //         DropdownMenuItem(
+                            //           child: Text("HOME"),
+                            //           value: 1,
+                            //         ),
+                            //         DropdownMenuItem(
+                            //           child: Text("OFFICE"),
+                            //           value: 2,
+                            //         ),
+                            //         DropdownMenuItem(
+                            //           child: Text("DELIVERY"),
+                            //           value: 3,
+                            //         ),
+                            //         DropdownMenuItem(
+                            //           child: Text("COMMUNICATION"),
+                            //           value: 4,
+                            //         )
+                            //       ],
+                            //       onChanged: (value) {
+                            //         setState(() {
+                            //           _addressValue = value as int;
+                            //           value == 1
+                            //               ? address_status = "HOME"
+                            //               : value == 2
+                            //               ? marital_status = "OFFICE"
+                            //               : value == 3 ? marital_status = "DELIVERY"
+                            //               : marital_status = "COMMUNICATION";
+                            //           _addressValue = value as int;
+                            //         });
+                            //         print(_maritalStatusValue.toString);
+                            //       },
+                            //     ),
+                            //   ),
+                            // ),
+                            Text(
+                              'Select Address Categories:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10),
+                            buildCategoryRadioButton('HOME'),
+                            if(selectedCategories.contains('HOME'))
+                            Column(
+                              children: [
+                                kycDataWidget(
+                                  //focus,
+                                    field: "Address 1",
+                                    labelText: "Enter",
+                                    control: homeAddress1Control,
+                                    validate: formatAndValidate.validateAddress,
+                                    format: formatAndValidate.formatAddress()),
+                                kycDataWidget(
+                                  //focus,
+                                    field: "Address 2",
+                                    labelText: "Enter",
+                                    control: homeAddress2Control,
+                                    validate: formatAndValidate.validateAddress,
+                                    format: formatAndValidate.formatAddress()),
+                                kycDataWidget(
+                                  //focus,
+                                    field: "Address 3",
+                                    labelText: "Enter",
+                                    control: homeAddress3Control,
+                                    validate: formatAndValidate.validateAddress,
+                                    format: formatAndValidate.formatAddress()),
+                                kycDataWidget(
+                                  //focus,
+                                    field: "City",
+                                    labelText: "Enter",
+                                    control: homecityControl,
+                                    validate: formatAndValidate.validateName,
+                                    keyboardInputType: TextInputType.name),
+                                Align(
+                                  alignment: AlignmentDirectional.topStart,
+                                  child: Text(
+                                    "State",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                _stateList(),
+                                kycDataWidget(
+                                  //focus,
+                                  field: "Country",
+                                  labelText: "Enter",
+                                  control: countryControl,
+                                  keyboardInputType: TextInputType.text,
+                                  validate: formatAndValidate.formatName,
+                                  format: formatAndValidate.formatName(),
+                                  enabled: false,
+                                ),
+                                kycDataWidget(
+                                  //focus,
+                                    field: "Pin Code",
+                                    labelText: "Enter",
+                                    control: homepinNumberControl,
+                                    keyboardInputType: TextInputType.number,
+                                    validate: formatAndValidate.validatePinCode,
+                                    format: formatAndValidate.formatPinCode()),
+                              ],
+                            ),
+                            buildCategoryRadioButton('OFFICE'),
+                            if(selectedCategories.contains('OFFICE'))
+                              Column(
+                                children: [
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 1",
+                                      labelText: "Enter",
+                                      control: officeAddress1Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 2",
+                                      labelText: "Enter",
+                                      control: officeAddress2Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 3",
+                                      labelText: "Enter",
+                                      control: officeAddress3Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "City",
+                                      labelText: "Enter",
+                                      control: officecityControl,
+                                      validate: formatAndValidate.validateName,
+                                      keyboardInputType: TextInputType.name),
+                                  Align(
+                                    alignment: AlignmentDirectional.topStart,
+                                    child: Text(
+                                      "State",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  _stateList(),
+                                  kycDataWidget(
+                                    //focus,
+                                    field: "Country",
+                                    labelText: "Enter",
+                                    control: countryControl,
+                                    keyboardInputType: TextInputType.text,
+                                    validate: formatAndValidate.formatName,
+                                    format: formatAndValidate.formatName(),
+                                    enabled: false,
+                                  ),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Pin Code",
+                                      labelText: "Enter",
+                                      control: officepinNumberControl,
+                                      keyboardInputType: TextInputType.number,
+                                      validate: formatAndValidate.validatePinCode,
+                                      format: formatAndValidate.formatPinCode()),
+                                ],
+                              ),
+                            buildCategoryRadioButton('DELIVERY'),
+                            if(selectedCategories.contains('DELIVERY'))
+                              Column(
+                                children: [
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 1",
+                                      labelText: "Enter",
+                                      control: deliveryAddress1Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 2",
+                                      labelText: "Enter",
+                                      control: deliveryAddress2Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 3",
+                                      labelText: "Enter",
+                                      control: deliveryAddress3Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "City",
+                                      labelText: "Enter",
+                                      control: deliverycityControl,
+                                      validate: formatAndValidate.validateName,
+                                      keyboardInputType: TextInputType.name),
+                                  Align(
+                                    alignment: AlignmentDirectional.topStart,
+                                    child: Text(
+                                      "State",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  _stateList(),
+                                  kycDataWidget(
+                                    //focus,
+                                    field: "Country",
+                                    labelText: "Enter",
+                                    control: countryControl,
+                                    keyboardInputType: TextInputType.text,
+                                    validate: formatAndValidate.formatName,
+                                    format: formatAndValidate.formatName(),
+                                    enabled: false,
+                                  ),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Pin Code",
+                                      labelText: "Enter",
+                                      control: deliverypinNumberControl,
+                                      keyboardInputType: TextInputType.number,
+                                      validate: formatAndValidate.validatePinCode,
+                                      format: formatAndValidate.formatPinCode()),
+                                ],
+                              ),
+                            buildCategoryRadioButton('COMMUNICATION'),
+                            if(selectedCategories.contains('COMMUNICATION'))
+                              Column(
+                                children: [
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 1",
+                                      labelText: "Enter",
+                                      control: communicationAddress1Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 2",
+                                      labelText: "Enter",
+                                      control: communicationAddress2Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Address 3",
+                                      labelText: "Enter",
+                                      control: communicationAddress3Control,
+                                      validate: formatAndValidate.validateAddress,
+                                      format: formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "City",
+                                      labelText: "Enter",
+                                      control: communicationcityControl,
+                                      validate: formatAndValidate.validateName,
+                                      keyboardInputType: TextInputType.name),
+                                  Align(
+                                    alignment: AlignmentDirectional.topStart,
+                                    child: Text(
+                                      "State",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  _stateList(),
+                                  kycDataWidget(
+                                    //focus,
+                                    field: "Country",
+                                    labelText: "Enter",
+                                    control: countryControl,
+                                    keyboardInputType: TextInputType.text,
+                                    validate: formatAndValidate.formatName,
+                                    format: formatAndValidate.formatName(),
+                                    enabled: false,
+                                  ),
+                                  kycDataWidget(
+                                    //focus,
+                                      field: "Pin Code",
+                                      labelText: "Enter",
+                                      control: communicationpinNumberControl,
+                                      keyboardInputType: TextInputType.number,
+                                      validate: formatAndValidate.validatePinCode,
+                                      format: formatAndValidate.formatPinCode()),
+                                ],
+                              ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      alignment: Alignment.centerLeft,
-                      underline: Container(),
-                      elevation: 0,
-                      // isDense: true,
-                      iconSize: 30,
-                      //  icon: Icon(Icons.arrow_downward_rounded),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
-                          fontSize: 16),
-                      value: _addressValue,
-                      items: [
-                        DropdownMenuItem(
-                          child: Text("select"),
-                          value: 0,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("HOME"),
-                          value: 1,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("OFFICE"),
-                          value: 2,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("DELIVERY"),
-                          value: 3,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("COMMUNICATION"),
-                          value: 4,
-                        )
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _addressValue = value as int;
-                          value == 1
-                              ? address_status = "HOME"
-                              : value == 2
-                              ? marital_status = "OFFICE"
-                              : value == 3 ? marital_status = "DELIVERY"
-                              : marital_status = "COMMUNICATION";
-                        });
-                        print(_maritalStatusValue.toString);
-                      },
-                    ),
+
+                    ],
                   ),
                 ),
                 SizedBox(height: 10,),
-                _addressValue == 0
-                    ? Container()  // Don't show kycDataWidget when "select" is chosen
-                    : kycDataWidget(
-                  field: "Address",
-                  labelText: "Enter",
-                  control: address2Control,
-                  validate: formatAndValidate.validateAddress,
-                  format: formatAndValidate.formatAddress(),
-                ),
                 Text(
                   "NOTE: Please prevent @,#,%,\$,\&,+,=,*,"
                   ",! and white spaces while entering your address.",
                   style: TextStyle(color: Colors.red),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                kycDataWidget(
-                    //focus,
-                    field: "Pin Code",
-                    labelText: "Enter",
-                    control: pinNumberControl,
-                    keyboardInputType: TextInputType.number,
-                    validate: formatAndValidate.validatePinCode,
-                    format: formatAndValidate.formatPinCode()),
-                kycDataWidget(
-                    //focus,
-                    field: "City",
-                    labelText: "Enter",
-                    control: cityControl,
-                    validate: formatAndValidate.validateName,
-                    keyboardInputType: TextInputType.name),
-                Text(
-                  "Select State",
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                // StreamBuilder<ApiResponse<StateCodeResponse>>(
-                //     stream: _walletBloc.getStateListStream,
-                //     builder: (context, snapshot) {
-                //       if (snapshot.hasData) {
-                //         switch (snapshot.data!.status!) {
-                //           case Status.LOADING:
-                //             return CommonApiLoader();
-                //           case Status.COMPLETED:
-                //             StateCodeResponse response = snapshot.data!.data!;
-                //             return (response);
-                //           case Status.ERROR:
-                //             return CommonApiErrorWidget(
-                //                 "${snapshot.data!.message!}", _getStateList);
-                //         }
-                //       }
-                //       return SizedBox();
-                //     }),
-                _stateList(),
                 SizedBox(
                   height: 20,
                 ),
@@ -991,8 +1336,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           dob: dobControl.text,
                           gender: gender,
                           address: address1Control.text,
-                          pinCode: pinNumberControl.text,
-                          city: cityControl.text,
+                          pinCode: permanentpinNumberControl.text,
+                          city: permanentcityControl.text,
                           //aadhaarNumber: aadhaarControl.text,
                           state: (selectedState?.stateId ?? 0).toString());
                     } else if (_genderValue == 0) {
@@ -1022,6 +1367,26 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget buildCategoryRadioButton(String category) {
+    return Row(
+      children: [
+        Checkbox(
+          value: selectedCategories.contains(category),
+          onChanged: (value) {
+            setState(() {
+              if (value != null && value) {
+                selectedCategories.add(category);
+              } else {
+                selectedCategories.remove(category);
+              }
+            });
+          },
+        ),
+        Text(category),
+      ],
     );
   }
 

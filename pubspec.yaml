@@ -75,7 +75,8 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   badges: ^3.1.1
   http: ^0.13.6
-  timer_builder: ^2.0.0
+  expansion_tile_card: ^2.0.0
+
 
 
 

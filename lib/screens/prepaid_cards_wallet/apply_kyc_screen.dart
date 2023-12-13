@@ -1197,7 +1197,21 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       String? city,
       String? state,
       String? aadhaarNumber}) async {
+
+    List<Map<String, dynamic>> addressInfo = [
+    {
+      "addressCategory": "PERMANENT",
+    "address1": "F2 AMPA FLATS",
+    "address2": "NSK ROAD 2ND STREET",
+    "address3": "TNAGAR",
+    "city": "CHENNAI",
+    "state_code": 24,
+    "country": "INDIA",
+    "pinCode": "600028"
+    },
+    ];
     Map<String, dynamic> body = {};
+
     body["account_id"] = User.userId;
     body["first_name"] = fName;
     body["last_name"] = lName;

@@ -27,7 +27,7 @@ class PopupImageData {
       this.updatedAt,});
 
   PopupImageData.fromJson(dynamic json) {
-    id = json['id'];
+    id = json['id'].toString();
     image = json['image'];
     imageUrl = json['image_url'];
     status = json['status'];

@@ -199,8 +199,7 @@ class Apis {
   static String getBackToCampusProductsList = "api/get-campus-products";
   static String getHICardBalance = "api/get-hi-card-balance";
   static String checkHiCardBalance = "api/check-hi-card-balance";
-  static String getHICardRedemptionHistory =
-      "api/get-hi-card-redemptionhistory";
+  static String getHICardRedemptionHistory = "api/get-hi-card-redemptionhistory";
   static String giftHICard = "api/gift-hi-card";
   static String getOrderIdTouchPoint = "api/get-order-id-touchpoint";
   // static String getGiftOrder = "api/get-gift-order";
@@ -242,5 +241,6 @@ class Apis {
 
 
   /////Additional api set from public live/////////
-static String notificationread = "api/notification-read";
+  static String notificationread = "api/notification-read";
+
 }

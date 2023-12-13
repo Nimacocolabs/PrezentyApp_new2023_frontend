@@ -47,11 +47,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController phoneNumberControl = TextEditingController();
   final TextEditingController emailIdControl = TextEditingController();
   final TextEditingController panNumberControl = TextEditingController();
+  final TextEditingController addressCategoryControl = TextEditingController();
+
 
   //final TextEditingController aadhaarControl = TextEditingController();
 
   final TextEditingController dobControl = TextEditingController();
-  final TextEditingController addressControl = TextEditingController();
+  final TextEditingController address1Control = TextEditingController();
+  final TextEditingController address2Control = TextEditingController();
   final TextEditingController permanentAddressControl = TextEditingController();
   final TextEditingController pinNumberControl = TextEditingController();
   final TextEditingController permanentPinNumberControl =
@@ -81,7 +84,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
 
   Country _country = Country(
     isoCode: "IN",
-    phoneCode: "91",
+    phoneCode: "+91",
     name: "India",
     iso3Code: "IND",
   );
@@ -122,7 +125,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     panNumberControl.text = widget.panNumber;
 
     emailIdControl.text = User.userEmail;
-    phoneNumberControl.text = _country.phoneCode+User.userMobile;
+    phoneNumberControl.text ="${_country.phoneCode}-${User.userMobile}";
+
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getStateList();
@@ -164,70 +168,76 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black87),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  height: 48,
-                  width: screenWidth - 20,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2,
-                        color: primaryColor,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 48,
+                      width: screenWidth * 0.3,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: primaryColor,
+                          ),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          alignment: AlignmentDirectional.centerEnd,
+                          underline: Container(),
+                          elevation: 0,
+                          // isDense: true,
+                          iconSize: 30,
+                          //  icon: Icon(Icons.arrow_downward_rounded),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                              fontSize: 16),
+                          value: _titleValue,
+                          items: [
+                            DropdownMenuItem(
+                              child: Text("Title"),
+                              value: 0,
+                            ),
+                            DropdownMenuItem(
+                              child: Text("Mr"),
+                              value: 1,
+                            ),
+                            DropdownMenuItem(
+                              child: Text("Ms"),
+                              value: 2,
+                            ),
+                            DropdownMenuItem(
+                              child: Text("Mrs"),
+                              value: 3,
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _titleValue = value as int;
+                              value == 1
+                                  ? title = "Mr"
+                                  : value == 2
+                                  ? title = "Ms"
+                                  : title = "Mrs";
+                            });
+                            print(_titleValue.toString);
+                          },
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      alignment: AlignmentDirectional.centerEnd,
-                      underline: Container(),
-                      elevation: 0,
-                      // isDense: true,
-                      iconSize: 30,
-                      //  icon: Icon(Icons.arrow_downward_rounded),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
-                          fontSize: 16),
-                      value: _titleValue,
-                      items: [
-                        DropdownMenuItem(
-                          child: Text("Title"),
-                          value: 0,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("Mr"),
-                          value: 1,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("Ms"),
-                          value: 2,
-                        ),
-                        DropdownMenuItem(
-                          child: Text("Mrs"),
-                          value: 3,
-                        ),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _titleValue = value as int;
-                          value == 1
-                              ? title = "Mr"
-                              : value == 2
-                              ? title = "Ms"
-                              : title = "Mrs";
-                        });
-                        print(_titleValue.toString);
-                      },
                     ),
-                  ),
-                ),
-                kycDataWidget(
-                  // focus,
-                  field: "First Name",
-                  labelText: "first Name",
-                  control: firstNameControl,
-                  validate: formatAndValidate.validateName,
-                  format: formatAndValidate.formatName(),
+                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: screenWidth * 0.6,
+                      child: kycDataWidget(
+                        // focus,
+                        field: "",
+                        labelText: "first Name",
+                        control: firstNameControl,
+                        validate: formatAndValidate.validateName,
+                        format: formatAndValidate.formatName(),
+                      ),
+                    ),
+                  ],
                 ),
                 kycDataWidget(
                   //focus,
@@ -425,11 +435,11 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 10,
                 ),
                 Row(
                   children: [
-                    Text("NRI Customer"),
+                    Text("NRI Customer",style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black54),),
                     Spacer(),
                     SizedBox(
                       height: 50,
@@ -454,7 +464,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 ),
                 Row(
                   children: [
-                    Text("Minor"),
+                    Text("Minor",style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black54)),
                     Spacer(),
                     SizedBox(
                       height: 50,
@@ -477,6 +487,36 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                     ),
                   ],
                 ),
+                Row(
+                  children: [
+                    Text("Dependant",style: TextStyle(fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54),),
+                    Spacer(),
+                    SizedBox(
+                      height: 50,
+                      width: 60,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Switch(
+                          value: isDependant,
+                          activeColor: primaryColor,
+                          activeTrackColor: Colors.grey[350],
+                          inactiveThumbColor: Colors.grey,
+                          inactiveTrackColor: Colors.grey[350],
+                          onChanged: (check) {
+                            setState(() {
+                              isDependant =check ;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
                 Text(
                   "Employment Industry",
                   style: TextStyle(
@@ -498,7 +538,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       borderRadius: BorderRadius.circular(8)),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton(
-                      alignment: AlignmentDirectional.centerEnd,
+                      alignment: Alignment.centerLeft,
                       underline: Container(),
                       elevation: 0,
                       // isDense: true,
@@ -507,7 +547,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black54,
-                          fontSize: 16),
+                          fontSize: 11.2),
                       value: _employmentIndustryValue,
                       items: [
                         DropdownMenuItem(
@@ -523,7 +563,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           value: 2,
                         ),
                         DropdownMenuItem(
-                          child: Text("ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"),
+                          child: Text("ARTS AUDIO OR VIDEO TECHNOLOGY \nAND COMMUNICATIONS"),
                           value: 3,
                         ),
                         DropdownMenuItem(
@@ -606,6 +646,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: 10,),
                 Text(
                   "Employment Type",
                   style: TextStyle(
@@ -627,7 +668,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       borderRadius: BorderRadius.circular(8)),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton(
-                      alignment: AlignmentDirectional.centerEnd,
+                      alignment: Alignment.centerLeft,
                       underline: Container(),
                       elevation: 0,
                       // isDense: true,
@@ -636,7 +677,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black54,
-                          fontSize: 16),
+                          fontSize: 12),
                       value: _employmentTypeValue,
                       items: [
                         DropdownMenuItem(
@@ -711,49 +752,46 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    Text("Dependant"),
-                    Spacer(),
-                    SizedBox(
-                      height: 50,
-                      width: 60,
-                      child: FittedBox(
-                        fit: BoxFit.fill,
-                        child: Switch(
-                          value: isDependant,
-                          activeColor: primaryColor,
-                          activeTrackColor: Colors.grey[350],
-                          inactiveThumbColor: Colors.grey,
-                          inactiveTrackColor: Colors.grey[350],
-                          onChanged: (check) {
-                            setState(() {
-                              isDependant =check ;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                SizedBox(height: 10,),
                 kycDataWidget(
-                    //focus,
+                  //focus,
                     field: "Permanent Address",
                     labelText: "Enter",
-                    control: addressControl,
+                    control: address1Control,
                     validate: formatAndValidate.validateAddress,
                     format: formatAndValidate.formatAddress()),
-
+                DropdownButtonFormField<String>(
+                  value: addressCategoryControl.text,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      addressCategoryControl.text = newValue!;
+                    });
+                  },
+                  items: <String>['HOME', 'OFFICE', 'DELIVERY', 'COMMUNICATION']
+                      .map<DropdownMenuItem<String>>(
+                        (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
+                      .toList(),
+                  decoration: InputDecoration(labelText: 'Address Category'),
+                ),
+                kycDataWidget(
+                  //focus,
+                    field: "Permanent Address",
+                    labelText: "Enter",
+                    control: address2Control,
+                    validate: formatAndValidate.validateAddress,
+                    format: formatAndValidate.formatAddress()),
                 Text(
                   "NOTE: Please prevent @,#,%,\$,\&,+,=,*,"
                   ",! and white spaces while entering your address.",
                   style: TextStyle(color: Colors.red),
                 ),
-
                 SizedBox(
                   height: 20,
                 ),
-
                 kycDataWidget(
                     //focus,
                     field: "Pin Code",
@@ -900,7 +938,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           pan: panNumberControl.text,
                           dob: dobControl.text,
                           gender: gender,
-                          address: addressControl.text,
+                          address: address1Control.text,
                           pinCode: pinNumberControl.text,
                           city: cityControl.text,
                           //aadhaarNumber: aadhaarControl.text,

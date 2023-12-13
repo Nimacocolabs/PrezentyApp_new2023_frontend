@@ -81,6 +81,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   String employmentIndustry="Select";
   int _employmentTypeValue=0;
   String employmentType="Select";
+  String address_status = "select";
+  int _addressValue = 0;
 
   Country _country = Country(
     isoCode: "IN",
@@ -760,30 +762,80 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                     control: address1Control,
                     validate: formatAndValidate.validateAddress,
                     format: formatAndValidate.formatAddress()),
-                DropdownButtonFormField<String>(
-                  value: addressCategoryControl.text,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      addressCategoryControl.text = newValue!;
-                    });
-                  },
-                  items: <String>['HOME', 'OFFICE', 'DELIVERY', 'COMMUNICATION']
-                      .map<DropdownMenuItem<String>>(
-                        (String value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+                Text("Select addrees type",style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54)),
+                SizedBox(height: 10,),
+                Container(
+                  height: 48,
+                  width: screenWidth - 20,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 2,
+                        color: primaryColor,
+                      ),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      alignment: Alignment.centerLeft,
+                      underline: Container(),
+                      elevation: 0,
+                      // isDense: true,
+                      iconSize: 30,
+                      //  icon: Icon(Icons.arrow_downward_rounded),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16),
+                      value: _addressValue,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text("select"),
+                          value: 0,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("HOME"),
+                          value: 1,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("OFFICE"),
+                          value: 2,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("DELIVERY"),
+                          value: 3,
+                        ),
+                        DropdownMenuItem(
+                          child: Text("COMMUNICATION"),
+                          value: 4,
+                        )
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _addressValue = value as int;
+                          value == 1
+                              ? address_status = "HOME"
+                              : value == 2
+                              ? marital_status = "OFFICE"
+                              : value == 3 ? marital_status = "DELIVERY"
+                              : marital_status = "COMMUNICATION";
+                        });
+                        print(_maritalStatusValue.toString);
+                      },
                     ),
-                  )
-                      .toList(),
-                  decoration: InputDecoration(labelText: 'Address Category'),
+                  ),
                 ),
-                kycDataWidget(
-                  //focus,
-                    field: "Permanent Address",
-                    labelText: "Enter",
-                    control: address2Control,
-                    validate: formatAndValidate.validateAddress,
-                    format: formatAndValidate.formatAddress()),
+                SizedBox(height: 10,),
+                _addressValue == 0
+                    ? Container()  // Don't show kycDataWidget when "select" is chosen
+                    : kycDataWidget(
+                  field: "Address",
+                  labelText: "Enter",
+                  control: address2Control,
+                  validate: formatAndValidate.validateAddress,
+                  format: formatAndValidate.formatAddress(),
+                ),
                 Text(
                   "NOTE: Please prevent @,#,%,\$,\&,+,=,*,"
                   ",! and white spaces while entering your address.",

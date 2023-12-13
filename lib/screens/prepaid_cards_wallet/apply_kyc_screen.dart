@@ -1210,6 +1210,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     "pinCode": "600028"
     },
     ];
+
+
+
     Map<String, dynamic> body = {};
 
     body["account_id"] = User.userId;

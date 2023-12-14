@@ -408,8 +408,8 @@ class _ApplyPrepaidCardListScreenState
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {
                         selectedCard = cardDetailsData;
-                        // _applyCardCheckWalletCreationAndPayment();
-                        Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
+                         //_applyCardCheckWalletCreationAndPayment();
+                  Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
                       }
                     },
                     child: Container(

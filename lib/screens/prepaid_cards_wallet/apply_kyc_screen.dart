@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:event_app/bloc/wallet_bloc.dart';
 import 'package:event_app/models/wallet&prepaid_cards/register_wallet_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/state_data_response.dart';
@@ -19,7 +21,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'dart:async';
 import '../../util/app_helper.dart';
-
+import 'package:http/http.dart' as http;
 class ApplyKycScreen extends StatefulWidget {
   ApplyKycScreen(
       {Key? key,
@@ -1599,17 +1601,31 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     body["card_id"] = widget.cardId;
 
     try {
+
       AppDialogs.loading();
-      RegisterWalletResponse response = await _walletBloc.registerWallet(body);
+
+
+      Map<String, dynamic> data = {
+        'firstName': 'Abin',
+        'contactNo': '9948258241',
+        'user_id': 1710,
+      };
+      final response = await http.post(
+        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
+        // headers: <String, String>{
+        //   'Content-Type': 'application/json; charset=UTF-8',
+        // },
+        body: jsonEncode(data),
+      );
       Get.back();
-      if (response.success!) {
-        toastMessage(response.message);
-        print(response.data);
+      if (response.statusCode==200!) {
+        toastMessage(response.statusCode);
+        print(response.body);
         Get.to(() => ApplyKycVerifyOtpScreen(
-              verifyToken: response.data!.kycReferenceId!.toString(),
+             // verifyToken: response.body!.!.toString(),
             ));
       } else {
-        toastMessage('${response.message!}');
+        toastMessage('${response.statusCode!}');
       }
     } catch (e, s) {
       Completer().completeError(e, s);

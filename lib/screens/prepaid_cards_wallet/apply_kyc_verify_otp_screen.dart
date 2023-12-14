@@ -14,8 +14,8 @@ import 'package:otp_text_field/style.dart';
 
 // ignore: must_be_immutable
 class ApplyKycVerifyOtpScreen extends StatefulWidget {
-  ApplyKycVerifyOtpScreen({required this.verifyToken, Key? key}) : super(key: key);
-  String verifyToken;
+  ApplyKycVerifyOtpScreen({ Key? key}) : super(key: key);
+ // String verifyToken;
 
   @override
   State<ApplyKycVerifyOtpScreen> createState() => _ApplyKycVerifyOtpScreenState();
@@ -178,7 +178,7 @@ class _ApplyKycVerifyOtpScreenState extends State<ApplyKycVerifyOtpScreen> {
                       otp = "";
                       setState(() {});
                       startTimer();
-                      _resendOtp();
+                     // _resendOtp();
                     },
                     style: TextButton.styleFrom(padding: EdgeInsets.zero),
                     child: Text(" Resend",
@@ -198,34 +198,34 @@ class _ApplyKycVerifyOtpScreenState extends State<ApplyKycVerifyOtpScreen> {
     );
   }
 
-  _resendOtp() async {
-    try {
-      AppDialogs.loading();
-      RegisterWalletResponse response = await _walletBloc
-          .registerWalletResendOtp(User.userId, widget.verifyToken);
-      Get.back();
-      if (response.success!) {
-        toastMessage(response.message);
-        print(response.data);
-        Get.offAll(ApplyKycVerifyOtpScreen(
-          verifyToken: response.data!.kycReferenceId!.toString(),
-        ));
-      } else {
-        toastMessage('${response.message!}');
-      }
-    } catch (e, s) {
-      Completer().completeError(e, s);
-      Get.back();
-      toastMessage('Something went wrong. Please try again');
-    }
-  }
+  // _resendOtp() async {
+  //   try {
+  //     AppDialogs.loading();
+  //     RegisterWalletResponse response = await _walletBloc
+  //         .registerWalletResendOtp(User.userId, widget.verifyToken);
+  //     Get.back();
+  //     if (response.success!) {
+  //       toastMessage(response.message);
+  //       print(response.data);
+  //       Get.offAll(ApplyKycVerifyOtpScreen(
+  //        // verifyToken: response.data!.kycReferenceId!.toString(),
+  //       ));
+  //     } else {
+  //       toastMessage('${response.message!}');
+  //     }
+  //   } catch (e, s) {
+  //     Completer().completeError(e, s);
+  //     Get.back();
+  //     toastMessage('Something went wrong. Please try again');
+  //   }
+  // }
 
   Future _verifyOtp({
     String? otp,
   }) async {
     Map<String, dynamic> body = {};
     body["account_id"] = User.userId;
-    body["min_kyc_reference_id"] = widget.verifyToken;
+ //   body["min_kyc_reference_id"] = widget.verifyToken;
     body["otp"] = otp;
 
     try {

@@ -644,6 +644,7 @@ class WalletBloc {
       AppDialogs.loading();
       ApplyCardTaxInfoResponse response =
           await _walletRepository!.getApplyCardTaxInfo(body);
+
       Get.back();
 
       if (response.success ?? false) {

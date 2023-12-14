@@ -1668,8 +1668,9 @@ _upgradeCardGetTaxInfo();
                             ),
                             onPressed: () {
 
-                              _upgradeInitPayment(
-                                  couponCode, taxData.amount.toString());
+                              ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',);
+                              // _upgradeInitPayment(
+                              //     couponCode, taxData.amount.toString());
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(16),

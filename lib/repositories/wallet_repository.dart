@@ -163,6 +163,7 @@ class WalletRepository {
     final response = await apiProvider
         .getJsonInstance()
         .post(Apis.getWalletDetails, data: {"account_id": userId});
+    print("api->${Apis.getWalletDetails}");
     return WalletDetailsResponse.fromJson(jsonDecode(response.data));
   }
 
@@ -261,6 +262,7 @@ class WalletRepository {
     Response response = await apiProvider
         .getJsonInstance()
         .post(Apis.getApplyCardTaxInfo, data: body);
+    print("api Apply card=-.${Apis.getApplyCardTaxInfo}");
     return ApplyCardTaxInfoResponse.fromJson(jsonDecode(response.data));
   }
 

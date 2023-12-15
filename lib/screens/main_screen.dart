@@ -72,10 +72,14 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
       if (!b) {
       await  AuthBloc().checkIsMobileEmailVerified(User.userId);
       }
+      getPrepaidCardUserOrNotToken();
       getPrepaidCardUserOrNot();
     });
   }
-
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNot = await _profileBloc.tokenforPrepaidcard(accountId);
+    setState(() {});
+  }
   getPrepaidCardUserOrNot() async {
     prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(accountId);
      setState(() {});

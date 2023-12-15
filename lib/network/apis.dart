@@ -107,7 +107,7 @@ class Apis {
   static String blockCardNow = "api/block-physical-card-request";
 
   static String walletCreationAndPaymentStatus = "api/check-paid-wallet-status";
-  static String registerWallet = "api/wallet-registration";
+  static String registerWallet = "api/prepaid/cards/wallet-registration";
   static String verifyWalletRegistrationOtp = "api/verify-registration";
   static String walletRegistrationResendOtp = "api/resend-otp";
   static String getWalletDetails = "api/fetch-wallet-details";

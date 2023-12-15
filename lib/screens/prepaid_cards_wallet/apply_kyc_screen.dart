@@ -8,6 +8,7 @@ import 'package:event_app/network/api_response.dart';
 import 'package:event_app/screens/login/select_country_dialog_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_verify_otp_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/wallet_home_screen.dart';
 import 'package:event_app/screens/splash_screen.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:event_app/util/user.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
+import 'package:otp_text_field/otp_text_field.dart';
 import 'dart:async';
 import '../../util/app_helper.dart';
 import 'package:http/http.dart' as http;
@@ -67,7 +69,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController homeAddress3Control = TextEditingController();
   final TextEditingController homepinNumberControl = TextEditingController();
   final TextEditingController homecityControl = TextEditingController();
-
+  String entityId="";
+  String categories="";
   final TextEditingController officeAddress1Control = TextEditingController();
   final TextEditingController officeAddress2Control = TextEditingController();
   final TextEditingController officeAddress3Control = TextEditingController();
@@ -84,6 +87,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController communicationAddress2Control = TextEditingController();
   final TextEditingController communicationAddress3Control = TextEditingController();
   final TextEditingController communicationpinNumberControl = TextEditingController();
+  final TextEditingController OtpNumberControl = TextEditingController();
   final TextEditingController communicationcityControl = TextEditingController();
 
   final TextEditingController referredByControl = TextEditingController();
@@ -103,9 +107,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   int _maritalStatusValue = 0;
   RxBool isChecked = false.obs;
   TermsAndConditionsData? terms_Conditions;
-  int _employmentIndustryValue=0;
+  String _employmentIndustryValue="";
   String employmentIndustry="Select";
-  int _employmentTypeValue=0;
+  String _employmentTypeValue="";
   String employmentType="Select";
   String address_status = "select";
   int _addressValue = 0;
@@ -572,94 +576,94 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       items: [
                         DropdownMenuItem(
                           child: Text("select"),
-                          value: 0,
+                          value: "",
                         ),
                         DropdownMenuItem(
                           child: Text("AGRICULTURE FOOD NATURAL RESOURCES"),
-                          value: 1,
+                          value: "AGRICULTURE_FOOD_NATURAL_RESOURCES",
                         ),
                         DropdownMenuItem(
                           child: Text("ARCHITECTURE AND CONSTRUCTION"),
-                          value: 2,
+                          value:"ARCHITECTURE_AND_CONSTRUCTION" ,
                         ),
                         DropdownMenuItem(
                           child: Text("ARTS AUDIO OR VIDEO TECHNOLOGY \nAND COMMUNICATIONS"),
-                          value: 3,
+                          value:"ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS" ,
                         ),
                         DropdownMenuItem(
                           child: Text("BUSINESS MANAGEMENT AND ADMINISTRATION"),
-                          value: 4,
+                          value: "BUSINESS_MANAGEMENT_AND_ADMINISTRATION",
                         ),
                         DropdownMenuItem(
                           child: Text("EDUCATION AND TRAINING"),
-                          value: 5,
+                          value: "EDUCATION_AND_TRAINING",
                         ),
                         DropdownMenuItem(
                           child: Text("FINANCE"),
-                          value: 6,
+                          value: "FINANCE",
                         ),
                         DropdownMenuItem(
                           child: Text("GOVERNMENT AND PUBLIC ADMINISTRATION"),
-                          value: 7,
+                          value: "GOVERNMENT_AND_PUBLIC_ADMINISTRATION",
                         ),
                         DropdownMenuItem(
                           child: Text("HEALTH SCIENCE"),
-                          value: 8,
+                          value: "HEALTH_SCIENCE",
                         ),
                         DropdownMenuItem(
                           child: Text("HOSPITALITY AND TOURISM"),
-                          value: 9,
+                          value: "HOSPITALITY_AND_TOURISM",
                         ),
                         DropdownMenuItem(
                           child: Text("HUMAN SERVICES"),
-                          value: 10,
+                          value: "HUMAN_SERVICES",
                         ),
                         DropdownMenuItem(
                           child: Text("INFORMATION TECHNOLOGY"),
-                          value: 11,
+                          value: "INFORMATION_TECHNOLOGY",
                         ),
                         DropdownMenuItem(
                           child: Text("LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"),
-                          value: 12,
+                          value: "LAW_PUBLIC_SAFETY_CORRECTIONS_AND_SECURITY",
                         ),
                         DropdownMenuItem(
                           child: Text("MANUFACTURING"),
-                          value: 13,
+                          value: "MANUFACTURING",
                         ),
                         DropdownMenuItem(
                           child: Text("MARKETING SALES AND SERVICE"),
-                          value: 14,
+                          value: "MARKETING_SALES_AND_SERVICE",
                         ),
                         DropdownMenuItem(
                           child: Text("SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"),
-                          value: 15,
+                          value: "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS",
                         ),
                         DropdownMenuItem(
                           child: Text("TRANSPORTATION DISTRIBUTION AND LOGISTICS"),
-                          value: 16,
+                          value: "TRANSPORTATION_DISTRIBUTION_AND_LOGISTICS",
                         )
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _employmentIndustryValue = value as int;
-                          value == 1
+                          _employmentIndustryValue = value as String;
+                          value == "AGRICULTURE_FOOD_NATURAL_RESOURCES"
                               ? employmentIndustry = "AGRICULTURE FOOD NATURAL RESOURCES"
-                              : value == 2
+                              : value == "ARCHITECTURE_AND_CONSTRUCTION"
                               ? employmentIndustry = "ARCHITECTURE AND CONSTRUCTION"
-                              : value == 3 ? employmentIndustry = "ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"
-                              : value == 4 ? employmentIndustry = "BUSINESS MANAGEMENT AND ADMINISTRATION"
-                              : value == 5 ? employmentIndustry ="EDUCATION AND TRAINING"
-                              : value == 6 ? employmentIndustry = "FINANCE"
-                              : value == 7 ? employmentIndustry="GOVERNMENT AND PUBLIC ADMINISTRATION"
-                              : value == 8 ? employmentIndustry= "HEALTH SCIENCE"
-                              : value == 9 ? employmentIndustry = "HOSPITALITY AND TOURISM"
-                              : value == 10 ? employmentIndustry ="HUMAN SERVICES"
-                              : value == 11 ? employmentIndustry = "INFORMATION TECHNOLOGY"
-                              : value == 12 ? employmentIndustry = "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"
-                              : value == 13 ? employmentIndustry = "MANUFACTURING"
-                              : value == 14 ? employmentIndustry = "MARKETING SALES AND SERVICE"
-                              : value == 15 ? employmentIndustry = "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"
-                              : employmentIndustry == "TRANSPORTATION DISTRIBUTION AND LOGISTICS";
+                              : value == "ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS" ? employmentIndustry = "ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"
+                              : value == "BUSINESS_MANAGEMENT_AND_ADMINISTRATION" ? employmentIndustry = "BUSINESS MANAGEMENT AND ADMINISTRATION"
+                              : value == "EDUCATION_AND_TRAINING" ? employmentIndustry ="EDUCATION AND TRAINING"
+                              : value == "FINANCE" ? employmentIndustry = "FINANCE"
+                              : value == "GOVERNMENT_AND_PUBLIC_ADMINISTRATION" ? employmentIndustry="GOVERNMENT AND PUBLIC ADMINISTRATION"
+                              : value == "HEALTH_SCIENCE" ? employmentIndustry= "HEALTH SCIENCE"
+                              : value == "HOSPITALITY_AND_TOURISM" ? employmentIndustry = "HOSPITALITY AND TOURISM"
+                              : value == "HUMAN_SERVICES" ? employmentIndustry ="HUMAN SERVICES"
+                              : value == "INFORMATION_TECHNOLOGY" ? employmentIndustry = "INFORMATION TECHNOLOGY"
+                              : value == "LAW_PUBLIC_SAFETY_CORRECTIONS_AND_SECURITY" ? employmentIndustry = "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"
+                              : value == "MANUFACTURING" ? employmentIndustry = "MANUFACTURING"
+                              : value == "MARKETING_SALES_AND_SERVICE" ? employmentIndustry = "MARKETING SALES AND SERVICE"
+                              : value == "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS" ? employmentIndustry = "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"
+                              :value == "TRANSPORTATION_DISTRIBUTION_AND_LOGISTICS"? employmentIndustry == "TRANSPORTATION DISTRIBUTION AND LOGISTICS":employmentIndustry="";
                         });
                         print(_employmentIndustryValue.toString);
                       },
@@ -702,69 +706,69 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       items: [
                         DropdownMenuItem(
                           child: Text("select"),
-                          value: 0,
+                          value: "",
                         ),
                         DropdownMenuItem(
                           child: Text("EMPLOYED"),
-                          value: 1,
+                          value: "EMPLOYED",
                         ),
                         DropdownMenuItem(
                           child: Text("UNEMPLOYED"),
-                          value: 2,
+                          value: "UNEMPLOYED",
                         ),
                         DropdownMenuItem(
                           child: Text("ENTREPRENEUR"),
-                          value: 3,
+                          value: "ENTREPRENEUR",
                         ),
                         DropdownMenuItem(
                           child: Text("PUBLIC SECTOR EMPLOYEE"),
-                          value: 4,
+                          value: "PUBLIC_SECTOR_EMPLOYEE",
                         ),
                         DropdownMenuItem(
                           child: Text("FREELANCER"),
-                          value: 5,
+                          value: "FREELANCER",
                         ),
                         DropdownMenuItem(
                           child: Text("HOUSEWORK"),
-                          value: 6,
+                          value: "HOUSEWORK",
                         ),
                         DropdownMenuItem(
                           child: Text("APPRENTICE"),
-                          value: 7,
+                          value: "APPRENTICE",
                         ),
                         DropdownMenuItem(
                           child: Text("RETIRED"),
-                          value: 8,
+                          value: "RETIRED",
                         ),
                         DropdownMenuItem(
                           child: Text("STUDENT"),
-                          value: 9,
+                          value: "STUDENT",
                         ),
                         DropdownMenuItem(
                           child: Text("SELF EMPLOYED"),
-                          value: 10,
+                          value: "SELF_EMPLOYED",
                         ),
                         DropdownMenuItem(
                           child: Text("MILITARY OR COMMUNITY SERVICE"),
-                          value: 11,
+                          value: "MILITARY_OR_COMMUNITY_SERVICE",
                         ),
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _employmentTypeValue = value as int;
-                          value == 1
+                          _employmentTypeValue = value as String ;
+                          value == "EMPLOYED"
                               ? employmentType = "EMPLOYED"
-                              : value == 2
+                              : value == "UNEMPLOYED"
                               ? employmentType = "UNEMPLOYED"
-                              : value == 3 ? employmentType = "ENTREPRENEUR"
-                              : value == 4 ? employmentType = "PUBLIC SECTOR EMPLOYEE"
-                              : value == 5 ? employmentType ="FREELANCER"
-                              : value == 6 ? employmentType = "HOUSEWORK"
-                              : value == 7 ? employmentType="APPRENTICE"
-                              : value == 8 ? employmentType= "RETIRED"
-                              : value == 9 ? employmentType = "STUDENT"
-                              : value == 10 ? employmentType ="SELF EMPLOYED"
-                              : employmentType = "MILITARY OR COMMUNITY SERVICE";
+                              : value == "ENTREPRENEUR" ? employmentType = "ENTREPRENEUR"
+                              : value == "PUBLIC_SECTOR_EMPLOYEE" ? employmentType = "PUBLIC SECTOR EMPLOYEE"
+                              : value == "FREELANCER" ? employmentType ="FREELANCER"
+                              : value == "HOUSEWORK" ? employmentType = "HOUSEWORK"
+                              : value == "APPRENTICE" ? employmentType="APPRENTICE"
+                              : value == "RETIRED" ? employmentType= "RETIRED"
+                              : value == "STUDENT" ? employmentType = "STUDENT"
+                              : value == "SELF_EMPLOYED" ? employmentType ="SELF EMPLOYED"
+                              :value=="MILITARY_OR_COMMUNITY_SERVICE"? employmentType = "MILITARY OR COMMUNITY SERVICE":employmentType=="";
 
                         });
                         print(_employmentIndustryValue.toString);
@@ -1247,6 +1251,22 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                   validate: (v) {},
                   format: [],
                 ),
+                Row(
+                  children: [
+                    SizedBox(width: 170,
+                      child: kycDataWidget(
+                        //focus,
+                          field: "Enter OTP",
+                          labelText: "Enter",
+                          control: OtpNumberControl,
+                          keyboardInputType: TextInputType.number,
+                          validate: formatAndValidate.validateOtp,
+                          format: formatAndValidate.formatPinCode()),
+                    ),
+                    SizedBox(width: 30,),
+                    ElevatedButton(onPressed: ()async{await generateotp();}, child: Text("Generate Otp")),
+                  ],
+                ),
 
                 terms_Conditions != null
                     ? Container(
@@ -1334,8 +1354,10 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       _sendOtp(
                           fName: firstNameControl.text,
                           lName: lastNameControl.text,
+                          mName:middleNameControl.text,
                           pan: panNumberControl.text,
                           dob: dobControl.text,
+                          otp: OtpNumberControl.text.toString(),
                           gender: gender,
                           address: address1Control.text,
                           pinCode: permanentpinNumberControl.text,
@@ -1381,6 +1403,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
             setState(() {
               if (value != null && value) {
                 selectedCategories.add(category);
+                categories= category;
+                print("category->${category}");
               } else {
                 selectedCategories.remove(category);
               }
@@ -1551,10 +1575,54 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
           }
         });
   }
+  Future generateotp()async{
+       try {
 
-  Future _sendOtp(
-      {String? fName,
+  AppDialogs.loading();
+
+
+  Map<String, dynamic> data =
+              {
+              'firstName': firstNameControl.text,
+                "contactNo": "7012733764",
+                'user_id': User.userId,
+  };
+  print("number->${phoneNumberControl.text}");
+  final response = await http.post(
+  Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
+  headers:{
+  "Authorization":"Bearer 4|d6tyfQIfBzH2C2XfuB7IXxhtJA9pDQSWRt444nVL",
+  },
+  body:data,
+  );
+  Get.back();
+  print(response.body);
+  if (response.statusCode==200) {
+  toastMessage(response.statusCode);
+  Map jsonResponse = json.decode(response.body);
+
+  // Extract entityId from the response
+entityId = jsonResponse['entityId'];
+print("entity->${entityId}");
+  // Get.to(() => ApplyKycVerifyOtpScreen(
+  // // verifyToken: response.body!.!.toString(),
+  // ));
+  } else {
+  toastMessage('${response.statusCode}');
+  }
+  } catch (e, s) {
+  Completer().completeError(e, s);
+  Get.back();
+  toastMessage('Something went wrong. Please try again');
+  }
+}
+
+
+Future _sendOtp(
+    {String? fName,
       String? lName,
+      String? mName,
+String?otp,
       //String? email,
       String? pan,
       String? dob,
@@ -1565,74 +1633,130 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       String? state,
       String? aadhaarNumber}) async {
 
-    List<Map<String, dynamic>> addressInfo = [
+  List<Map<String, dynamic>> addressInfo = [
     {
+
       "addressCategory": "PERMANENT",
-    "address1": "F2 AMPA FLATS",
-    "address2": "NSK ROAD 2ND STREET",
-    "address3": "TNAGAR",
-    "city": "CHENNAI",
-    "state_code": 24,
-    "country": "INDIA",
-    "pinCode": "600028"
+      "address1": permanentAddress1Control.text,
+      "address2": permanentAddress2Control.text,
+      "address3": permanentAddress3Control.text,
+      "city": permanentcityControl.text,
+      "state_code": state,
+      "country": "INDIA",
+      "pinCode":permanentpinNumberControl.text
     },
-    ];
+   // if(categories == "HOME") {
+   //   "addressCategory":categories ,
+   //    "address1": homeAddress1Control.text,
+   //    "address2": homeAddress2Control.text,
+   //    "address3": homeAddress3Control.text,
+   //    "city": homecityControl.text,
+   //    "state_code": state,
+   //    "country": "INDIA",
+   //    "pinCode": homepinNumberControl.text.toString()
+   //  }else if(categories == "OFFICE"){
+   //   "addressCategory":categories ,
+   //   "address1": officeAddress1Control.text,
+   //   "address2": officeAddress2Control.text,
+   //   "address3": officeAddress3Control.text,
+   //   "city": officecityControl.text,
+   //   "state_code": state,
+   //   "country": "INDIA",
+   //   "pinCode": officepinNumberControl.text.toString()
+   // }
+   // else if(categories=="DELIVERY"){
+   //     "addressCategory":categories ,
+   //     "address1": deliveryAddress1Control.text,
+   //     "address2": deliveryAddress2Control.text,
+   //     "address3": deliveryAddress3Control.text,
+   //     "city": deliverycityControl.text,
+   //     "state_code": state,
+   //     "country": "INDIA",
+   //     "pinCode": deliverypinNumberControl.text.toString()
+   //
+   // }
+   // else{
+   //       "addressCategory":categories ,
+   //       "address1": communicationAddress1Control.text,
+   //       "address2": communicationAddress2Control.text,
+   //       "address3": communicationAddress3Control.text,
+   //       "city": communicationcityControl.text,
+   //       "state_code": state,
+   //       "country": "INDIA",
+   //       "pinCode": communicationpinNumberControl.text.toString()
+   //     }
 
+  ];
 
-
-    Map<String, dynamic> body = {};
-
-    body["account_id"] = User.userId;
-    body["first_name"] = fName;
-    body["last_name"] = lName;
-    body["email"] = User.userEmail;
-    body["phone_number"] = User.userMobile;
-    body["date_of_birth"] = dob;
-    body["gender"] = gender;
-    body["address_type"] = "PERMANENT";
-    body["address"] = address;
-    body["pin_code"] = pinCode;
-    body["city"] = city;
-    body["state_code"] = state;
-    body["pan_number"] = pan!.toUpperCase();
-    // body["aadhaar_number"] = aadhaarNumber;
-    body["rzr_pay_id"] = widget.razorPayId!;
-    body["referred_by"] = referredByControl.text.trim();
-    body["card_id"] = widget.cardId;
-
-    try {
-
-      AppDialogs.loading();
-
-
-      Map<String, dynamic> data = {
-        'firstName': 'Abin',
-        'contactNo': '9948258241',
-        'user_id': 1710,
-      };
-      final response = await http.post(
-        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
-        // headers: <String, String>{
-        //   'Content-Type': 'application/json; charset=UTF-8',
-        // },
-        body: jsonEncode(data),
-      );
-      Get.back();
-      if (response.statusCode==200!) {
-        toastMessage(response.statusCode);
-        print(response.body);
-        Get.to(() => ApplyKycVerifyOtpScreen(
-             // verifyToken: response.body!.!.toString(),
-            ));
-      } else {
-        toastMessage('${response.statusCode!}');
-      }
-    } catch (e, s) {
-      Completer().completeError(e, s);
-      Get.back();
-      toastMessage('Something went wrong. Please try again');
+// communicationInfo array
+  List<Map<String, dynamic>> communicationInfo = [
+    {
+      "contactNo":"+917012733764",
+      "notification": true,
+      "emailId": emailIdControl.text
     }
+  ];
+  // kycInfo array
+  List<Map<String, dynamic>> kycInfo = [
+    {
+      "documentType": "PAN",
+      "documentNo": panNumberControl.text,
+      "documentExpiry": ""
+    }
+  ];
+  List<Map<String, dynamic>> dateInfo = [
+    {
+      "dateType": "DOB",
+      "date": dob,
+    }
+  ];
+
+  Map<String, dynamic> body = {};
+  body["user_id"] = User.userId;
+  body["firstName"] = fName;
+  body["middleName"] = mName;
+  body["entityId"] = entityId;
+  body["title"] =title;
+  body["lastName"] = lName;
+  body["email"] = User.userEmail;
+  body["otp"]= OtpNumberControl.text.toString();
+  body["isNRICustomer"]= isNricustomer;
+  body["isMinor"]=isMinor;
+  body["isDependant"]= isDependant;
+  body["maritalStatus"]=marital_status;
+  body["countryCode"]="91";
+  body["employmentIndustry"]=_employmentIndustryValue;
+  body["employmentType"]=_employmentTypeValue;
+  // body["aadhaar_number"] = aadhaarNumber;
+  // body["rzr_pay_id"] = widget.razorPayId!;
+  body["referred_by"] = User.userId;
+  body["prepaid_card_id"] = 5;
+  body["gender"] = gender!.toUpperCase();
+  body["addressInfo"] = addressInfo;
+  body["communicationInfo"]= communicationInfo;
+  body["aliasName"]= fName;
+  body["kycInfo"]=kycInfo;
+  body["dateInfo"]=dateInfo;
+
+print("body->${body}");
+  print("body->${otp}");
+  try {
+    AppDialogs.loading();
+    RegisterWalletResponse response = await _walletBloc.registerWallet(body);
+    Get.back();
+    if (response.success!) {
+      toastMessage(response.message);
+      print(response.data);
+      Get.to(() =>  WalletHomeScreen(isToLoadMoney: false,));
+    } else {
+      toastMessage('${response.message!}');
+    }
+  } catch (e, s) {
+    Completer().completeError(e, s);
+    Get.back();
+    toastMessage(e);
   }
+}
 }
 
 class FormatAndValidate {
@@ -1710,6 +1834,13 @@ class FormatAndValidate {
         value!.isEmpty || value.length != 6 ? "Enter 6 digit pin code" : null;
     print("xxxx");
     print(x.toString());
+    return x;
+  }
+  validateOtp(value) {
+    String? x =
+    value!.isEmpty || value.length != 6 ? "Enter 6 digit OTP" : null;
+    print("xxxx");
+    print("x==${x.toString()}");
     return x;
   }
 

@@ -32,6 +32,8 @@ import '../models/spin_voucher_list_response.dart';
 import '../models/virtual_account_balance_model.dart';
 import '../util/user.dart';
 int unreadCount= 0;
+String TokenPrepaidCard="";
+bool prepiad_user = false;
 class ProfileRepository {
   late ApiProvider apiProvider;
   late ApiProviderPrepaidCards apiProviderPPCards;
@@ -111,22 +113,25 @@ class ProfileRepository {
         .post(Apis.transferCoinHistory, data: {"account_id": '$accountId'});
     return CoinTransferHistoryModel.fromJson(json.decode(response.data));
   }
-
-  Future<CommonResponse> checkPrepaidUserOrNot(String userId) async {
-    final response = await apiProviderPPCards
-        .getJsonInstance()
-        .post("${Apis.checkPrepaidUserOrNot}${userId}",);
-    Map map = jsonDecode(response.data);
-    return CommonResponse.fromJson(map);
-  }
   Future<CommonResponse> checkPrepaidUserOrNotToken(String userId) async {
     final response = await apiProviderPPCards
         .getJsonInstance()
-        .post("${Apis.checkPrepaidUserOrNotToken}${userId}", );
-    Map map = jsonDecode(response.data);
-    print("response token->${map}");
-    return CommonResponse.fromJson(map);
+        .get("${Apis.checkPrepaidUserOrNotToken}${userId}");
+    print("response token->${response.data}");
+    TokenPrepaidCard= response.data["token"];
+  //  Map map = jsonDecode(response.data);
+    print("response token->${TokenPrepaidCard}");
+    return CommonResponse.fromJson(response.data);
   }
+  Future<CommonResponse> checkPrepaidUserOrNot(String userId) async {
+    final response = await apiProviderPPCards
+        .getJsonInstancecard()
+        .get("${Apis.checkPrepaidUserOrNot}${userId}",);
+    prepiad_user = response.data["prepaid_user"];
+    //Map map = jsonDecode(response.data);
+    return CommonResponse.fromJson(response.data);
+  }
+
   Future<CommonResponse> transferCoinsToPrepaidCard(FormData body) async {
     final response = await apiProviderPPCards
         .getJsonInstance()

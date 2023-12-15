@@ -1,4 +1,5 @@
 import 'package:event_app/bloc/profile_bloc.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/gifting_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_prepaid_card_list_screen.dart';
@@ -53,7 +54,7 @@ void initState() {
             color: Colors.transparent,
             child: InkWell(
                 onTap: () async {
-                  if (prepaidCardUserOrNot == true) {
+                  if (prepiad_user == true) {
                     Get.to(() => WalletHomeScreen(isToLoadMoney: false,));
                     //  bool? hasMpin = await _walletBloc.getMPinStatus(User.userId);
                     //           if(hasMpin!=null) {

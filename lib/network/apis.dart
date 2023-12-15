@@ -110,7 +110,7 @@ class Apis {
   static String registerWallet = "api/prepaid/cards/wallet-registration";
   static String verifyWalletRegistrationOtp = "api/verify-registration";
   static String walletRegistrationResendOtp = "api/resend-otp";
-  static String getWalletDetails = "api/fetch-wallet-details";
+  static String getWalletDetails = "api/prepaid/cards/wallet-details";
   static String getCVV = "api/fetch-cvv";
   static String checkPhysicalCardExists = "api/check-enable-cardsetpin-button";
   static String checkEnableRequestPhysicalCard =

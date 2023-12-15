@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
     });
   }
   getPrepaidCardUserOrNotToken() async {
-    prepaidCardUserOrNot = await _profileBloc.tokenforPrepaidcard(accountId);
+    prepaidCardUserOrNot = await _profileBloc.tokencard(accountId);
     setState(() {});
   }
   getPrepaidCardUserOrNot() async {

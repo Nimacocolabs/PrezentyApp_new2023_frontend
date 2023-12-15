@@ -68,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? pickedXmlFile;
   FilePickerResult? pickerResult;
   bool? prepaidCardUserOrNot;
+  bool? prepaidCardUserOrNotToken;
   @override
   void initState() {
     super.initState();
@@ -80,6 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _profileBloc.getProfileInfo();
 
       getVirtualAccountBalance();
+      getPrepaidCardUserOrNotToken();
       getPrepaidCardUserOrNot();
       getUserImage();
 
@@ -104,6 +106,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   getPrepaidCardUserOrNot() async {
     prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(accountId);
+    setState(() {});
+  }
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(accountId);
     setState(() {});
   }
  getUserImage() async {

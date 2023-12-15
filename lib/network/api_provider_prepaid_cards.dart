@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:event_app/network/api_interceptor.dart';
 import 'package:event_app/network/api_interceptor_prepaid_cards.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/util/app_helper.dart';
 
 class ApiProviderPrepaidCards {
@@ -27,7 +28,11 @@ class ApiProviderPrepaidCards {
     _dio!.options.headers.addAll({"Content-Type": "application/json"});
     return _dio!;
   }
-
+  Dio getJsonInstancecard() {
+    _dio!.options.headers.addAll({"Content-Type": "application/json",
+    "Authorization":"Bearer ${TokenPrepaidCard}"});
+    return _dio!;
+  }
   Dio getMultipartInstance() {
     _dio!.options.headers.addAll({"Content-Type": "multipart/form-data"});
     return _dio!;

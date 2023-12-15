@@ -368,10 +368,11 @@ class ProfileBloc {
       return false;
     }
   }
-  Future<bool> tokenforPrepaidcard(String accountId) async {
+  Future<bool> tokencard(String accountId) async {
     try {
       CommonResponse? response =
       await _repository.checkPrepaidUserOrNotToken(accountId);
+      print("response->${response}");
       return response.success ?? false;
     } catch (e, s) {
       Completer().completeError(e, s);

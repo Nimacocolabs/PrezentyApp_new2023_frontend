@@ -115,11 +115,18 @@ class ProfileRepository {
   Future<CommonResponse> checkPrepaidUserOrNot(String userId) async {
     final response = await apiProviderPPCards
         .getJsonInstance()
-        .post(Apis.checkPrepaidUserOrNot, data: {"account_id": '$userId'});
+        .post("${Apis.checkPrepaidUserOrNot}${userId}",);
     Map map = jsonDecode(response.data);
     return CommonResponse.fromJson(map);
   }
-
+  Future<CommonResponse> checkPrepaidUserOrNotToken(String userId) async {
+    final response = await apiProviderPPCards
+        .getJsonInstance()
+        .post("${Apis.checkPrepaidUserOrNotToken}${userId}", );
+    Map map = jsonDecode(response.data);
+    print("response token->${map}");
+    return CommonResponse.fromJson(map);
+  }
   Future<CommonResponse> transferCoinsToPrepaidCard(FormData body) async {
     final response = await apiProviderPPCards
         .getJsonInstance()

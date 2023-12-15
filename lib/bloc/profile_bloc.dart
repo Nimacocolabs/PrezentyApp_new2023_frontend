@@ -368,7 +368,16 @@ class ProfileBloc {
       return false;
     }
   }
-
+  Future<bool> tokenforPrepaidcard(String accountId) async {
+    try {
+      CommonResponse? response =
+      await _repository.checkPrepaidUserOrNotToken(accountId);
+      return response.success ?? false;
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      return false;
+    }
+  }
   Future<CommonResponse> transferCoinsToPrepaidCard(FormData body) async {
     try {
       CommonResponse response =

@@ -158,7 +158,8 @@ class Apis {
   static String accountDeleteEmailOtp = "api/account-delele-email-confirm";
   static String accountDeleteConfirm = "api/confirm-account-delele-request";
   static String transferCoinHistory = "api/coin-transfer-history";
-  static String checkPrepaidUserOrNot = "api/check-prepaid-user-or-not";
+  static String checkPrepaidUserOrNot = "api/prepaid/cards/check-customer/";
+  static String checkPrepaidUserOrNotToken = "api/prepaid/cards/get-token/";
   static String transferCoinToPrepaidCard = "api/transfer-coin-to-prepaid-card";
   static String userPermenantAddress = "api/get-user-permenant-address";
   static String getPhysicalOrderId = "api/get-physical-order-id-amount";

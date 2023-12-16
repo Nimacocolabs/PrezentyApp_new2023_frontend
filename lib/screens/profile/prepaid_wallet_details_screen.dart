@@ -27,7 +27,7 @@ class _PrepaidWalletDetailsScreenState
   WalletBloc _walletBloc = WalletBloc();
   String accountId = User.userId;
   fetchUserData? kycUserData;
-  WalletDetailsData? walletData;
+  WalletDetails? walletData;
   FetchPhysicalCardDetailsModel? physicalCardData;
   GetPhysicalCardStatusModel?  physicalCardStatus;
 
@@ -148,7 +148,7 @@ class _PrepaidWalletDetailsScreenState
                                     padding:
                                         const EdgeInsets.fromLTRB(39, 0, 0, 0),
                                     child: Text(
-                                      '${walletData?.walletDetails?.cardName ?? ""}',
+                                      '${walletData?.cardName ?? ""}',
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),
@@ -467,8 +467,7 @@ class _PrepaidWalletDetailsScreenState
                                                           RequestPhysicalCard(
                                                             kitNumber: _walletBloc
                                                                 .walletDetailsData!
-                                                                .cardDetails![0]
-                                                                .kitNumber!,
+                                                                .kitNo!,
                                                             cardNumber: _walletBloc
                                                                 .walletDetailsData!
                                                                 .cardDetails![0]
@@ -518,7 +517,7 @@ class _PrepaidWalletDetailsScreenState
                                     padding:
                                         const EdgeInsets.fromLTRB(39, 0, 0, 0),
                                     child: Text(
-                                      '${rupeeSymbol} ${walletData?.walletDetails?.balance ?? ""}',
+                                      '${rupeeSymbol} ${walletData?.balanceInfo?.balance ?? ""}',
                                       style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400),

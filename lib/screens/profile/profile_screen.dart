@@ -55,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? virtualAccountBalance;
   String accountId = User.userId;
   DeleteAccountOtpData? deleteData;
-  WalletDetailsData? walletData;
+  WalletDetails? walletData;
   UserSignUpResponse? userImage;
 
   final TextEditingController panNumberControl = TextEditingController();

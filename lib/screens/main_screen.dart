@@ -49,6 +49,7 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
   late VoidCallback refreshUIFn;
   WalletBloc _walletBloc = WalletBloc();
    bool? prepaidCardUserOrNot;
+   bool?prepaidCardUserOrNotToken;
   @override
   void initState() {
     super.initState();
@@ -77,7 +78,7 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
     });
   }
   getPrepaidCardUserOrNotToken() async {
-    prepaidCardUserOrNot = await _profileBloc.tokencard(accountId);
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(accountId);
     setState(() {});
   }
   getPrepaidCardUserOrNot() async {

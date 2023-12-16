@@ -27,7 +27,7 @@ import 'wallet_home_statement.dart';
 
 class WalletHomeTabs extends StatefulWidget {
   final WalletDetails? walletDetails;
-  final CardDetail cardDetail;
+  final CardDetails cardDetail;
 
   WalletHomeTabs({
     Key? key,
@@ -98,7 +98,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
   getCVV() async {
     String? url;
     FetchCardCvvResponse response =
-        await _walletBloc.getCardCVV(User.userId, widget.cardDetail.kitNumber);
+        await _walletBloc.getCardCVV(User.userId, widget.walletDetails!.kitNo);
     url = response.data!.url;
     return url;
   }
@@ -106,7 +106,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
   setCardPin() async {
     String? url;
     SetCardPinResponse response =
-        await _walletBloc.setCardPin(User.userId, widget.cardDetail.kitNumber);
+        await _walletBloc.setCardPin(User.userId, widget.walletDetails!.kitNo);
     url = response.data!.url;
     return url;
   }
@@ -622,7 +622,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                       borderRadius: BorderRadius.circular(screenWidth)),
                   child: Center(
                     child: Text(
-                      rupeeSymbol + widget.walletDetails!.balance.toString(),
+                      rupeeSymbol + widget.walletDetails!.balanceInfo!.balance.toString(),
                       maxLines: 1,
                       style: TextStyle(
                           color: Colors.black87,

@@ -1,5 +1,8 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:event_app/repositories/profile_repository.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/cardUrlscreen.dart';
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
 import 'package:event_app/models/common_response.dart';
@@ -45,7 +48,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   fetchUserData? userData;
   bool? isLoadMyWallet;
   int selectedRadioValue = 1;
-  WalletDetailsData? walletData;
+  WalletDetails? walletData;
   String? confirmWalletNumber;
   bool _passwordVisible = true;
   String? currentBalance;
@@ -59,7 +62,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   TextEditingController _textEditingControllerLoadingAmount =
       TextEditingController();
   TextEditingController _textEditingControllerEventID = TextEditingController();
-
+String cardUrl ="";
   @override
   void initState() {
     super.initState();
@@ -75,7 +78,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     walletData = await _walletBloc.getWalletDetails(User.userId);
 
     userData = await _walletBloc.fetchUserKYCDetails(accountId!);
-    await _checkEnableRequestPhysicalCard();
+    //await _checkEnableRequestPhysicalCard();
     setState(() {});
   }
 
@@ -107,7 +110,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   }
                   Get.to(() => RequestPhysicalCard(
                         kitNumber: _walletBloc
-                            .walletDetailsData!.cardDetails![0].kitNumber!,
+                            .walletDetailsData!.kitNo!,
                         cardNumber: _walletBloc
                             .walletDetailsData!.cardDetails![0].cardNumber!,
                       ));
@@ -257,7 +260,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .08,
                             top: screenWidth * .60,
                             child: Text(
-                              '${walletDetails.data!.cardDetails![0].cardNumber!.substring(0, 4)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(4, 8)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(8, 12)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
+                              '${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(0, 4)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(4, 8)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(8, 12)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -266,7 +269,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .18,
                             top: screenWidth * .95,
                             child: Text(
-                              '${walletDetails.data!.cardDetails![0].expiryMonth}/${walletDetails.data!.cardDetails![0].expiryYear!.substring(2, 4)}',
+                              '${walletDetails.walletDetails!.cardDetails![0].expiry}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -367,7 +370,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           SizedBox(
             height: 16,
           ),
-
+          Align(
+            alignment:Alignment.topRight ,
+            child: TextButton(
+              onPressed: (){
+generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletDetails!.kitNo}", "${walletDetails.walletDetails!.dob}");
+              }, child: Text("View Card",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+            ),
+          ),
           Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -381,38 +391,38 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   children: [
                     Expanded(
                         child: Text(
-                            walletDetails.data?.walletDetails?.cardName ?? '',
+                            walletDetails.walletDetails?.cardName ?? '',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500))),
                     SizedBox(width: 10),
-                    FutureBuilder(
-                      future: _walletBloc.getEnableUpgradeButton(User.userId,
-                          walletDetails.data?.walletDetails?.cardId ?? 0),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.waiting:
-                            return Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          default:
-                            if (snapshot.hasError || !snapshot.data)
-                              return SizedBox();
-                            else
-                              return ElevatedButton(
-                                  child: Text('Upgrade'),
-                                  onPressed: () {
-                                    Get.to(() => ApplyPrepaidCardListScreen(
-                                        isUpgrade: true,
-                                        currentCardId: walletDetails
-                                                .data?.walletDetails?.cardId ??
-                                            0));
-                                  });
-                        }
-                      },
-                    ),
+                    // FutureBuilder(
+                    //   future: _walletBloc.getEnableUpgradeButton(User.userId,
+                    //       walletDetails.walletDetails?.cardDetails?[0].c ?? 0),
+                    //   builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    //     switch (snapshot.connectionState) {
+                    //       case ConnectionState.waiting:
+                    //         return Padding(
+                    //           padding: const EdgeInsets.all(6.0),
+                    //           child: Center(
+                    //             child: CircularProgressIndicator(),
+                    //           ),
+                    //         );
+                    //       default:
+                    //         if (snapshot.hasError || !snapshot.data)
+                    //           return SizedBox();
+                    //         else
+                    //           return ElevatedButton(
+                    //               child: Text('Upgrade'),
+                    //               onPressed: () {
+                    //                 Get.to(() => ApplyPrepaidCardListScreen(
+                    //                     isUpgrade: true,
+                    //                     currentCardId: walletDetails
+                    //                             .data?.walletDetails?.cardId ??
+                    //                         0));
+                    //               });
+                    //     }
+                    //   },
+                    // ),
                   ],
                 ),
               )),
@@ -443,7 +453,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                 fontSize: 18, fontWeight: FontWeight.w500))),
                     SizedBox(width: 10),
                     Text(
-                      "${walletDetails.data?.walletDetails?.walletNumber}",
+                      "${walletDetails.walletDetails?.walletNumber}",
                       style: TextStyle(color: Colors.black, fontSize: 16),
                     )
                   ],
@@ -630,8 +640,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             height: 15,
           ),
           WalletHomeTabs(
-            walletDetails: walletDetails.data!.walletDetails,
-            cardDetail: walletDetails.data!.cardDetails![0],
+            walletDetails: walletDetails.walletDetails!,
+            cardDetail: walletDetails.walletDetails!.cardDetails![0],
           ),
           SizedBox(
             height: 50,
@@ -720,11 +730,51 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   //       false; //if showDialouge had returned null, then return false
   // }
 
-  _checkEnableRequestPhysicalCard() async {
-    enableRequestPhysicalCard.value =
-        await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
-            _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
-    setState(() {});
+  // _checkEnableRequestPhysicalCard() async {
+  //   enableRequestPhysicalCard.value =
+  //       await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
+  //           _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
+  //   setState(() {});
+  // }
+  Future generateurl(String entityid,kit,dob)async{
+    try {
+
+      AppDialogs.loading();
+
+
+      Map<String, dynamic> data =
+      {
+        "entity_id":"${entityid}",
+        "kit_no":"${kit}",
+        "dob":"${dob}"
+      };
+      final response = await http.post(
+        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
+        headers:{
+          "Authorization":"Bearer ${TokenPrepaidCard}",
+        },
+        body:data,
+      );
+      Get.back();
+      print(response.body);
+      if (response.statusCode==200) {
+        toastMessage(response.statusCode);
+        Map jsonResponse = json.decode(response.body);
+
+        // Extract entityId from the response
+        cardUrl = jsonResponse['cardUrl'];
+        print("entity->${cardUrl}");
+        Get.to(() => CardUrlScreen(url: cardUrl,
+        // verifyToken: response.body!.!.toString(),
+        ));
+      } else {
+        toastMessage('${response.statusCode}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
   }
 
   Future<dynamic> _blockCard(String accountId) async {
@@ -1295,7 +1345,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         amount: amountTyped,
       );
 
-      String? currentBalance = walletData?.walletDetails?.balance.toString();
+      String? currentBalance = walletData?.balanceInfo?.balance.toString();
       if (validateWalletData.statusCode == 200) {
         Get.off(WalletPaymentScreen(
           accountid: User.userId,

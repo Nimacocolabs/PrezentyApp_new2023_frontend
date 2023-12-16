@@ -139,7 +139,7 @@ class WalletRepository {
 
   Future<RegisterWalletResponse> registerWallet(Map body) async {
     Response response = await apiProvider
-        .getJsonInstance()
+        .getJsonInstancecard()
         .post(Apis.registerWallet, data: body);
     return RegisterWalletResponse.fromJson(jsonDecode(response.data));
   }
@@ -161,10 +161,10 @@ class WalletRepository {
 
   Future<WalletDetailsResponse> getWalletDetails(String? userId) async {
     final response = await apiProvider
-        .getJsonInstance()
-        .post(Apis.getWalletDetails, data: {"account_id": userId});
+        .getJsonInstancecard()
+        .get(Apis.getWalletDetails,);
     print("api->${Apis.getWalletDetails}");
-    return WalletDetailsResponse.fromJson(jsonDecode(response.data));
+    return WalletDetailsResponse.fromJson(response.data);
   }
 
   Future<SetCardPinResponse> setCardPin(

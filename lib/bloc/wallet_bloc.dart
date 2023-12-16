@@ -86,7 +86,7 @@ class WalletBloc {
   bool hasNextPage = true;
   int pageNumber = 0;
   int perPage = 20;
-  WalletDetailsData? walletDetailsData;
+  WalletDetails? walletDetailsData;
 
   LoadMoreListener? listener;
 
@@ -445,7 +445,7 @@ class WalletBloc {
     }
   }
 
-  Future<WalletDetailsData?> getWalletDetails(String? userId) async {
+  Future<WalletDetails?> getWalletDetails(String? userId) async {
     try {
       _getWalletDetailsSink.add(ApiResponse.loading('Fetching'));
       walletDetailsData = null;
@@ -453,8 +453,8 @@ class WalletBloc {
           await _walletRepository!.getWalletDetails(userId);
 
       if (response.success ?? false) {
-        walletDetailsData = response.data;
-        if (response.data!.walletDetails!.walletStatus == "LOCKED") {
+        walletDetailsData = response.walletDetails;
+        if (response.walletDetails!.cardDetails![0].status == "LOCKED") {
           Get.back();
           AppDialogs.message(
               'Your wallet is currently inactive. If you wish to activate your wallet please contact the customer care.');

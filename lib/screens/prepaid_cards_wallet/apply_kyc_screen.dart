@@ -5,6 +5,7 @@ import 'package:event_app/models/wallet&prepaid_cards/register_wallet_response.d
 import 'package:event_app/models/wallet&prepaid_cards/state_data_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/terms_and_conditions_model.dart';
 import 'package:event_app/network/api_response.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/login/select_country_dialog_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_verify_otp_screen.dart';
@@ -1584,14 +1585,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   Map<String, dynamic> data =
               {
               'firstName': firstNameControl.text,
-                "contactNo": "7012733764",
+                "contactNo": User.userMobile,
                 'user_id': User.userId,
   };
   print("number->${phoneNumberControl.text}");
   final response = await http.post(
   Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
   headers:{
-  "Authorization":"Bearer 4|d6tyfQIfBzH2C2XfuB7IXxhtJA9pDQSWRt444nVL",
+  "Authorization":"Bearer ${TokenPrepaidCard}",
   },
   body:data,
   );
@@ -1691,7 +1692,7 @@ String?otp,
 // communicationInfo array
   List<Map<String, dynamic>> communicationInfo = [
     {
-      "contactNo":"+917012733764",
+      "contactNo":"+91${User.userMobile}",
       "notification": true,
       "emailId": emailIdControl.text
     }

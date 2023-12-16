@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/event_bloc.dart';
 import 'package:event_app/bloc/profile_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:event_app/models/touchpoint_wallet_balance_response.dart';
 import 'package:event_app/models/home_events_response.dart';
 import 'package:event_app/models/user_sign_up_response.dart';
 import 'package:event_app/network/api_response.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/deals_for_you_details_screen.dart';
 import 'package:event_app/screens/drawer/happy_moments_screen.dart';
 import 'package:event_app/screens/drawer/tambola_game_screen.dart';
@@ -31,6 +33,7 @@ import 'package:event_app/util/user.dart';
 import 'package:event_app/widgets/CommonApiErrorWidget.dart';
 import 'package:event_app/widgets/CommonApiLoader.dart';
 import 'package:event_app/widgets/CommonApiResultsEmptyWidget.dart';
+import 'package:event_app/widgets/app_dialogs.dart';
 import 'package:event_app/widgets/succes_or_failed_common_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,13 +72,46 @@ class _HomeScreenState extends State<HomeScreen>
       "https://prezentycards-live/public/app-assets/image/verified.png";
   String? sliderImageBaseUrl =
       "https://prezenty.in/prezentycards-live/public/app-assets/image/slider/";
+  Future bankbalcInfo()async{
+    try {
 
+      AppDialogs.loading();
+
+
+      final response = await http.post(
+        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
+        headers:{
+          "Authorization":"Bearer ${TokenPrepaidCard}",
+        },
+      );
+      Get.back();
+      print(response.body);
+      if (response.statusCode==200) {
+        toastMessage(response.statusCode);
+        // Map jsonResponse = json.decode(response.body);
+        //
+        // // Extract entityId from the response
+        // cardUrl = jsonResponse['cardUrl'];
+        // print("entity->${cardUrl}");
+        // Get.to(() => CardUrlScreen(url: cardUrl,
+          // verifyToken: response.body!.!.toString(),
+       // ));
+      } else {
+        toastMessage('${response.statusCode}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
+  }
   @override
   void initState() {
     super.initState();
     _reloadList();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
+      await bankbalcInfo();
       getData();
       await _profileBloc.getProfileInfo();
       Notifications.setUserId(User.userEmail);

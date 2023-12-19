@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:event_app/repositories/profile_repository.dart';
-import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/cardUrlscreen.dart';
+import 'package:event_app/screens/main_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
@@ -25,6 +25,7 @@ import 'package:event_app/widgets/common_bottom_navigation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../../models/block_card_response.dart';
 import '../../../widgets/app_dialogs.dart';
 import '../apply_prepaid_card_list_screen.dart';
@@ -62,15 +63,22 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   TextEditingController _textEditingControllerLoadingAmount =
       TextEditingController();
   TextEditingController _textEditingControllerEventID = TextEditingController();
-String cardUrl ="";
+  String cardUrl = "";
+  int? selectedCheckboxIndex;
+
+  List<String> checkboxItems = ['LOCK', 'UNLOCK', 'BLOCK',];
+
+
   @override
   void initState() {
     super.initState();
     _walletBloc = WalletBloc();
-   
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-       _getWalletDetails();
-    widget.isToLoadMoney ?? false ?  Navigator.pushReplacement(context, loadMoneyWidget()) :null;
+      _getWalletDetails();
+      widget.isToLoadMoney ?? false
+          ? Navigator.pushReplacement(context, loadMoneyWidget())
+          : null;
     });
   }
 
@@ -78,7 +86,7 @@ String cardUrl ="";
     walletData = await _walletBloc.getWalletDetails(User.userId);
 
     userData = await _walletBloc.fetchUserKYCDetails(accountId!);
-    //await _checkEnableRequestPhysicalCard();
+    await _checkEnableRequestPhysicalCard();
     setState(() {});
   }
 
@@ -109,17 +117,19 @@ String cardUrl ="";
                     return;
                   }
                   Get.to(() => RequestPhysicalCard(
-                        kitNumber: _walletBloc
-                            .walletDetailsData!.kitNo!,
+                        kitNumber: _walletBloc.walletDetailsData!.kitNo!,
                         cardNumber: _walletBloc
                             .walletDetailsData!.cardDetails![0].cardNumber!,
                       ));
                 } else if (v == 2) {
-                  _showBlockPopUp(context);
+                  _showBlockPopUp(context,_walletBloc
+                      .walletDetailsData,_walletBloc
+                      .walletDetailsData!.cardDetails!);
+                  print("scd=>${enableRequestPhysicalCard.value}");
                 }
               },
               itemBuilder: (context) => [
-                    if (enableRequestPhysicalCard.value)
+                    if (enableRequestPhysicalCard.value = true)
                       PopupMenuItem(
                         value: 1,
                         child: Text(
@@ -371,11 +381,18 @@ String cardUrl ="";
             height: 16,
           ),
           Align(
-            alignment:Alignment.topRight ,
+            alignment: Alignment.topRight,
             child: TextButton(
-              onPressed: (){
-generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletDetails!.kitNo}", "${walletDetails.walletDetails!.dob}");
-              }, child: Text("View Card",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+              onPressed: () {
+                generateurl(
+                    "${walletDetails.walletDetails!.entityId}",
+                    "${walletDetails.walletDetails!.kitNo}",
+                    "${walletDetails.walletDetails!.dob}");
+              },
+              child: Text(
+                "View Card",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
             ),
           ),
           Card(
@@ -390,8 +407,7 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                        child: Text(
-                            walletDetails.walletDetails?.cardName ?? '',
+                        child: Text(walletDetails.walletDetails?.cardName ?? '',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500))),
                     SizedBox(width: 10),
@@ -649,79 +665,39 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
         ]);
   }
 
-  Future<bool> _showBlockPopUp(context) async {
-    return await showDialog(
-          //show confirm dialogue
-          //the return value will be from "Yes" or "No" options
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Block Now ?'),
-            titleTextStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: secondaryColor),
-            content: const Text('Do you want to block and replace your card?'),
-            contentTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: secondaryColor),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                //return false when click on "NO"
-                child: const Text(
-                  'No',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              ElevatedButton(
-                // onPressed:() =>
-                onPressed: () => _blockCard(accountId!),
-                //Navigator.of(context).pop(true),
-                //return true when click on "Yes"
-                child: const Text(
-                  'Yes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false; //if showDialouge had returned null, then return false
-  }
-
-  // Future<bool> showExitPopup() async {
+  // Future<bool> _showBlockPopUp(context) async {
   //   return await showDialog(
   //         //show confirm dialogue
   //         //the return value will be from "Yes" or "No" options
   //         context: context,
   //         builder: (context) => AlertDialog(
-  //           title: const Text('Exit Wallet?'),
-  //           // titleTextStyle: TextStyle(
-  //           //     fontSize: 12,
-  //           //     fontWeight: FontWeight.bold,
-  //           //     color: secondaryColor),
-  //           content: const Text('Do you want to exit Wallet?'),
-  //           // contentTextStyle: TextStyle(
-  //           //     // fontSize: 18,
-  //           //     fontWeight: FontWeight.normal,
-  //           //     color: secondaryColor),
+  //           title: const Text('Block Now ?'),
+  //           titleTextStyle: TextStyle(
+  //               fontSize: 24,
+  //               fontWeight: FontWeight.bold,
+  //               color: secondaryColor),
+  //           content: const Text('Do you want to block and replace your card?'),
+  //           contentTextStyle: TextStyle(
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.normal,
+  //               color: secondaryColor),
   //           actions: [
   //             ElevatedButton(
   //               onPressed: () => Navigator.of(context).pop(false),
   //               //return false when click on "NO"
   //               child: const Text(
   //                 'No',
-  //                 // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
   //               ),
   //             ),
   //             ElevatedButton(
-  //               onPressed: () => Get.offAll(() => MainScreen()),
+  //               // onPressed:() =>
+  //               onPressed: () => _blockCard(accountId!),
   //               //Navigator.of(context).pop(true),
   //               //return true when click on "Yes"
   //               child: const Text(
   //                 'Yes',
-  //                 // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
   //               ),
   //             ),
   //           ],
@@ -730,43 +706,172 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
   //       false; //if showDialouge had returned null, then return false
   // }
 
-  // _checkEnableRequestPhysicalCard() async {
-  //   enableRequestPhysicalCard.value =
-  //       await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
-  //           _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
-  //   setState(() {});
-  // }
-  Future generateurl(String entityid,kit,dob)async{
+  Future<bool> _showBlockPopUp(context,WalletDetails,CardDetails) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title:  Text('Card'),
+        titleTextStyle: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: secondaryColor),
+        content:  SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              Text("Current Status : ${CardDetails![0].status}",style: TextStyle(fontWeight: FontWeight.w500),),
+              SizedBox(height: 10,),
+              Text('Do you want to change the status in your card?'),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              itemCount: checkboxItems.length,
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text(checkboxItems[index]),
+                  value: selectedCheckboxIndex == index,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCheckboxIndex = value! ? index : null;
+                      print("Selected-->$selectedCheckboxIndex");
+                    });
+                  },
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                );
+              },
+            ),
+          ),
+
+            ],
+          ),
+        ),
+        contentTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.normal,
+            color: secondaryColor),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            //return false when click on "NO"
+            child: const Text(
+              'No',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ElevatedButton(
+            // onPressed:() =>
+            onPressed: () => _blockCard(accountId!),
+            //Navigator.of(context).pop(true),
+            //return true when click on "Yes"
+            child: const Text(
+              'Yes',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    ) ??
+        false; //if showDialouge had returned null, then return false
+  }
+
+
+
+  Future<bool> showExitPopup() async {
+    return await showDialog(
+          //show confirm dialogue
+          //the return value will be from "Yes" or "No" options
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit Wallet?'),
+            // titleTextStyle: TextStyle(
+            //     fontSize: 12,
+            //     fontWeight: FontWeight.bold,
+            //     color: secondaryColor),
+            content: const Text('Do you want to exit Wallet?'),
+            // contentTextStyle: TextStyle(
+            //     // fontSize: 18,
+            //     fontWeight: FontWeight.normal,
+            //     color: secondaryColor),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                //return false when click on "NO"
+                child: const Text(
+                  'No',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Get.offAll(() => MainScreen()),
+                //Navigator.of(context).pop(true),
+                //return true when click on "Yes"
+                child: const Text(
+                  'Yes',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false; //if showDialouge had returned null, then return false
+  }
+
+  _checkEnableRequestPhysicalCard() async {
+    enableRequestPhysicalCard.value =
+        await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
+            _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
+    setState(() {});
+  }
+
+  Future generateurl(String entityid, kit, dob) async {
     try {
-
-      AppDialogs.loading();
-
-
-      Map<String, dynamic> data =
-      {
-        "entity_id":"${entityid}",
-        "kit_no":"${kit}",
-        "dob":"${dob}"
+      Map<String, dynamic> data = {
+        "entity_id": "${entityid}",
+        "kit_no": "${kit}",
+        "dob": "${dob}"
       };
       final response = await http.post(
-        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
-        headers:{
-          "Authorization":"Bearer ${TokenPrepaidCard}",
+        Uri.parse(
+            "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
+        headers: {
+          "Authorization": "Bearer ${TokenPrepaidCard}",
         },
-        body:data,
+        body: data,
       );
-      Get.back();
-      print(response.body);
-      if (response.statusCode==200) {
-        toastMessage(response.statusCode);
-        Map jsonResponse = json.decode(response.body);
+      Get.back(); // Close any existing dialogs
 
-        // Extract entityId from the response
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        toastMessage(response.statusCode);
+
+        Map jsonResponse = json.decode(response.body);
         cardUrl = jsonResponse['cardUrl'];
         print("entity->${cardUrl}");
-        Get.to(() => CardUrlScreen(url: cardUrl,
-        // verifyToken: response.body!.!.toString(),
-        ));
+
+        // Show the cardUrl in a WebView
+        Get.dialog(
+          AlertDialog(
+            title: Text('Card Widget'),
+            content: Container(
+              width: 600,
+              height: 600, // Adjust height as needed
+              child: WebView(
+                initialUrl: cardUrl,
+                javascriptMode: JavascriptMode.unrestricted,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Close the dialog
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
       } else {
         toastMessage('${response.statusCode}');
       }
@@ -896,43 +1001,50 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
                                           ],
                                         )),
                             ),
-                             Text("NOTE: Your monthly load limit is ${rupeeSymbol} 10,000.",
-                                  style: TextStyle(color: primaryColor,fontWeight: FontWeight.w900),),
-                             widget.isToLoadMoney ?? false ? Container():
-                            Divider(
-                              thickness: 2,
+                            Text(
+                              "NOTE: Your monthly load limit is ${rupeeSymbol} 10,000.",
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w900),
                             ),
-                            widget.isToLoadMoney ?? false ? Container():
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text("For IMPS",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w700)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    "Account Number : ${userData?.vaNumber ?? ""} ",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                    ),
+                            widget.isToLoadMoney ?? false
+                                ? Container()
+                                : Divider(
+                                    thickness: 2,
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                      "IFSC Code : ${userData?.vaIfsc ?? 0} ",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      )),
-                                ),
-                              ],
-                            ),
+                            widget.isToLoadMoney ?? false
+                                ? Container()
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text("For IMPS",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w700)),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                          "Account Number : ${userData?.vaNumber ?? ""} ",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                            "IFSC Code : ${userData?.vaIfsc ?? 0} ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            )),
+                                      ),
+                                    ],
+                                  ),
                             Divider(
                               thickness: 2,
                             ),
@@ -1086,7 +1198,6 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
                                                       loadingAmount.toString(),
                                                 );
                                               }
-
                                             },
                                             child: Text("Load Money")),
                                       )
@@ -1354,7 +1465,6 @@ generateurl("${walletDetails.walletDetails!.entityId}", "${walletDetails.walletD
           walletNumber: validateWalletData.walletNumber,
           eventId: eventIdTyped,
           type: type,
-
         ));
       } else {
         toastMessage("${validateWalletData.message}");

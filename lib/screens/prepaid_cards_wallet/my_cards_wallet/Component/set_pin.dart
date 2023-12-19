@@ -12,6 +12,7 @@ class SetCardPin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("page-->${url}");
     return Scaffold(
       // appBar: AppBar(
       //   title: const Text('Set PIN'),
@@ -30,7 +31,7 @@ class SetCardPin extends StatelessWidget {
           javascriptEnabled: true,
           interactionSettings: WebBrowserInteractionSettings(
               topBar: null, bottomBar: null, gestureNavigationEnabled: false,
-            
+
               ),
         ),
       ),

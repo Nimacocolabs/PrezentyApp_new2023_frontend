@@ -13,6 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+
+
   cupertino_icons: ^1.0.2
   package_info_plus: ^3.0.1
   fluttertoast: ^8.0.8
@@ -76,6 +78,7 @@ dependencies:
   badges: ^3.1.1
   http: ^0.13.6
   expansion_tile_card: ^2.0.0
+  webview_flutter: ^2.8.0
 
 
 

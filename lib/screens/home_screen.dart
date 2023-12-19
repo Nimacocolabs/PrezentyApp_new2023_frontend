@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen>
   var searchText = '';
   String accountId = User.userId;
   HomscreenCommonApisModel? dataValue;
-
+String bank_info="";
   String? coinBalance;
   String? imageBaseUrl =
       "https://prezenty.in/prezentycards-live/public/app-assets/image/prepaid_card_bg/";
@@ -78,24 +78,19 @@ class _HomeScreenState extends State<HomeScreen>
       AppDialogs.loading();
 
 
-      final response = await http.post(
+      final response = await http.get(
         Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
         headers:{
           "Authorization":"Bearer ${TokenPrepaidCard}",
         },
       );
+      Map jsonResponse = json.decode(response.body);
+      bank_info = jsonResponse["balance"]["balance"];
+      print("response.body==>${jsonResponse["balance"]["balance"]}");
       Get.back();
-      print(response.body);
       if (response.statusCode==200) {
         toastMessage(response.statusCode);
-        // Map jsonResponse = json.decode(response.body);
-        //
-        // // Extract entityId from the response
-        // cardUrl = jsonResponse['cardUrl'];
-        // print("entity->${cardUrl}");
-        // Get.to(() => CardUrlScreen(url: cardUrl,
-          // verifyToken: response.body!.!.toString(),
-       // ));
+
       } else {
         toastMessage('${response.statusCode}');
       }
@@ -111,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen>
     _reloadList();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
-      await bankbalcInfo();
+      bankbalcInfo();
       getData();
       await _profileBloc.getProfileInfo();
       Notifications.setUserId(User.userEmail);
@@ -1463,7 +1458,7 @@ class _HomeScreenState extends State<HomeScreen>
                             padding: EdgeInsets.symmetric(
                                 vertical: 4, horizontal: 8),
                             child: Text(
-                              '${rupeeSymbol} ${dataValue?.touchWalletDetails?.walletBalance ?? 0}',
+                              '${rupeeSymbol} ${bank_info ?? 0}',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,

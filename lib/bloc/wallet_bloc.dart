@@ -399,7 +399,7 @@ class WalletBloc {
     }
   }
 
-  Future<RegisterWalletResponse> registerWallet(Map body) async {
+  Future<RegisterWalletResponse> registerWallet(String body) async {
     try {
       RegisterWalletResponse response =
           await _walletRepository!.registerWallet(body);
@@ -509,13 +509,13 @@ class WalletBloc {
     return false;
   }
 
-  Future<SetCardPinResponse> setCardPin(
-      String? userId, String? kitNumber) async {
+  Future<SetCardPinResponse> setCardPin() async {
     try {
-      AppDialogs.loading();
+      //AppDialogs.loading();
       SetCardPinResponse response =
-          await _walletRepository!.setCardPin(userId, kitNumber);
+          await _walletRepository!.setCardPin();
       toastMessage(response.message);
+      print("Response-->${response.widgetUrl}");
       return response;
     } catch (e, s) {
       Completer().completeError(e, s);
@@ -524,6 +524,9 @@ class WalletBloc {
       AppDialogs.closeDialog();
     }
   }
+
+
+
 
   Future<BlockCardResponse> blockCard(String? userId) async {
     try {

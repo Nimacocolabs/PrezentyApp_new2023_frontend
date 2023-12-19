@@ -115,7 +115,7 @@ class Apis {
   static String checkPhysicalCardExists = "api/check-enable-cardsetpin-button";
   static String checkEnableRequestPhysicalCard =
       "api/check-enable-request-physicalcard";
-  static String setCardPin = 'api/set-card-pin';
+  static String setCardPin = 'api/prepaid/cards/set-pin';
   static String loadMoney = "";
   static String getWalletStatementList = "api/fetch-wallet-statement";
   static String requestPhysicalCard = "api/physicalcard-request";

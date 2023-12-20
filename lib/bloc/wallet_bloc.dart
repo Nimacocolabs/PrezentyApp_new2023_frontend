@@ -86,7 +86,7 @@ class WalletBloc {
   bool hasNextPage = true;
   int pageNumber = 0;
   int perPage = 20;
-  WalletDetailsData? walletDetailsData;
+  WalletDetails? walletDetailsData;
 
   LoadMoreListener? listener;
 
@@ -99,7 +99,7 @@ class WalletBloc {
   Stream<ApiResponse<WalletStatementResponse>> get statementStream =>
       _statementController.stream;
 
-  List<Statement> statementList = [];
+  List<Transactions> statementList = [];
 
 //------------------------------------------------------------------------------
   late StreamController<ApiResponse<StateCodeResponse>> _getStateListController;
@@ -399,7 +399,7 @@ class WalletBloc {
     }
   }
 
-  Future<RegisterWalletResponse> registerWallet(Map body) async {
+  Future<RegisterWalletResponse> registerWallet(String body) async {
     try {
       RegisterWalletResponse response =
           await _walletRepository!.registerWallet(body);
@@ -445,7 +445,7 @@ class WalletBloc {
     }
   }
 
-  Future<WalletDetailsData?> getWalletDetails(String? userId) async {
+  Future<WalletDetails?> getWalletDetails(String? userId) async {
     try {
       _getWalletDetailsSink.add(ApiResponse.loading('Fetching'));
       walletDetailsData = null;
@@ -453,8 +453,8 @@ class WalletBloc {
           await _walletRepository!.getWalletDetails(userId);
 
       if (response.success ?? false) {
-        walletDetailsData = response.data;
-        if (response.data!.walletDetails!.walletStatus == "LOCKED") {
+        walletDetailsData = response.walletDetails;
+        if (response.walletDetails!.cardDetails!.status == "LOCKED") {
           Get.back();
           AppDialogs.message(
               'Your wallet is currently inactive. If you wish to activate your wallet please contact the customer care.');
@@ -509,13 +509,13 @@ class WalletBloc {
     return false;
   }
 
-  Future<SetCardPinResponse> setCardPin(
-      String? userId, String? kitNumber) async {
+  Future<SetCardPinResponse> setCardPin() async {
     try {
-      AppDialogs.loading();
+      //AppDialogs.loading();
       SetCardPinResponse response =
-          await _walletRepository!.setCardPin(userId, kitNumber);
+          await _walletRepository!.setCardPin();
       toastMessage(response.message);
+      print("Response-->${response.widgetUrl}");
       return response;
     } catch (e, s) {
       Completer().completeError(e, s);
@@ -525,9 +525,20 @@ class WalletBloc {
     }
   }
 
-  Future<BlockCardResponse> blockCard(String? userId) async {
+  Future<BlockCardResponse> blockCard(String body) async {
     try {
-      BlockCardResponse response = await _walletRepository!.blockCard(userId);
+      BlockCardResponse response = await _walletRepository!.blockCard(body);
+      toastMessage(response.message);
+      return response;
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      throw e;
+    }
+  }
+
+  Future<BlockCardResponse> replaceCard(String body) async {
+    try {
+      BlockCardResponse response = await _walletRepository!.replaceCard(body);
       toastMessage(response.message);
       return response;
     } catch (e, s) {
@@ -537,7 +548,7 @@ class WalletBloc {
   }
 
   getStatementList(bool isPagination,
-      {String? userId, String? fromDate, String? toDate}) async {
+      {String? entityId, String? fromDate, String? toDate}) async {
     if (isLoading) return;
 
     isLoading = true;
@@ -552,13 +563,13 @@ class WalletBloc {
     try {
       WalletStatementResponse response =
           await _walletRepository!.getStatementList(
-        userId: userId,
+            entityId: entityId,
         fromDate: fromDate,
         toDate: toDate,
         pageNumber: pageNumber,
       );
 
-      if (response.data?.count?.total == 0) {
+      if (response.pagination?.totalPages == 0) {
         hasNextPage = false;
         toastMessage('No more transactions');
       }
@@ -571,7 +582,7 @@ class WalletBloc {
       //     itemsList.addAll(response.list!);
       //   }
       // } else {
-      statementList.addAll(response.data!.statement ?? []);
+      statementList.addAll(response.transactions ?? []);
       // }
       stamementSink!.add(ApiResponse.completed(response));
       if (isPagination) {

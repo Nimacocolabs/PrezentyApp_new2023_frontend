@@ -27,7 +27,7 @@ import 'wallet_home_statement.dart';
 
 class WalletHomeTabs extends StatefulWidget {
   final WalletDetails? walletDetails;
-  final CardDetail cardDetail;
+  final CardDetails cardDetail;
 
   WalletHomeTabs({
     Key? key,
@@ -45,7 +45,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
    WalletBloc _walletBloc = WalletBloc();
   ProfileBloc _profileBloc = ProfileBloc();
   // int? tabCategory = 0;
-  late bool showSetPinButton = false;
+  late bool showSetPinButton = true;
   final _setPinControl = TextEditingController();
   final _confirmPinControl = TextEditingController();
   final _resetPinControl = TextEditingController();
@@ -80,12 +80,12 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           _walletBloc = WalletBloc();
     _profileBloc = ProfileBloc();
-    checkPhysicalCardExists(User.userId, widget.cardDetail.cardNumber);
-   
+    // checkPhysicalCardExists(User.userId, widget.cardDetail.cardNumber);
+
    _walletBloc.getTouchPoints(accountId);
     getTPDetails();
        });
-  
+
   }
 
   //
@@ -98,7 +98,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
   getCVV() async {
     String? url;
     FetchCardCvvResponse response =
-        await _walletBloc.getCardCVV(User.userId, widget.cardDetail.kitNumber);
+        await _walletBloc.getCardCVV(User.userId, widget.walletDetails!.kitNo);
     url = response.data!.url;
     return url;
   }
@@ -106,8 +106,9 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
   setCardPin() async {
     String? url;
     SetCardPinResponse response =
-        await _walletBloc.setCardPin(User.userId, widget.cardDetail.kitNumber);
-    url = response.data!.url;
+        await _walletBloc.setCardPin();
+    url = response.widgetUrl;
+    print("Url--->${url}");
     return url;
   }
 
@@ -184,7 +185,8 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                           //   tabCategory = 1;
                           // });
                           String url = await setCardPin();
-                          Get.to(() => SetCardPin(url: url));
+                          print("Correct---->${url}");
+                           Get.to(() => SetCardPin(url: url));
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 17),
@@ -212,43 +214,46 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                       ),
                     )
                   : SizedBox(),
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    // setState(() {
-                    //   tabCategory = 2;
-                    // });
 
-                    String url = await getCVV();
-                    Get.to(() => FetchCVVScreen(url: url));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    // width: (screenWidth / 4) - 5,
-                    // decoration: BoxDecoration(
-                    // border: Border(
-                    //     bottom: BorderSide(
-                    //         width: 2,
-                    //         color: tabCategory == 2
-                    //             ? primaryColor
-                    //             : Colors.transparent,
-                    //         style: BorderStyle.solid))
-                    // ),
-                    child: Text(
-                      "CVV",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            // tabCategory == 2 ? Colors.black87 :
-                            Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Expanded(
+              //   child: InkWell(
+              //     borderRadius: BorderRadius.circular(10),
+              //     onTap: () async {
+              //       // setState(() {
+              //       //   tabCategory = 2;
+              //       // });
+              //
+              //       String url = await getCVV();
+              //       Get.to(() => FetchCVVScreen(url: url));
+              //     },
+              //     child: Container(
+              //       padding: const EdgeInsets.symmetric(vertical: 17),
+              //       // width: (screenWidth / 4) - 5,
+              //       // decoration: BoxDecoration(
+              //       // border: Border(
+              //       //     bottom: BorderSide(
+              //       //         width: 2,
+              //       //         color: tabCategory == 2
+              //       //             ? primaryColor
+              //       //             : Colors.transparent,
+              //       //         style: BorderStyle.solid))
+              //       // ),
+              //       child: Text(
+              //         "CVV",
+              //         textAlign: TextAlign.center,
+              //         style: TextStyle(
+              //           fontSize: 14,
+              //           fontWeight: FontWeight.bold,
+              //           color:
+              //               // tabCategory == 2 ? Colors.black87 :
+              //               Colors.grey,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
+
+
               // Expanded(
               //   child: InkWell(
               //     borderRadius: BorderRadius.circular(10),
@@ -257,7 +262,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
               //        String? value = await AppDialogs.inputAmountBottomSheet(
               //         "", "Enter the amount to be loaded into your wallet");
               //     if (value != null) {
-                   
+
               //       Get.to(WalletPaymentScreen(
               //           accountid: User.userId, amount: value,availableWalletBalance: currentBalance,));
               //                          }
@@ -622,7 +627,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                       borderRadius: BorderRadius.circular(screenWidth)),
                   child: Center(
                     child: Text(
-                      rupeeSymbol + widget.walletDetails!.balance.toString(),
+                      rupeeSymbol + widget.walletDetails!.balanceInfo!.balance.toString(),
                       maxLines: 1,
                       style: TextStyle(
                           color: Colors.black87,
@@ -840,7 +845,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                                     Expanded(
                                       child: TextButton(
                                         onPressed: () async {
-                                         
+
 
                                                    CardTypeResponse =   await _walletBloc.getCustomerCardType(accountId);
                                                     if(CardTypeResponse?.statusCode == 500){
@@ -855,7 +860,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text("Transfer Touchpoints"),
-                                             
+
                                           ],
                                         ),
                                       ),
@@ -879,7 +884,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
             ],
           )),
         ),
-   
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8),
           child: Text(
@@ -930,6 +935,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                 height: screenHeight - 320,
                 child: Center(child: CommonApiLoader()))
             : WalletStatementList(
+                entityId:widget.walletDetails!.entityId.toString(),
                 fromDate: fromDateControl.text,
                 toDate: toDateControl.text,
               ),
@@ -951,7 +957,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                       .trim()) ??
                   0) /
               100;
-       
+
           return SingleChildScrollView(
             child: StatefulBuilder(
               builder: ((BuildContext context, setState) => SafeArea(
@@ -1064,7 +1070,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
 
                                                     validation(
                                                         typedTP: enteredTP,equivalentAmount:eqValue );
-                                                   
+
 
                                                     // String typedAmount =
                                                     //     _textFieldControlAmountEntered
@@ -1088,9 +1094,9 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
 
   validation({String? typedTP,num? equivalentAmount}) async {
   int? touchPointsGiven = int.tryParse(typedTP!);
-   
+
     int? availableTp = int.tryParse(touchpointsData!.touchPoints);
-   
+
 if(typedTP.isEmpty){
   toastMessage("Please enter a valid touchpoint");
 } else if(touchPointsGiven!< 100){
@@ -1110,7 +1116,7 @@ if(typedTP.isEmpty){
                                                                     typedTP,
                                                                 amount: equivalentAmount
                                                                     .toString());
-                                                    
+
                                                     if (transferTPcata
                                                             ?.statusCode ==
                                                         200) {
@@ -1127,8 +1133,8 @@ if(typedTP.isEmpty){
                                                           WalletHomeScreen(isToLoadMoney: false,));
                                                     }
     }
-    
-    
+
+
   }
 
   bool refreshWalletStatement = false;

@@ -42,6 +42,8 @@ import '../models/offer_response.dart';
 import '../models/wallet&prepaid_cards/apply_card_tax_info_response.dart';
 import '../models/wallet&prepaid_cards/get_merchants_list_model.dart';
 
+
+
 class WalletRepository {
   late ApiProviderPrepaidCards apiProvider;
 
@@ -137,9 +139,9 @@ class WalletRepository {
     return WalletCreationAndPaymentStatus.fromJson(jsonDecode(response.data));
   }
 
-  Future<RegisterWalletResponse> registerWallet(Map body) async {
+  Future<RegisterWalletResponse> registerWallet(String body) async {
     Response response = await apiProvider
-        .getJsonInstance()
+        .getJsonInstancecard()
         .post(Apis.registerWallet, data: body);
     return RegisterWalletResponse.fromJson(jsonDecode(response.data));
   }
@@ -161,40 +163,45 @@ class WalletRepository {
 
   Future<WalletDetailsResponse> getWalletDetails(String? userId) async {
     final response = await apiProvider
-        .getJsonInstance()
-        .post(Apis.getWalletDetails, data: {"account_id": userId});
-    print("api->${Apis.getWalletDetails}");
-    return WalletDetailsResponse.fromJson(jsonDecode(response.data));
+        .getJsonInstancecard()
+        .get(Apis.getWalletDetails,);
+    return WalletDetailsResponse.fromJson(response.data);
   }
 
-  Future<SetCardPinResponse> setCardPin(
-      String? userId, String? kitNumber) async {
-    final response = await apiProvider.getJsonInstance().post(Apis.setCardPin,
-        data: {"account_id": userId, "kit_number": kitNumber});
-    return SetCardPinResponse.fromJson(jsonDecode(response.data));
+  Future<SetCardPinResponse> setCardPin() async {
+    final response = await apiProvider.getJsonInstancecard().get(Apis.setCardPin);
+    return SetCardPinResponse.fromJson(response.data);
   }
 
-  Future<BlockCardResponse> blockCard(String? userId) async {
+  Future<BlockCardResponse> blockCard(String? body) async {
     final response = await apiProvider
-        .getJsonInstance()
-        .post(Apis.blockCardNow, data: {"account_id": userId});
-    return BlockCardResponse.fromJson(jsonDecode(response.data));
+        .getJsonInstancecard()
+        .post(Apis.blockCardNow, data: body);
+    return BlockCardResponse.fromJson(response.data);
+  }
+
+  Future<BlockCardResponse> replaceCard(String? body) async {
+    final response = await apiProvider
+        .getJsonInstancecard()
+        .post(Apis.replaceCardNow, data: body);
+    return BlockCardResponse.fromJson(response.data);
   }
 
   Future<WalletStatementResponse> getStatementList(
-      {String? userId,
+      {String? entityId,
       String? fromDate,
       String? toDate,
       int? pageNumber}) async {
     final response = await apiProvider
-        .getJsonInstance()
+        .getJsonInstancecard()
         .post(Apis.getWalletStatementList, data: {
-      "account_id": userId,
-      "from_date": fromDate,
-      "to_date": toDate,
-      "page": pageNumber
+      "entityId": entityId,
+      "pageNumber": pageNumber,
+      "pageSize":5,
+      "fromDate": fromDate,
+      "toDate": toDate,
     });
-    return WalletStatementResponse.fromJson(jsonDecode(response.data));
+    return WalletStatementResponse.fromJson(response.data);
   }
 
   Future<FetchCardCvvResponse> getCardCVV(

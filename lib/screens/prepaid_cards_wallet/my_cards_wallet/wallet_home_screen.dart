@@ -1,5 +1,8 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:event_app/repositories/profile_repository.dart';
+import 'package:event_app/screens/main_screen.dart';
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
 import 'package:event_app/models/common_response.dart';
@@ -22,6 +25,7 @@ import 'package:event_app/widgets/common_bottom_navigation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../../../models/block_card_response.dart';
 import '../../../widgets/app_dialogs.dart';
 import '../apply_prepaid_card_list_screen.dart';
@@ -45,7 +49,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   fetchUserData? userData;
   bool? isLoadMyWallet;
   int selectedRadioValue = 1;
-  WalletDetailsData? walletData;
+  WalletDetails? walletData;
   String? confirmWalletNumber;
   bool _passwordVisible = true;
   String? currentBalance;
@@ -59,15 +63,19 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   TextEditingController _textEditingControllerLoadingAmount =
       TextEditingController();
   TextEditingController _textEditingControllerEventID = TextEditingController();
+  String cardUrl = "";
+
 
   @override
   void initState() {
     super.initState();
     _walletBloc = WalletBloc();
-   
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-       _getWalletDetails();
-    widget.isToLoadMoney ?? false ?  Navigator.pushReplacement(context, loadMoneyWidget()) :null;
+      _getWalletDetails();
+      widget.isToLoadMoney ?? false
+          ? Navigator.pushReplacement(context, loadMoneyWidget())
+          : null;
     });
   }
 
@@ -100,23 +108,25 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               ),
               onSelected: (v) {
                 if (v == 1) {
-                  if (_walletBloc.walletDetailsData == null ||
-                      (_walletBloc.walletDetailsData?.cardDetails ?? [])
-                          .isEmpty) {
+                  if (_walletBloc.walletDetailsData == null
+                      // ||
+                      // (_walletBloc.walletDetailsData?.cardDetails ?? [])
+                          ) {
                     return;
                   }
                   Get.to(() => RequestPhysicalCard(
-                        kitNumber: _walletBloc
-                            .walletDetailsData!.cardDetails![0].kitNumber!,
+                        kitNumber: _walletBloc.walletDetailsData!.kitNo!,
                         cardNumber: _walletBloc
-                            .walletDetailsData!.cardDetails![0].cardNumber!,
+                            .walletDetailsData!.cardDetails!.cardNumber!,
                       ));
                 } else if (v == 2) {
-                  _showBlockPopUp(context);
+                  _showBlockPopUp(context, _walletBloc.walletDetailsData,
+                      _walletBloc.walletDetailsData!.cardDetails!);
+                  print("scd=>${enableRequestPhysicalCard.value}");
                 }
               },
               itemBuilder: (context) => [
-                    if (enableRequestPhysicalCard.value)
+                    if (enableRequestPhysicalCard.value = true)
                       PopupMenuItem(
                         value: 1,
                         child: Text(
@@ -257,7 +267,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .08,
                             top: screenWidth * .60,
                             child: Text(
-                              '${walletDetails.data!.cardDetails![0].cardNumber!.substring(0, 4)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(4, 8)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(8, 12)} ${walletDetails.data!.cardDetails![0].cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
+                              '${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(0, 4)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(4, 8)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(8, 12)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -266,7 +276,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .18,
                             top: screenWidth * .95,
                             child: Text(
-                              '${walletDetails.data!.cardDetails![0].expiryMonth}/${walletDetails.data!.cardDetails![0].expiryYear!.substring(2, 4)}',
+                              '${walletDetails.walletDetails!.cardDetails!.expiry}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -367,7 +377,21 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           SizedBox(
             height: 16,
           ),
-
+          Align(
+            alignment: Alignment.topRight,
+            child: TextButton(
+              onPressed: () {
+                generateurl(
+                    "${walletDetails.walletDetails!.entityId}",
+                    "${walletDetails.walletDetails!.kitNo}",
+                    "${walletDetails.walletDetails!.dob}");
+              },
+              child: Text(
+                "View Card",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            ),
+          ),
           Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -380,39 +404,38 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                        child: Text(
-                            walletDetails.data?.walletDetails?.cardName ?? '',
+                        child: Text(walletDetails.walletDetails?.cardName ?? '',
                             style: TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500))),
                     SizedBox(width: 10),
-                    FutureBuilder(
-                      future: _walletBloc.getEnableUpgradeButton(User.userId,
-                          walletDetails.data?.walletDetails?.cardId ?? 0),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.waiting:
-                            return Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          default:
-                            if (snapshot.hasError || !snapshot.data)
-                              return SizedBox();
-                            else
-                              return ElevatedButton(
-                                  child: Text('Upgrade'),
-                                  onPressed: () {
-                                    Get.to(() => ApplyPrepaidCardListScreen(
-                                        isUpgrade: true,
-                                        currentCardId: walletDetails
-                                                .data?.walletDetails?.cardId ??
-                                            0));
-                                  });
-                        }
-                      },
-                    ),
+                    // FutureBuilder(
+                    //   future: _walletBloc.getEnableUpgradeButton(User.userId,
+                    //       walletDetails.walletDetails?.cardDetails?[0].c ?? 0),
+                    //   builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    //     switch (snapshot.connectionState) {
+                    //       case ConnectionState.waiting:
+                    //         return Padding(
+                    //           padding: const EdgeInsets.all(6.0),
+                    //           child: Center(
+                    //             child: CircularProgressIndicator(),
+                    //           ),
+                    //         );
+                    //       default:
+                    //         if (snapshot.hasError || !snapshot.data)
+                    //           return SizedBox();
+                    //         else
+                    //           return ElevatedButton(
+                    //               child: Text('Upgrade'),
+                    //               onPressed: () {
+                    //                 Get.to(() => ApplyPrepaidCardListScreen(
+                    //                     isUpgrade: true,
+                    //                     currentCardId: walletDetails
+                    //                             .data?.walletDetails?.cardId ??
+                    //                         0));
+                    //               });
+                    //     }
+                    //   },
+                    // ),
                   ],
                 ),
               )),
@@ -443,7 +466,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                 fontSize: 18, fontWeight: FontWeight.w500))),
                     SizedBox(width: 10),
                     Text(
-                      "${walletDetails.data?.walletDetails?.walletNumber}",
+                      "${walletDetails.walletDetails?.walletNumber}",
                       style: TextStyle(color: Colors.black, fontSize: 16),
                     )
                   ],
@@ -630,8 +653,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             height: 15,
           ),
           WalletHomeTabs(
-            walletDetails: walletDetails.data!.walletDetails,
-            cardDetail: walletDetails.data!.cardDetails![0],
+            walletDetails: walletDetails.walletDetails!,
+            cardDetail: walletDetails.walletDetails!.cardDetails!,
           ),
           SizedBox(
             height: 50,
@@ -639,79 +662,39 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         ]);
   }
 
-  Future<bool> _showBlockPopUp(context) async {
-    return await showDialog(
-          //show confirm dialogue
-          //the return value will be from "Yes" or "No" options
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Block Now ?'),
-            titleTextStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: secondaryColor),
-            content: const Text('Do you want to block and replace your card?'),
-            contentTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: secondaryColor),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                //return false when click on "NO"
-                child: const Text(
-                  'No',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              ElevatedButton(
-                // onPressed:() =>
-                onPressed: () => _blockCard(accountId!),
-                //Navigator.of(context).pop(true),
-                //return true when click on "Yes"
-                child: const Text(
-                  'Yes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false; //if showDialouge had returned null, then return false
-  }
-
-  // Future<bool> showExitPopup() async {
+  // Future<bool> _showBlockPopUp(context) async {
   //   return await showDialog(
   //         //show confirm dialogue
   //         //the return value will be from "Yes" or "No" options
   //         context: context,
   //         builder: (context) => AlertDialog(
-  //           title: const Text('Exit Wallet?'),
-  //           // titleTextStyle: TextStyle(
-  //           //     fontSize: 12,
-  //           //     fontWeight: FontWeight.bold,
-  //           //     color: secondaryColor),
-  //           content: const Text('Do you want to exit Wallet?'),
-  //           // contentTextStyle: TextStyle(
-  //           //     // fontSize: 18,
-  //           //     fontWeight: FontWeight.normal,
-  //           //     color: secondaryColor),
+  //           title: const Text('Block Now ?'),
+  //           titleTextStyle: TextStyle(
+  //               fontSize: 24,
+  //               fontWeight: FontWeight.bold,
+  //               color: secondaryColor),
+  //           content: const Text('Do you want to block and replace your card?'),
+  //           contentTextStyle: TextStyle(
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.normal,
+  //               color: secondaryColor),
   //           actions: [
   //             ElevatedButton(
   //               onPressed: () => Navigator.of(context).pop(false),
   //               //return false when click on "NO"
   //               child: const Text(
   //                 'No',
-  //                 // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
   //               ),
   //             ),
   //             ElevatedButton(
-  //               onPressed: () => Get.offAll(() => MainScreen()),
+  //               // onPressed:() =>
+  //               onPressed: () => _blockCard(accountId!),
   //               //Navigator.of(context).pop(true),
   //               //return true when click on "Yes"
   //               child: const Text(
   //                 'Yes',
-  //                 // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  //                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
   //               ),
   //             ),
   //           ],
@@ -720,26 +703,244 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   //       false; //if showDialouge had returned null, then return false
   // }
 
+  Future<bool> _showBlockPopUp(context, WalletDetails, CardDetails) async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Card'),
+            titleTextStyle: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: secondaryColor),
+            content: SizedBox(
+              height: 300,
+              child: Column(
+                children: [
+                  Text(
+                    "Current Status : ${CardDetails!.status}",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text('Do you want to change the status in your card?'),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  if (CardDetails!.status == "ALLOCATED")
+                    Column(
+                      children: [
+                        SizedBox(
+                            width: screenWidth * 1,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"L","Card Lock");
+                                }, child: Text("LOCK"))),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                            width: screenWidth * 1,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"BL","Card Block");
+                                }, child: Text("BLOCK"))),
+                        if (CardDetails!.status == "BLOCKED")
+                          SizedBox(
+                              width: screenWidth * 1,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    _replaceCard(WalletDetails.entityId,WalletDetails.kitNo);
+                                  }, child: Text("REPLACE"))),
+                      ],
+                    ),
+                  // if(CardDetails![0].status=="LOCKED")
+                  //   SizedBox(
+                  //       width: screenWidth * 1,
+                  //       child: ElevatedButton(
+                  //           onPressed: () {
+                  //             _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"UL","Card Unlock");
+                  //           }, child: Text("UNLOCK"))),
+                ],
+              ),
+            ),
+            contentTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+                color: secondaryColor),
+            // actions: [
+            //   ElevatedButton(
+            //     onPressed: () => Navigator.of(context).pop(false),
+            //     //return false when click on "NO"
+            //     child: const Text(
+            //       'No',
+            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //     ),
+            //   ),
+            //   ElevatedButton(
+            //     // onPressed:() =>
+            //     onPressed: () => _blockCard(accountId!),
+            //     //Navigator.of(context).pop(true),
+            //     //return true when click on "Yes"
+            //     child: const Text(
+            //       'Yes',
+            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //     ),
+            //   ),
+            // ],
+          ),
+        ) ??
+        false; //if showDialouge had returned null, then return false
+  }
+
+  Future<bool> showExitPopup() async {
+    return await showDialog(
+          //show confirm dialogue
+          //the return value will be from "Yes" or "No" options
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit Wallet?'),
+            // titleTextStyle: TextStyle(
+            //     fontSize: 12,
+            //     fontWeight: FontWeight.bold,
+            //     color: secondaryColor),
+            content: const Text('Do you want to exit Wallet?'),
+            // contentTextStyle: TextStyle(
+            //     // fontSize: 18,
+            //     fontWeight: FontWeight.normal,
+            //     color: secondaryColor),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                //return false when click on "NO"
+                child: const Text(
+                  'No',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Get.offAll(() => MainScreen()),
+                //Navigator.of(context).pop(true),
+                //return true when click on "Yes"
+                child: const Text(
+                  'Yes',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false; //if showDialouge had returned null, then return false
+  }
+
   _checkEnableRequestPhysicalCard() async {
     enableRequestPhysicalCard.value =
         await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
-            _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
+            _walletBloc.walletDetailsData!.cardDetails!.cardNumber ?? '');
     setState(() {});
   }
 
-  Future<dynamic> _blockCard(String accountId) async {
+  Future generateurl(String entityid, kit, dob) async {
+    try {
+      Map<String, dynamic> data = {
+        "entity_id": "${entityid}",
+        "kit_no": "${kit}",
+        "dob": "${dob}"
+      };
+      final response = await http.post(
+        Uri.parse(
+            "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
+        headers: {
+          "Authorization": "Bearer ${TokenPrepaidCard}",
+        },
+        body: data,
+      );
+      Get.back(); // Close any existing dialogs
+
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        toastMessage(response.statusCode);
+
+        Map jsonResponse = json.decode(response.body);
+        cardUrl = jsonResponse['cardUrl'];
+        print("entity->${cardUrl}");
+
+        // Show the cardUrl in a WebView
+        Get.dialog(
+          AlertDialog(
+            title: Text('Card Widget'),
+            content: Container(
+              width: 600,
+              height: 600, // Adjust height as needed
+              child: WebView(
+                initialUrl: cardUrl,
+                javascriptMode: JavascriptMode.unrestricted,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Close the dialog
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        toastMessage('${response.statusCode}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
+  }
+
+  Future<dynamic> _blockCard(String entityId,kitNo,flag,reason) async {
     AppDialogs.loading();
+    Map<String, dynamic> data = {
+      "entityId": "${entityId}",
+      "flag":"${flag}",
+      "kitNo": "${kitNo}",
+      "reason": "${reason}"
+    };
 
     try {
-      BlockCardResponse response = await _walletBloc.blockCard(accountId);
+      BlockCardResponse response = await _walletBloc.blockCard(json.encode(data));
       Get.back();
-      if (response.success!) {
+      if (response.statusCode == 200) {
         Get.back();
-
         AppDialogs.message(
-            "Your card is blocked successfully and send the request for new card");
+            "${response.message!}");
       } else {
-        // toastMessage('${response.message!}');
+        toastMessage('${response.message!}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
+  }
+
+  Future<dynamic> _replaceCard(String entityId,kitNo) async {
+    AppDialogs.loading();
+    Map<String, dynamic> data = {
+      "entityId": "${entityId}",
+      "oldKitNo": "${kitNo}",
+    };
+
+    try {
+      BlockCardResponse response = await _walletBloc.replaceCard(json.encode(data));
+      Get.back();
+      if (response.statusCode == 200) {
+        Get.back();
+        AppDialogs.message(
+            "${response.message!}");
+      } else {
+        toastMessage('${response.message!}');
       }
     } catch (e, s) {
       Completer().completeError(e, s);
@@ -846,43 +1047,50 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                           ],
                                         )),
                             ),
-                             Text("NOTE: Your monthly load limit is ${rupeeSymbol} 10,000.",
-                                  style: TextStyle(color: primaryColor,fontWeight: FontWeight.w900),),
-                             widget.isToLoadMoney ?? false ? Container():
-                            Divider(
-                              thickness: 2,
+                            Text(
+                              "NOTE: Your monthly load limit is ${rupeeSymbol} 10,000.",
+                              style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w900),
                             ),
-                            widget.isToLoadMoney ?? false ? Container():
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text("For IMPS",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.w700)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                    "Account Number : ${userData?.vaNumber ?? ""} ",
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                    ),
+                            widget.isToLoadMoney ?? false
+                                ? Container()
+                                : Divider(
+                                    thickness: 2,
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Text(
-                                      "IFSC Code : ${userData?.vaIfsc ?? 0} ",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                      )),
-                                ),
-                              ],
-                            ),
+                            widget.isToLoadMoney ?? false
+                                ? Container()
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text("For IMPS",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.w700)),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                          "Account Number : ${userData?.vaNumber ?? ""} ",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                            "IFSC Code : ${userData?.vaIfsc ?? 0} ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            )),
+                                      ),
+                                    ],
+                                  ),
                             Divider(
                               thickness: 2,
                             ),
@@ -1036,7 +1244,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                       loadingAmount.toString(),
                                                 );
                                               }
-
                                             },
                                             child: Text("Load Money")),
                                       )
@@ -1295,7 +1502,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         amount: amountTyped,
       );
 
-      String? currentBalance = walletData?.walletDetails?.balance.toString();
+      String? currentBalance = walletData?.balanceInfo?.balance.toString();
       if (validateWalletData.statusCode == 200) {
         Get.off(WalletPaymentScreen(
           accountid: User.userId,
@@ -1304,7 +1511,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           walletNumber: validateWalletData.walletNumber,
           eventId: eventIdTyped,
           type: type,
-
         ));
       } else {
         toastMessage("${validateWalletData.message}");

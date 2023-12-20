@@ -5,6 +5,7 @@ import 'package:event_app/models/wallet&prepaid_cards/register_wallet_response.d
 import 'package:event_app/models/wallet&prepaid_cards/state_data_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/terms_and_conditions_model.dart';
 import 'package:event_app/network/api_response.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/login/select_country_dialog_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_verify_otp_screen.dart';
@@ -24,6 +25,7 @@ import 'package:otp_text_field/otp_text_field.dart';
 import 'dart:async';
 import '../../util/app_helper.dart';
 import 'package:http/http.dart' as http;
+
 class ApplyKycScreen extends StatefulWidget {
   ApplyKycScreen(
       {Key? key,
@@ -58,10 +60,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController address2Control = TextEditingController();
   final TextEditingController address3Control = TextEditingController();
 
-  final TextEditingController permanentAddress1Control = TextEditingController();
-  final TextEditingController permanentAddress2Control = TextEditingController();
-  final TextEditingController permanentAddress3Control = TextEditingController();
-  final TextEditingController permanentpinNumberControl = TextEditingController();
+  final TextEditingController permanentAddress1Control =
+      TextEditingController();
+  final TextEditingController permanentAddress2Control =
+      TextEditingController();
+  final TextEditingController permanentAddress3Control =
+      TextEditingController();
+  final TextEditingController permanentpinNumberControl =
+      TextEditingController();
   final TextEditingController permanentcityControl = TextEditingController();
 
   final TextEditingController homeAddress1Control = TextEditingController();
@@ -69,8 +75,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController homeAddress3Control = TextEditingController();
   final TextEditingController homepinNumberControl = TextEditingController();
   final TextEditingController homecityControl = TextEditingController();
-  String entityId="";
-  String categories="";
+  String entityId = "";
+  String categories = "";
   final TextEditingController officeAddress1Control = TextEditingController();
   final TextEditingController officeAddress2Control = TextEditingController();
   final TextEditingController officeAddress3Control = TextEditingController();
@@ -80,20 +86,26 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   final TextEditingController deliveryAddress1Control = TextEditingController();
   final TextEditingController deliveryAddress2Control = TextEditingController();
   final TextEditingController deliveryAddress3Control = TextEditingController();
-  final TextEditingController deliverypinNumberControl = TextEditingController();
+  final TextEditingController deliverypinNumberControl =
+      TextEditingController();
   final TextEditingController deliverycityControl = TextEditingController();
 
-  final TextEditingController communicationAddress1Control = TextEditingController();
-  final TextEditingController communicationAddress2Control = TextEditingController();
-  final TextEditingController communicationAddress3Control = TextEditingController();
-  final TextEditingController communicationpinNumberControl = TextEditingController();
+  final TextEditingController communicationAddress1Control =
+      TextEditingController();
+  final TextEditingController communicationAddress2Control =
+      TextEditingController();
+  final TextEditingController communicationAddress3Control =
+      TextEditingController();
+  final TextEditingController communicationpinNumberControl =
+      TextEditingController();
   final TextEditingController OtpNumberControl = TextEditingController();
-  final TextEditingController communicationcityControl = TextEditingController();
+  final TextEditingController communicationcityControl =
+      TextEditingController();
 
   final TextEditingController referredByControl = TextEditingController();
-  bool isNricustomer=false;
-  bool isMinor=false;
-  bool isDependant=false;
+  bool isNricustomer = false;
+  bool isMinor = false;
+  bool isDependant = false;
   String? addressType;
   States? selectedState;
   String? birthDateInString;
@@ -107,10 +119,10 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
   int _maritalStatusValue = 0;
   RxBool isChecked = false.obs;
   TermsAndConditionsData? terms_Conditions;
-  String _employmentIndustryValue="";
-  String employmentIndustry="Select";
-  String _employmentTypeValue="";
-  String employmentType="Select";
+  String _employmentIndustryValue = "";
+  String employmentIndustry = "Select";
+  String _employmentTypeValue = "";
+  String employmentType = "Select";
   String address_status = "select";
   int _addressValue = 0;
 
@@ -120,7 +132,6 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     name: "India",
     iso3Code: "IND",
   );
-
 
   final _formKey = GlobalKey<FormState>();
   FormatAndValidate formatAndValidate = FormatAndValidate();
@@ -157,9 +168,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     panNumberControl.text = widget.panNumber;
 
     emailIdControl.text = User.userEmail;
-    phoneNumberControl.text ="${_country.phoneCode}-${User.userMobile}";
-    countryControl.text=_country.name;
-
+    phoneNumberControl.text = "${_country.phoneCode}-${User.userMobile}";
+    countryControl.text = _country.name;
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getStateList();
@@ -250,15 +260,17 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                               value == 1
                                   ? title = "Mr"
                                   : value == 2
-                                  ? title = "Ms"
-                                  : title = "Mrs";
+                                      ? title = "Ms"
+                                      : title = "Mrs";
                             });
                             print(_titleValue.toString);
                           },
                         ),
                       ),
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
                     SizedBox(
                       width: screenWidth * 0.6,
                       child: kycDataWidget(
@@ -450,8 +462,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           value == 1
                               ? marital_status = "Single"
                               : value == 2
-                              ? marital_status = "Married"
-                              : marital_status = "Others";
+                                  ? marital_status = "Married"
+                                  : marital_status = "Others";
                         });
                         print(_maritalStatusValue.toString);
                       },
@@ -463,7 +475,13 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 ),
                 Row(
                   children: [
-                    Text("NRI Customer",style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black54),),
+                    Text(
+                      "NRI Customer",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54),
+                    ),
                     Spacer(),
                     SizedBox(
                       height: 50,
@@ -478,7 +496,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           inactiveTrackColor: Colors.grey[350],
                           onChanged: (check) {
                             setState(() {
-                              isNricustomer =check ;
+                              isNricustomer = check;
                             });
                           },
                         ),
@@ -488,7 +506,11 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 ),
                 Row(
                   children: [
-                    Text("Minor",style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black54)),
+                    Text("Minor",
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54)),
                     Spacer(),
                     SizedBox(
                       height: 50,
@@ -503,7 +525,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           inactiveTrackColor: Colors.grey[350],
                           onChanged: (check) {
                             setState(() {
-                              isMinor =check ;
+                              isMinor = check;
                             });
                           },
                         ),
@@ -513,9 +535,13 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 ),
                 Row(
                   children: [
-                    Text("Dependant",style: TextStyle(fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54),),
+                    Text(
+                      "Dependant",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54),
+                    ),
                     Spacer(),
                     SizedBox(
                       height: 50,
@@ -530,7 +556,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           inactiveTrackColor: Colors.grey[350],
                           onChanged: (check) {
                             setState(() {
-                              isDependant =check ;
+                              isDependant = check;
                             });
                           },
                         ),
@@ -584,11 +610,13 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                         ),
                         DropdownMenuItem(
                           child: Text("ARCHITECTURE AND CONSTRUCTION"),
-                          value:"ARCHITECTURE_AND_CONSTRUCTION" ,
+                          value: "ARCHITECTURE_AND_CONSTRUCTION",
                         ),
                         DropdownMenuItem(
-                          child: Text("ARTS AUDIO OR VIDEO TECHNOLOGY \nAND COMMUNICATIONS"),
-                          value:"ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS" ,
+                          child: Text(
+                              "ARTS AUDIO OR VIDEO TECHNOLOGY \nAND COMMUNICATIONS"),
+                          value:
+                              "ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS",
                         ),
                         DropdownMenuItem(
                           child: Text("BUSINESS MANAGEMENT AND ADMINISTRATION"),
@@ -623,7 +651,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           value: "INFORMATION_TECHNOLOGY",
                         ),
                         DropdownMenuItem(
-                          child: Text("LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"),
+                          child: Text(
+                              "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"),
                           value: "LAW_PUBLIC_SAFETY_CORRECTIONS_AND_SECURITY",
                         ),
                         DropdownMenuItem(
@@ -635,11 +664,14 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           value: "MARKETING_SALES_AND_SERVICE",
                         ),
                         DropdownMenuItem(
-                          child: Text("SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"),
-                          value: "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS",
+                          child: Text(
+                              "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"),
+                          value:
+                              "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS",
                         ),
                         DropdownMenuItem(
-                          child: Text("TRANSPORTATION DISTRIBUTION AND LOGISTICS"),
+                          child:
+                              Text("TRANSPORTATION DISTRIBUTION AND LOGISTICS"),
                           value: "TRANSPORTATION_DISTRIBUTION_AND_LOGISTICS",
                         )
                       ],
@@ -647,30 +679,67 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                         setState(() {
                           _employmentIndustryValue = value as String;
                           value == "AGRICULTURE_FOOD_NATURAL_RESOURCES"
-                              ? employmentIndustry = "AGRICULTURE FOOD NATURAL RESOURCES"
+                              ? employmentIndustry =
+                                  "AGRICULTURE FOOD NATURAL RESOURCES"
                               : value == "ARCHITECTURE_AND_CONSTRUCTION"
-                              ? employmentIndustry = "ARCHITECTURE AND CONSTRUCTION"
-                              : value == "ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS" ? employmentIndustry = "ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"
-                              : value == "BUSINESS_MANAGEMENT_AND_ADMINISTRATION" ? employmentIndustry = "BUSINESS MANAGEMENT AND ADMINISTRATION"
-                              : value == "EDUCATION_AND_TRAINING" ? employmentIndustry ="EDUCATION AND TRAINING"
-                              : value == "FINANCE" ? employmentIndustry = "FINANCE"
-                              : value == "GOVERNMENT_AND_PUBLIC_ADMINISTRATION" ? employmentIndustry="GOVERNMENT AND PUBLIC ADMINISTRATION"
-                              : value == "HEALTH_SCIENCE" ? employmentIndustry= "HEALTH SCIENCE"
-                              : value == "HOSPITALITY_AND_TOURISM" ? employmentIndustry = "HOSPITALITY AND TOURISM"
-                              : value == "HUMAN_SERVICES" ? employmentIndustry ="HUMAN SERVICES"
-                              : value == "INFORMATION_TECHNOLOGY" ? employmentIndustry = "INFORMATION TECHNOLOGY"
-                              : value == "LAW_PUBLIC_SAFETY_CORRECTIONS_AND_SECURITY" ? employmentIndustry = "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"
-                              : value == "MANUFACTURING" ? employmentIndustry = "MANUFACTURING"
-                              : value == "MARKETING_SALES_AND_SERVICE" ? employmentIndustry = "MARKETING SALES AND SERVICE"
-                              : value == "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS" ? employmentIndustry = "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"
-                              :value == "TRANSPORTATION_DISTRIBUTION_AND_LOGISTICS"? employmentIndustry == "TRANSPORTATION DISTRIBUTION AND LOGISTICS":employmentIndustry="";
+                                  ? employmentIndustry =
+                                      "ARCHITECTURE AND CONSTRUCTION"
+                                  : value ==
+                                          "ARTS_AUDIO_OR_VIDEO_TECHNOLOGY_AND_COMMUNICATIONS"
+                                      ? employmentIndustry =
+                                          "ARTS AUDIO OR VIDEO TECHNOLOGY AND COMMUNICATIONS"
+                                      : value ==
+                                              "BUSINESS_MANAGEMENT_AND_ADMINISTRATION"
+                                          ? employmentIndustry =
+                                              "BUSINESS MANAGEMENT AND ADMINISTRATION"
+                                          : value == "EDUCATION_AND_TRAINING"
+                                              ? employmentIndustry =
+                                                  "EDUCATION AND TRAINING"
+                                              : value == "FINANCE"
+                                                  ? employmentIndustry =
+                                                      "FINANCE"
+                                                  : value ==
+                                                          "GOVERNMENT_AND_PUBLIC_ADMINISTRATION"
+                                                      ? employmentIndustry =
+                                                          "GOVERNMENT AND PUBLIC ADMINISTRATION"
+                                                      : value ==
+                                                              "HEALTH_SCIENCE"
+                                                          ? employmentIndustry =
+                                                              "HEALTH SCIENCE"
+                                                          : value ==
+                                                                  "HOSPITALITY_AND_TOURISM"
+                                                              ? employmentIndustry =
+                                                                  "HOSPITALITY AND TOURISM"
+                                                              : value ==
+                                                                      "HUMAN_SERVICES"
+                                                                  ? employmentIndustry =
+                                                                      "HUMAN SERVICES"
+                                                                  : value ==
+                                                                          "INFORMATION_TECHNOLOGY"
+                                                                      ? employmentIndustry =
+                                                                          "INFORMATION TECHNOLOGY"
+                                                                      : value ==
+                                                                              "LAW_PUBLIC_SAFETY_CORRECTIONS_AND_SECURITY"
+                                                                          ? employmentIndustry =
+                                                                              "LAW PUBLIC SAFETY CORRECTIONS AND SECURITY"
+                                                                          : value == "MANUFACTURING"
+                                                                              ? employmentIndustry = "MANUFACTURING"
+                                                                              : value == "MARKETING_SALES_AND_SERVICE"
+                                                                                  ? employmentIndustry = "MARKETING SALES AND SERVICE"
+                                                                                  : value == "SCIENCE_TECHNOLOGY_ENGINEERING_AND_MATHEMATICS"
+                                                                                      ? employmentIndustry = "SCIENCE TECHNOLOGY ENGINEERING AND MATHEMATICS"
+                                                                                      : value == "TRANSPORTATION_DISTRIBUTION_AND_LOGISTICS"
+                                                                                          ? employmentIndustry == "TRANSPORTATION DISTRIBUTION AND LOGISTICS"
+                                                                                          : employmentIndustry = "";
                         });
                         print(_employmentIndustryValue.toString);
                       },
                     ),
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   "Employment Type",
                   style: TextStyle(
@@ -755,44 +824,70 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _employmentTypeValue = value as String ;
+                          _employmentTypeValue = value as String;
                           value == "EMPLOYED"
                               ? employmentType = "EMPLOYED"
                               : value == "UNEMPLOYED"
-                              ? employmentType = "UNEMPLOYED"
-                              : value == "ENTREPRENEUR" ? employmentType = "ENTREPRENEUR"
-                              : value == "PUBLIC_SECTOR_EMPLOYEE" ? employmentType = "PUBLIC SECTOR EMPLOYEE"
-                              : value == "FREELANCER" ? employmentType ="FREELANCER"
-                              : value == "HOUSEWORK" ? employmentType = "HOUSEWORK"
-                              : value == "APPRENTICE" ? employmentType="APPRENTICE"
-                              : value == "RETIRED" ? employmentType= "RETIRED"
-                              : value == "STUDENT" ? employmentType = "STUDENT"
-                              : value == "SELF_EMPLOYED" ? employmentType ="SELF EMPLOYED"
-                              :value=="MILITARY_OR_COMMUNITY_SERVICE"? employmentType = "MILITARY OR COMMUNITY SERVICE":employmentType=="";
-
+                                  ? employmentType = "UNEMPLOYED"
+                                  : value == "ENTREPRENEUR"
+                                      ? employmentType = "ENTREPRENEUR"
+                                      : value == "PUBLIC_SECTOR_EMPLOYEE"
+                                          ? employmentType =
+                                              "PUBLIC SECTOR EMPLOYEE"
+                                          : value == "FREELANCER"
+                                              ? employmentType = "FREELANCER"
+                                              : value == "HOUSEWORK"
+                                                  ? employmentType = "HOUSEWORK"
+                                                  : value == "APPRENTICE"
+                                                      ? employmentType =
+                                                          "APPRENTICE"
+                                                      : value == "RETIRED"
+                                                          ? employmentType =
+                                                              "RETIRED"
+                                                          : value == "STUDENT"
+                                                              ? employmentType =
+                                                                  "STUDENT"
+                                                              : value ==
+                                                                      "SELF_EMPLOYED"
+                                                                  ? employmentType =
+                                                                      "SELF EMPLOYED"
+                                                                  : value ==
+                                                                          "MILITARY_OR_COMMUNITY_SERVICE"
+                                                                      ? employmentType =
+                                                                          "MILITARY OR COMMUNITY SERVICE"
+                                                                      : employmentType ==
+                                                                          "";
                         });
                         print(_employmentIndustryValue.toString);
                       },
                     ),
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(width: 2, color: primaryColor), // Outer border styling
+                    border: Border.all(
+                        width: 2, color: primaryColor), // Outer border styling
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ExpansionTileCard(
-                    shadowColor:primaryColor,
+                    shadowColor: primaryColor,
                     elevation: 8,
                     borderRadius: BorderRadius.circular(10),
                     baseColor: Colors.grey[300],
                     // leading: CircleAvatar(backgroundColor: ColorConstant.green6320,
                     //     child: Text(numbering[index],style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold,color: Colors.white),)),
-                    title: Text("Permanent Address",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    title: Text(
+                      "Permanent Address",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     children: [
                       Container(
-                        padding: EdgeInsets.all(10), // Adjust the padding for the children
+                        padding: EdgeInsets.all(
+                            10), // Adjust the padding for the children
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -801,28 +896,28 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                               height: 1.0,
                             ),
                             kycDataWidget(
-                              //focus,
+                                //focus,
                                 field: "Address 1",
                                 labelText: "Enter",
                                 control: permanentAddress1Control,
                                 validate: formatAndValidate.validateAddress,
                                 format: formatAndValidate.formatAddress()),
                             kycDataWidget(
-                              //focus,
+                                //focus,
                                 field: "Address 2",
                                 labelText: "Enter",
                                 control: permanentAddress2Control,
                                 validate: formatAndValidate.validateAddress,
                                 format: formatAndValidate.formatAddress()),
                             kycDataWidget(
-                              //focus,
+                                //focus,
                                 field: "Address 3",
                                 labelText: "Enter",
                                 control: permanentAddress3Control,
                                 validate: formatAndValidate.validateAddress,
                                 format: formatAndValidate.formatAddress()),
                             kycDataWidget(
-                              //focus,
+                                //focus,
                                 field: "City",
                                 labelText: "Enter",
                                 control: permanentcityControl,
@@ -853,7 +948,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                               enabled: false,
                             ),
                             kycDataWidget(
-                              //focus,
+                                //focus,
                                 field: "Pin Code",
                                 labelText: "Enter",
                                 control: permanentpinNumberControl,
@@ -863,30 +958,40 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
-                SizedBox(height: 10,),
-                Text("Add another address",style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54)),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
+                Text("Add another address",
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54)),
+                SizedBox(
+                  height: 10,
+                ),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(width: 2, color: primaryColor), // Outer border styling
+                    border: Border.all(
+                        width: 2, color: primaryColor), // Outer border styling
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ExpansionTileCard(
-                    shadowColor:primaryColor,
+                    shadowColor: primaryColor,
                     elevation: 8,
                     borderRadius: BorderRadius.circular(10),
                     baseColor: Colors.grey[300],
-                    title: Text("Address",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                    title: Text(
+                      "Address",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     children: [
                       Container(
-                        padding: EdgeInsets.all(10), // Adjust the padding for the children
+                        padding: EdgeInsets.all(
+                            10), // Adjust the padding for the children
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -894,7 +999,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                               thickness: 1.5,
                               height: 1.0,
                             ),
-                            SizedBox(height: 10,),
+                            SizedBox(
+                              height: 10,
+                            ),
                             // Container(
                             //   height: 48,
                             //   width: screenWidth - 20,
@@ -957,102 +1064,117 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                             // ),
                             Text(
                               'Select Address Categories:',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 10),
                             buildCategoryRadioButton('HOME'),
-                            if(selectedCategories.contains('HOME'))
-                            Column(
-                              children: [
-                                kycDataWidget(
-                                  //focus,
-                                    field: "Address 1",
-                                    labelText: "Enter",
-                                    control: homeAddress1Control,
-                                    validate: formatAndValidate.validateAddress,
-                                    format: formatAndValidate.formatAddress()),
-                                kycDataWidget(
-                                  //focus,
-                                    field: "Address 2",
-                                    labelText: "Enter",
-                                    control: homeAddress2Control,
-                                    validate: formatAndValidate.validateAddress,
-                                    format: formatAndValidate.formatAddress()),
-                                kycDataWidget(
-                                  //focus,
-                                    field: "Address 3",
-                                    labelText: "Enter",
-                                    control: homeAddress3Control,
-                                    validate: formatAndValidate.validateAddress,
-                                    format: formatAndValidate.formatAddress()),
-                                kycDataWidget(
-                                  //focus,
-                                    field: "City",
-                                    labelText: "Enter",
-                                    control: homecityControl,
-                                    validate: formatAndValidate.validateName,
-                                    keyboardInputType: TextInputType.name),
-                                Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child: Text(
-                                    "State",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black54),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                _stateList(),
-                                kycDataWidget(
-                                  //focus,
-                                  field: "Country",
-                                  labelText: "Enter",
-                                  control: countryControl,
-                                  keyboardInputType: TextInputType.text,
-                                  validate: formatAndValidate.formatName,
-                                  format: formatAndValidate.formatName(),
-                                  enabled: false,
-                                ),
-                                kycDataWidget(
-                                  //focus,
-                                    field: "Pin Code",
-                                    labelText: "Enter",
-                                    control: homepinNumberControl,
-                                    keyboardInputType: TextInputType.number,
-                                    validate: formatAndValidate.validatePinCode,
-                                    format: formatAndValidate.formatPinCode()),
-                              ],
-                            ),
-                            buildCategoryRadioButton('OFFICE'),
-                            if(selectedCategories.contains('OFFICE'))
+                            if (selectedCategories.contains('HOME'))
                               Column(
                                 children: [
                                   kycDataWidget(
+                                      //focus,
+                                      field: "Address 1",
+                                      labelText: "Enter",
+                                      control: homeAddress1Control,
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                      //focus,
+                                      field: "Address 2",
+                                      labelText: "Enter",
+                                      control: homeAddress2Control,
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                      //focus,
+                                      field: "Address 3",
+                                      labelText: "Enter",
+                                      control: homeAddress3Control,
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
+                                  kycDataWidget(
+                                      //focus,
+                                      field: "City",
+                                      labelText: "Enter",
+                                      control: homecityControl,
+                                      validate: formatAndValidate.validateName,
+                                      keyboardInputType: TextInputType.name),
+                                  Align(
+                                    alignment: AlignmentDirectional.topStart,
+                                    child: Text(
+                                      "State",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  _stateList(),
+                                  kycDataWidget(
                                     //focus,
+                                    field: "Country",
+                                    labelText: "Enter",
+                                    control: countryControl,
+                                    keyboardInputType: TextInputType.text,
+                                    validate: formatAndValidate.formatName,
+                                    format: formatAndValidate.formatName(),
+                                    enabled: false,
+                                  ),
+                                  kycDataWidget(
+                                      //focus,
+                                      field: "Pin Code",
+                                      labelText: "Enter",
+                                      control: homepinNumberControl,
+                                      keyboardInputType: TextInputType.number,
+                                      validate:
+                                          formatAndValidate.validatePinCode,
+                                      format:
+                                          formatAndValidate.formatPinCode()),
+                                ],
+                              ),
+                            buildCategoryRadioButton('OFFICE'),
+                            if (selectedCategories.contains('OFFICE'))
+                              Column(
+                                children: [
+                                  kycDataWidget(
+                                      //focus,
                                       field: "Address 1",
                                       labelText: "Enter",
                                       control: officeAddress1Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 2",
                                       labelText: "Enter",
                                       control: officeAddress2Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 3",
                                       labelText: "Enter",
                                       control: officeAddress3Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "City",
                                       labelText: "Enter",
                                       control: officecityControl,
@@ -1083,42 +1205,50 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     enabled: false,
                                   ),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Pin Code",
                                       labelText: "Enter",
                                       control: officepinNumberControl,
                                       keyboardInputType: TextInputType.number,
-                                      validate: formatAndValidate.validatePinCode,
-                                      format: formatAndValidate.formatPinCode()),
+                                      validate:
+                                          formatAndValidate.validatePinCode,
+                                      format:
+                                          formatAndValidate.formatPinCode()),
                                 ],
                               ),
                             buildCategoryRadioButton('DELIVERY'),
-                            if(selectedCategories.contains('DELIVERY'))
+                            if (selectedCategories.contains('DELIVERY'))
                               Column(
                                 children: [
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 1",
                                       labelText: "Enter",
                                       control: deliveryAddress1Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 2",
                                       labelText: "Enter",
                                       control: deliveryAddress2Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 3",
                                       labelText: "Enter",
                                       control: deliveryAddress3Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "City",
                                       labelText: "Enter",
                                       control: deliverycityControl,
@@ -1149,42 +1279,50 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     enabled: false,
                                   ),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Pin Code",
                                       labelText: "Enter",
                                       control: deliverypinNumberControl,
                                       keyboardInputType: TextInputType.number,
-                                      validate: formatAndValidate.validatePinCode,
-                                      format: formatAndValidate.formatPinCode()),
+                                      validate:
+                                          formatAndValidate.validatePinCode,
+                                      format:
+                                          formatAndValidate.formatPinCode()),
                                 ],
                               ),
                             buildCategoryRadioButton('COMMUNICATION'),
-                            if(selectedCategories.contains('COMMUNICATION'))
+                            if (selectedCategories.contains('COMMUNICATION'))
                               Column(
                                 children: [
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 1",
                                       labelText: "Enter",
                                       control: communicationAddress1Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 2",
                                       labelText: "Enter",
                                       control: communicationAddress2Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Address 3",
                                       labelText: "Enter",
                                       control: communicationAddress3Control,
-                                      validate: formatAndValidate.validateAddress,
-                                      format: formatAndValidate.formatAddress()),
+                                      validate:
+                                          formatAndValidate.validateAddress,
+                                      format:
+                                          formatAndValidate.formatAddress()),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "City",
                                       labelText: "Enter",
                                       control: communicationcityControl,
@@ -1215,24 +1353,27 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     enabled: false,
                                   ),
                                   kycDataWidget(
-                                    //focus,
+                                      //focus,
                                       field: "Pin Code",
                                       labelText: "Enter",
                                       control: communicationpinNumberControl,
                                       keyboardInputType: TextInputType.number,
-                                      validate: formatAndValidate.validatePinCode,
-                                      format: formatAndValidate.formatPinCode()),
+                                      validate:
+                                          formatAndValidate.validatePinCode,
+                                      format:
+                                          formatAndValidate.formatPinCode()),
                                 ],
                               ),
                             SizedBox(height: 20),
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
-                SizedBox(height: 10,),
+                SizedBox(
+                  height: 10,
+                ),
                 Text(
                   "NOTE: Please prevent @,#,%,\$,\&,+,=,*,"
                   ",! and white spaces while entering your address.",
@@ -1241,7 +1382,6 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 SizedBox(
                   height: 20,
                 ),
-
                 kycDataWidget(
                   // focus,
                   field: "Referred person name",
@@ -1253,9 +1393,10 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 ),
                 Row(
                   children: [
-                    SizedBox(width: 170,
+                    SizedBox(
+                      width: 170,
                       child: kycDataWidget(
-                        //focus,
+                          //focus,
                           field: "Enter OTP",
                           labelText: "Enter",
                           control: OtpNumberControl,
@@ -1263,11 +1404,16 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                           validate: formatAndValidate.validateOtp,
                           format: formatAndValidate.formatPinCode()),
                     ),
-                    SizedBox(width: 30,),
-                    ElevatedButton(onPressed: ()async{await generateotp();}, child: Text("Generate Otp")),
+                    SizedBox(
+                      width: 30,
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          await generateotp();
+                        },
+                        child: Text("Generate Otp")),
                   ],
                 ),
-
                 terms_Conditions != null
                     ? Container(
                         decoration: BoxDecoration(
@@ -1287,7 +1433,6 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                         ),
                       )
                     : Container(),
-
                 Row(
                   children: [
                     Obx(() => Checkbox(
@@ -1330,11 +1475,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                     ),
                   ],
                 ),
-
                 SizedBox(
                   height: 30,
                 ),
-
                 TextButton(
                   onPressed: () {
                     if (selectedState == null) {
@@ -1354,7 +1497,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                       _sendOtp(
                           fName: firstNameControl.text,
                           lName: lastNameControl.text,
-                          mName:middleNameControl.text,
+                          mName: middleNameControl.text,
                           pan: panNumberControl.text,
                           dob: dobControl.text,
                           otp: OtpNumberControl.text.toString(),
@@ -1403,7 +1546,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
             setState(() {
               if (value != null && value) {
                 selectedCategories.add(category);
-                categories= category;
+                categories = category;
                 print("category->${category}");
               } else {
                 selectedCategories.remove(category);
@@ -1575,54 +1718,67 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
           }
         });
   }
-  Future generateotp()async{
-       try {
 
-  AppDialogs.loading();
+  Future generateotp() async {
+    try {
+      AppDialogs.loading();
+      Map<String, dynamic> data = {
+        'firstName': firstNameControl.text,
+        "contactNo": User.userMobile,
+        'user_id': User.userId,
+      };
+      final response = await http.post(
+        Uri.parse(
+            "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
+        headers: {
+          "Authorization": "Bearer ${TokenPrepaidCard}",
+        },
+        body: data,
+      );
+      Get.back();
+      print(response.body);
+      if (response.statusCode == 200) {
+        Map jsonResponse = json.decode(response.body);
+
+        entityId = jsonResponse['entityId'];
+        print("entity->${entityId}");
+        toastMessage('${jsonResponse['message']}');
+      } else {
+        Map errorResponse = json.decode(response.body);
+        if (errorResponse.containsKey('message') &&
+            errorResponse['message'] is Map<String, dynamic>) {
+          Map<String, dynamic> errorMessageMap = errorResponse['message'];
+
+          if (errorMessageMap.containsKey('firstName') &&
+              errorMessageMap['firstName'] is List<dynamic> &&
+              errorMessageMap['firstName'].isNotEmpty) {
 
 
-  Map<String, dynamic> data =
-              {
-              'firstName': firstNameControl.text,
-                "contactNo": "7012733764",
-                'user_id': User.userId,
-  };
-  print("number->${phoneNumberControl.text}");
-  final response = await http.post(
-  Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/generate/otp"),
-  headers:{
-  "Authorization":"Bearer 4|d6tyfQIfBzH2C2XfuB7IXxhtJA9pDQSWRt444nVL",
-  },
-  body:data,
-  );
-  Get.back();
-  print(response.body);
-  if (response.statusCode==200) {
-  toastMessage(response.statusCode);
-  Map jsonResponse = json.decode(response.body);
+          } else if (errorMessageMap.containsKey('contactNo') &&
+              errorMessageMap['contactNo'] is List<dynamic> &&
+              errorMessageMap['contactNo'].isNotEmpty) {
+            toastMessage(errorMessageMap['contactNo'][0]);
+          }
+          else{
+            toastMessage('Unknown error occurred');
+          }
+        } else {
 
-  // Extract entityId from the response
-entityId = jsonResponse['entityId'];
-print("entity->${entityId}");
-  // Get.to(() => ApplyKycVerifyOtpScreen(
-  // // verifyToken: response.body!.!.toString(),
-  // ));
-  } else {
-  toastMessage('${response.statusCode}');
+          toastMessage('Unknown error occurred');
+        }
+      }
+    }  catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
   }
-  } catch (e, s) {
-  Completer().completeError(e, s);
-  Get.back();
-  toastMessage('Something went wrong. Please try again');
-  }
-}
 
-
-Future _sendOtp(
-    {String? fName,
+  Future _sendOtp(
+      {String? fName,
       String? lName,
       String? mName,
-String?otp,
+      String? otp,
       //String? email,
       String? pan,
       String? dob,
@@ -1632,131 +1788,132 @@ String?otp,
       String? city,
       String? state,
       String? aadhaarNumber}) async {
-
-  List<Map<String, dynamic>> addressInfo = [
-    {
-
-      "addressCategory": "PERMANENT",
-      "address1": permanentAddress1Control.text,
-      "address2": permanentAddress2Control.text,
-      "address3": permanentAddress3Control.text,
-      "city": permanentcityControl.text,
-      "state_code": state,
-      "country": "INDIA",
-      "pinCode":permanentpinNumberControl.text
-    },
-   // if(categories == "HOME") {
-   //   "addressCategory":categories ,
-   //    "address1": homeAddress1Control.text,
-   //    "address2": homeAddress2Control.text,
-   //    "address3": homeAddress3Control.text,
-   //    "city": homecityControl.text,
-   //    "state_code": state,
-   //    "country": "INDIA",
-   //    "pinCode": homepinNumberControl.text.toString()
-   //  }else if(categories == "OFFICE"){
-   //   "addressCategory":categories ,
-   //   "address1": officeAddress1Control.text,
-   //   "address2": officeAddress2Control.text,
-   //   "address3": officeAddress3Control.text,
-   //   "city": officecityControl.text,
-   //   "state_code": state,
-   //   "country": "INDIA",
-   //   "pinCode": officepinNumberControl.text.toString()
-   // }
-   // else if(categories=="DELIVERY"){
-   //     "addressCategory":categories ,
-   //     "address1": deliveryAddress1Control.text,
-   //     "address2": deliveryAddress2Control.text,
-   //     "address3": deliveryAddress3Control.text,
-   //     "city": deliverycityControl.text,
-   //     "state_code": state,
-   //     "country": "INDIA",
-   //     "pinCode": deliverypinNumberControl.text.toString()
-   //
-   // }
-   // else{
-   //       "addressCategory":categories ,
-   //       "address1": communicationAddress1Control.text,
-   //       "address2": communicationAddress2Control.text,
-   //       "address3": communicationAddress3Control.text,
-   //       "city": communicationcityControl.text,
-   //       "state_code": state,
-   //       "country": "INDIA",
-   //       "pinCode": communicationpinNumberControl.text.toString()
-   //     }
-
-  ];
+    List<Map<String, dynamic>> addressInfo = [
+      {
+        "addressCategory": "PERMANENT",
+        "address1": permanentAddress1Control.text,
+        "address2": permanentAddress2Control.text,
+        "address3": permanentAddress3Control.text,
+        "city": permanentcityControl.text,
+        "state_code": state,
+        "country": "INDIA",
+        "pinCode": permanentpinNumberControl.text
+      },
+      // if(categories == "HOME") {
+      //   "addressCategory":categories ,
+      //    "address1": homeAddress1Control.text,
+      //    "address2": homeAddress2Control.text,
+      //    "address3": homeAddress3Control.text,
+      //    "city": homecityControl.text,
+      //    "state_code": state,
+      //    "country": "INDIA",
+      //    "pinCode": homepinNumberControl.text.toString()
+      //  }else if(categories == "OFFICE"){
+      //   "addressCategory":categories ,
+      //   "address1": officeAddress1Control.text,
+      //   "address2": officeAddress2Control.text,
+      //   "address3": officeAddress3Control.text,
+      //   "city": officecityControl.text,
+      //   "state_code": state,
+      //   "country": "INDIA",
+      //   "pinCode": officepinNumberControl.text.toString()
+      // }
+      // else if(categories=="DELIVERY"){
+      //     "addressCategory":categories ,
+      //     "address1": deliveryAddress1Control.text,
+      //     "address2": deliveryAddress2Control.text,
+      //     "address3": deliveryAddress3Control.text,
+      //     "city": deliverycityControl.text,
+      //     "state_code": state,
+      //     "country": "INDIA",
+      //     "pinCode": deliverypinNumberControl.text.toString()
+      //
+      // }
+      // else{
+      //       "addressCategory":categories ,
+      //       "address1": communicationAddress1Control.text,
+      //       "address2": communicationAddress2Control.text,
+      //       "address3": communicationAddress3Control.text,
+      //       "city": communicationcityControl.text,
+      //       "state_code": state,
+      //       "country": "INDIA",
+      //       "pinCode": communicationpinNumberControl.text.toString()
+      //     }
+    ];
 
 // communicationInfo array
-  List<Map<String, dynamic>> communicationInfo = [
-    {
-      "contactNo":"+917012733764",
-      "notification": true,
-      "emailId": emailIdControl.text
-    }
-  ];
-  // kycInfo array
-  List<Map<String, dynamic>> kycInfo = [
-    {
-      "documentType": "PAN",
-      "documentNo": panNumberControl.text,
-      "documentExpiry": ""
-    }
-  ];
-  List<Map<String, dynamic>> dateInfo = [
-    {
-      "dateType": "DOB",
-      "date": dob,
-    }
-  ];
+    List<Map<String, dynamic>> communicationInfo = [
+      {
+        "contactNo": "+91${User.userMobile}",
+        "notification": true,
+        "emailId": emailIdControl.text
+      }
+    ];
 
-  Map<String, dynamic> body = {};
-  body["user_id"] = User.userId;
-  body["firstName"] = fName;
-  body["middleName"] = mName;
-  body["entityId"] = entityId;
-  body["title"] =title;
-  body["lastName"] = lName;
-  body["email"] = User.userEmail;
-  body["otp"]= OtpNumberControl.text.toString();
-  body["isNRICustomer"]= isNricustomer;
-  body["isMinor"]=isMinor;
-  body["isDependant"]= isDependant;
-  body["maritalStatus"]=marital_status;
-  body["countryCode"]="91";
-  body["employmentIndustry"]=_employmentIndustryValue;
-  body["employmentType"]=_employmentTypeValue;
-  // body["aadhaar_number"] = aadhaarNumber;
-  // body["rzr_pay_id"] = widget.razorPayId!;
-  body["referred_by"] = User.userId;
-  body["prepaid_card_id"] = 5;
-  body["gender"] = gender!.toUpperCase();
-  body["addressInfo"] = addressInfo;
-  body["communicationInfo"]= communicationInfo;
-  body["aliasName"]= fName;
-  body["kycInfo"]=kycInfo;
-  body["dateInfo"]=dateInfo;
+    // kycInfo array
+    List<Map<String, dynamic>> kycInfo = [
+      {
+        "documentType": "PAN",
+        "documentNo": panNumberControl.text,
+        "documentExpiry": ""
+      }
+    ];
+    List<Map<String, dynamic>> dateInfo = [
+      {
+        "dateType": "DOB",
+        "date": dob,
+      }
+    ];
 
-print("body->${body}");
-  print("body->${otp}");
-  try {
-    AppDialogs.loading();
-    RegisterWalletResponse response = await _walletBloc.registerWallet(body);
-    Get.back();
-    if (response.success!) {
-      toastMessage(response.message);
+    Map<String, dynamic> body = {};
+    body["user_id"] = User.userId;
+    body["firstName"] = fName;
+    body["middleName"] = mName;
+    body["entityId"] = entityId;
+    body["title"] = title;
+    body["lastName"] = lName;
+    body["email"] = User.userEmail;
+    body["otp"] = OtpNumberControl.text.toString();
+    body["isNRICustomer"] = isNricustomer;
+    body["isMinor"] = isMinor;
+    body["isDependant"] = isDependant;
+    body["maritalStatus"] = marital_status;
+    body["countryCode"] = "91";
+    body["employmentIndustry"] = _employmentIndustryValue;
+    body["employmentType"] = _employmentTypeValue;
+    // body["aadhaar_number"] = aadhaarNumber;
+    // body["rzr_pay_id"] = widget.razorPayId!;
+    body["referred_by"] = User.userId;
+    body["prepaid_card_id"] = 5;
+    body["gender"] = gender!.toUpperCase();
+    body["addressInfo"] = addressInfo;
+    body["communicationInfo"] = communicationInfo;
+    body["aliasName"] = fName;
+    body["kycInfo"] = kycInfo;
+    body["dateInfo"] = dateInfo;
+    print("body->${body}");
+    print("body->${otp}");
+    try {
+      AppDialogs.loading();
+      RegisterWalletResponse response = await _walletBloc.registerWallet(json.encode(body));
+      Get.back();
       print(response.data);
-      Get.to(() =>  WalletHomeScreen(isToLoadMoney: false,));
-    } else {
-      toastMessage('${response.message!}');
+      if (response.statusCode == 200) {
+        toastMessage(response.message);
+        print(response.data);
+        Get.offAll(() => WalletHomeScreen(
+              isToLoadMoney: false,
+            ));
+      } else {
+        toastMessage('${response.message}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      String errorMessage = e.toString();
+      toastMessage(errorMessage);
     }
-  } catch (e, s) {
-    Completer().completeError(e, s);
-    Get.back();
-    toastMessage(e);
   }
-}
 }
 
 class FormatAndValidate {
@@ -1836,9 +1993,10 @@ class FormatAndValidate {
     print(x.toString());
     return x;
   }
+
   validateOtp(value) {
     String? x =
-    value!.isEmpty || value.length != 6 ? "Enter 6 digit OTP" : null;
+        value!.isEmpty || value.length != 6 ? "Enter 6 digit OTP" : null;
     print("xxxx");
     print("x==${x.toString()}");
     return x;

@@ -49,9 +49,13 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
   late VoidCallback refreshUIFn;
   WalletBloc _walletBloc = WalletBloc();
    bool? prepaidCardUserOrNot;
+   bool?prepaidCardUserOrNotToken;
   @override
   void initState() {
     super.initState();
+    getPrepaidCardUserOrNot();
+    getPrepaidCardUserOrNotToken();
+
     _notificationsBloc = NotificationListBloc(this);
     _notificationsBloc.getList(false);
     _repository.getList(1, 20);
@@ -72,12 +76,12 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
       if (!b) {
       await  AuthBloc().checkIsMobileEmailVerified(User.userId);
       }
-      getPrepaidCardUserOrNotToken();
-      getPrepaidCardUserOrNot();
+
+
     });
   }
   getPrepaidCardUserOrNotToken() async {
-    prepaidCardUserOrNot = await _profileBloc.tokencard(accountId);
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(accountId);
     setState(() {});
   }
   getPrepaidCardUserOrNot() async {

@@ -7,6 +7,7 @@ import 'dart:convert';
 
 WalletDetailsResponse walletDetailsResponseFromJson(String str) =>
     WalletDetailsResponse.fromJson(json.decode(str));
+
 class WalletDetailsResponse {
   bool? success;
   int? statusCode;
@@ -51,7 +52,7 @@ class WalletDetails {
   int? valid;
   String? cardName;
   String? slug;
-  List<CardDetails>? cardDetails;
+  CardDetails? cardDetails;
   BalanceInfo? balanceInfo;
 
   WalletDetails(
@@ -85,12 +86,9 @@ class WalletDetails {
     valid = json['valid'];
     cardName = json['card_name'];
     slug = json['slug'];
-    if (json['cardDetails'] != null) {
-      cardDetails = <CardDetails>[];
-      json['cardDetails'].forEach((v) {
-        cardDetails!.add(new CardDetails.fromJson(v));
-      });
-    }
+    cardDetails = json['CardDetails'] != null
+        ? new CardDetails.fromJson(json['CardDetails'])
+        : null;
     balanceInfo = json['balanceInfo'] != null
         ? new BalanceInfo.fromJson(json['balanceInfo'])
         : null;
@@ -112,7 +110,7 @@ class WalletDetails {
     data['card_name'] = this.cardName;
     data['slug'] = this.slug;
     if (this.cardDetails != null) {
-      data['cardDetails'] = this.cardDetails!.map((v) => v.toJson()).toList();
+      data['CardDetails'] = this.cardDetails!.toJson();
     }
     if (this.balanceInfo != null) {
       data['balanceInfo'] = this.balanceInfo!.toJson();
@@ -123,37 +121,37 @@ class WalletDetails {
 
 class CardDetails {
   String? cardNumber;
+  String? kitNo;
   String? expiry;
   String? status;
   String? type;
   String? network;
-  String? cardUrl;
 
   CardDetails(
       {this.cardNumber,
+        this.kitNo,
         this.expiry,
         this.status,
         this.type,
-        this.network,
-        this.cardUrl});
+        this.network});
 
   CardDetails.fromJson(Map<String, dynamic> json) {
     cardNumber = json['cardNumber'];
+    kitNo = json['kitNo'];
     expiry = json['expiry'];
     status = json['status'];
     type = json['type'];
     network = json['network'];
-    cardUrl = json['card_url'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['cardNumber'] = this.cardNumber;
+    data['kitNo'] = this.kitNo;
     data['expiry'] = this.expiry;
     data['status'] = this.status;
     data['type'] = this.type;
     data['network'] = this.network;
-    data['card_url'] = this.cardUrl;
     return data;
   }
 }
@@ -176,6 +174,175 @@ class BalanceInfo {
     return data;
   }
 }
+// class WalletDetailsResponse {
+//   bool? success;
+//   int? statusCode;
+//   String? message;
+//   WalletDetails? walletDetails;
+//
+//   WalletDetailsResponse(
+//       {this.success, this.statusCode, this.message, this.walletDetails});
+//
+//   WalletDetailsResponse.fromJson(Map<String, dynamic> json) {
+//     success = json['success'];
+//     statusCode = json['status_code'];
+//     message = json['message'];
+//     walletDetails = json['walletDetails'] != null
+//         ? new WalletDetails.fromJson(json['walletDetails'])
+//         : null;
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['success'] = this.success;
+//     data['status_code'] = this.statusCode;
+//     data['message'] = this.message;
+//     if (this.walletDetails != null) {
+//       data['walletDetails'] = this.walletDetails!.toJson();
+//     }
+//     return data;
+//   }
+// }
+//
+// class WalletDetails {
+//   String? entityId;
+//   String? kitNo;
+//   String? token;
+//   String? dob;
+//   String? walletNumber;
+//   String? prepaidCardId;
+//   String? virtualAccountNumber;
+//   String? phoneNumber;
+//   int? referredBy;
+//   Null? couponCode;
+//   int? valid;
+//   String? cardName;
+//   String? slug;
+//   List<CardDetails>? cardDetails;
+//   BalanceInfo? balanceInfo;
+//
+//   WalletDetails(
+//       {this.entityId,
+//         this.kitNo,
+//         this.token,
+//         this.dob,
+//         this.walletNumber,
+//         this.prepaidCardId,
+//         this.virtualAccountNumber,
+//         this.phoneNumber,
+//         this.referredBy,
+//         this.couponCode,
+//         this.valid,
+//         this.cardName,
+//         this.slug,
+//         this.cardDetails,
+//         this.balanceInfo});
+//
+//   WalletDetails.fromJson(Map<String, dynamic> json) {
+//     entityId = json['entity_id'];
+//     kitNo = json['kit_no'];
+//     token = json['token'];
+//     dob = json['dob'];
+//     walletNumber = json['wallet_number'];
+//     prepaidCardId = json['prepaid_card_id'];
+//     virtualAccountNumber = json['virtual_account_number'];
+//     phoneNumber = json['phone_number'];
+//     referredBy = json['referred_by'];
+//     couponCode = json['coupon_code'];
+//     valid = json['valid'];
+//     cardName = json['card_name'];
+//     slug = json['slug'];
+//     if (json['cardDetails'] != null) {
+//       cardDetails = <CardDetails>[];
+//       json['cardDetails'].forEach((v) {
+//         cardDetails!.add(new CardDetails.fromJson(v));
+//       });
+//     }
+//     balanceInfo = json['balanceInfo'] != null
+//         ? new BalanceInfo.fromJson(json['balanceInfo'])
+//         : null;
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['entity_id'] = this.entityId;
+//     data['kit_no'] = this.kitNo;
+//     data['token'] = this.token;
+//     data['dob'] = this.dob;
+//     data['wallet_number'] = this.walletNumber;
+//     data['prepaid_card_id'] = this.prepaidCardId;
+//     data['virtual_account_number'] = this.virtualAccountNumber;
+//     data['phone_number'] = this.phoneNumber;
+//     data['referred_by'] = this.referredBy;
+//     data['coupon_code'] = this.couponCode;
+//     data['valid'] = this.valid;
+//     data['card_name'] = this.cardName;
+//     data['slug'] = this.slug;
+//     if (this.cardDetails != null) {
+//       data['cardDetails'] = this.cardDetails!.map((v) => v.toJson()).toList();
+//     }
+//     if (this.balanceInfo != null) {
+//       data['balanceInfo'] = this.balanceInfo!.toJson();
+//     }
+//     return data;
+//   }
+// }
+//
+// class CardDetails {
+//   String? cardNumber;
+//   String? expiry;
+//   String? status;
+//   String? type;
+//   String? network;
+//   String? cardUrl;
+//
+//   CardDetails(
+//       {this.cardNumber,
+//         this.expiry,
+//         this.status,
+//         this.type,
+//         this.network,
+//         this.cardUrl});
+//
+//   CardDetails.fromJson(Map<String, dynamic> json) {
+//     cardNumber = json['cardNumber'];
+//     expiry = json['expiry'];
+//     status = json['status'];
+//     type = json['type'];
+//     network = json['network'];
+//     cardUrl = json['card_url'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['cardNumber'] = this.cardNumber;
+//     data['expiry'] = this.expiry;
+//     data['status'] = this.status;
+//     data['type'] = this.type;
+//     data['network'] = this.network;
+//     data['card_url'] = this.cardUrl;
+//     return data;
+//   }
+// }
+//
+// class BalanceInfo {
+//   String? balance;
+//   String? lienBalance;
+//
+//   BalanceInfo({this.balance, this.lienBalance});
+//
+//   BalanceInfo.fromJson(Map<String, dynamic> json) {
+//     balance = json['balance'];
+//     lienBalance = json['lienBalance'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['balance'] = this.balance;
+//     data['lienBalance'] = this.lienBalance;
+//     return data;
+//   }
+// }
 
 //
 // class WalletDetailsResponse {

@@ -470,7 +470,7 @@ class _PrepaidWalletDetailsScreenState
                                                                 .kitNo!,
                                                             cardNumber: _walletBloc
                                                                 .walletDetailsData!
-                                                                .cardDetails![0]
+                                                                .cardDetails!
                                                                 .cardNumber!,
                                                           ));
                                                     

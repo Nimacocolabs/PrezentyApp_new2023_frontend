@@ -10,10 +10,11 @@ import 'package:flutter/material.dart';
 
 class WalletStatementList extends StatefulWidget {
   const WalletStatementList(
-      {Key? key, required this.fromDate, required this.toDate})
+      {Key? key, required this.fromDate, required this.toDate,required this.entityId})
       : super(key: key);
   final String fromDate;
   final String toDate;
+  final String entityId;
 
   @override
   _WalletStatementListState createState() => _WalletStatementListState();
@@ -35,7 +36,7 @@ class _WalletStatementListState extends State<WalletStatementList>
 
     _walletBloc = WalletBloc(listener: this);
     _walletBloc.getStatementList(false,
-        userId: User.userId, fromDate: widget.fromDate, toDate: widget.toDate);
+        entityId: widget.entityId, fromDate: widget.fromDate, toDate: widget.toDate);
   }
 
   @override
@@ -107,13 +108,15 @@ class _WalletStatementListState extends State<WalletStatementList>
   }
 
   Widget _buildList() {
-    List<Statement> list = _walletBloc.statementList;
-    return list.isEmpty
+    List<Transactions> list = _walletBloc.statementList;
+    return
+      list.isEmpty
         ? Padding(
           padding: const EdgeInsets.all(50.0),
           child: CommonApiResultsEmptyWidget("No transactions to show"),
         )
-        : Column(
+        :
+      Column(
           children: [
             ListView.builder(
               physics: NeverScrollableScrollPhysics(),
@@ -121,7 +124,6 @@ class _WalletStatementListState extends State<WalletStatementList>
                 shrinkWrap: true,
                 itemCount: list.length,
                 itemBuilder: (BuildContext context, int index) {
-                  
                   return Card(
                       elevation: 5,
                       margin: EdgeInsets.all(4),
@@ -136,22 +138,24 @@ class _WalletStatementListState extends State<WalletStatementList>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    list[index].timestamp.toString().split(' ').first,
+                                  list[index].transaction!.time.toString(),
+                                    // list[index].timestamp.toString().split(' ').first,
                                     style: TextStyle(fontSize: 14, color: Colors.black,fontWeight: FontWeight.bold),
                                   ),
                                   SizedBox(width: 8),
-
-                                  if(list[index].type == "CREDIT" )
+                                  if(list[index].transaction!.type == "CREDIT" )
                                    Expanded(
                                      child: Text(
-                                      "+" +" "+ rupeeSymbol + list[index].amount.toString(),textAlign: TextAlign.right,
+                                      "+" +" "+ rupeeSymbol + "${list[index].transaction!.amount}",
+                                       textAlign: TextAlign.right,
                                       style: TextStyle(fontSize: 14, color: Colors.green,fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  if(list[index].type == "DEBIT" )
+                                  if(list[index].transaction!.type == "DEBIT" )
                                   Expanded(
                                      child: Text(
-                                      "-" + " "+rupeeSymbol + list[index].amount.toString(),textAlign: TextAlign.right,
+                                      "-" + " "+rupeeSymbol + "${list[index].transaction!.amount}",
+                                       textAlign: TextAlign.right,
                                       style: TextStyle(fontSize: 14, color: Colors.red,fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -159,46 +163,49 @@ class _WalletStatementListState extends State<WalletStatementList>
                             SizedBox(
                               height: 5,
                             ),
-
-
-
                             _item(
-                              "Transactions type ",
-                              '${list[index].transactionType}',
+                                '${list[index].transaction!.transactionType}',
+                              "transactionType"
                             ),
                             SizedBox(
                               height: 5,
                             ),
-                            if (list[index].bankReferenceNumber != null)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 5.0),
-                                child: _item("Bank Ref ID",
-                                    '${list[index].bankReferenceNumber}'),
-                              ),
+                            // if (list[index].bankReferenceNumber != null)
+                            //   Padding(
+                            //     padding: const EdgeInsets.only(bottom: 5.0),
+                            //     child: _item("Bank Ref ID",
+                            //         "bankReferenceNumber"),
+                            //         // '${list[index].bankReferenceNumber}'),
+                            //   ),
                             _item(
                               "Transaction ID",
-                              '${list[index].transactionId}',
+                              '${list[index].transaction!.txRef}',
                             ),
+                            // item(
+                            //   "Transaction ID",
+                            //   '${list[index].transaction!.externalTransactionId}',
+                            // ),
                             SizedBox(
                               height: 5,
                             ),
-                            _item(
-                              "Closing Balance",
-                              rupeeSymbol + '${list[index].openingBalance}',
-                            ),
+                            // _item(
+                            //   "Closing Balance",
+                            //   rupeeSymbol + ''${list[index].openingBalance}'',
+                            // ),
                             SizedBox(
                               height: 5,
                             ),
                             _item(
                               "Current Balance",
-                              rupeeSymbol + '${list[index].closingBalance}',
+                              rupeeSymbol + '${list[index].transaction!.balance}',
+                                  // '${list[index].closingBalance}',
                             ),
                             SizedBox(
                               height: 5,
                             ),
                             _item(
                               "Transaction Status",
-                              '${list[index].status}',
+                              '${list[index].transaction!.transactionStatus}',
                             ),
                             SizedBox(
                               height: 5,
@@ -225,7 +232,7 @@ class _WalletStatementListState extends State<WalletStatementList>
   _loadMoreEntries(){
     if (_walletBloc.hasNextPage) {
       _walletBloc.getStatementList(true,
-          userId: User.userId,
+          entityId: widget.entityId,
           fromDate: widget.fromDate,
           toDate: widget.toDate);
     }

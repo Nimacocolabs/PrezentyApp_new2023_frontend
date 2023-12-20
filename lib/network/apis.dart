@@ -104,7 +104,8 @@ class Apis {
   static String getAllAvailableCardList = "api/prepaid-card-list";
   static String getCardOffers = "api/card-offer-list";
   static String offers = "api/offers-list";
-  static String blockCardNow = "api/block-physical-card-request";
+  static String blockCardNow = "api/prepaid/cards/card-status";
+  static String replaceCardNow="api/prepaid/cards/replace-card";
 
   static String walletCreationAndPaymentStatus = "api/check-paid-wallet-status";
   static String registerWallet = "api/prepaid/cards/wallet-registration";
@@ -117,7 +118,7 @@ class Apis {
       "api/check-enable-request-physicalcard";
   static String setCardPin = 'api/prepaid/cards/set-pin';
   static String loadMoney = "";
-  static String getWalletStatementList = "api/fetch-wallet-statement";
+  static String getWalletStatementList = "api/prepaid/cards/transactions";
   static String requestPhysicalCard = "api/physicalcard-request";
 
   static String getOffers = "api/offers-list";

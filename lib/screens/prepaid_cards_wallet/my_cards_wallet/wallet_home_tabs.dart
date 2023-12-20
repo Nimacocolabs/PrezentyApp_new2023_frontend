@@ -215,43 +215,45 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                     )
                   : SizedBox(),
 
-              Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    // setState(() {
-                    //   tabCategory = 2;
-                    // });
+              // Expanded(
+              //   child: InkWell(
+              //     borderRadius: BorderRadius.circular(10),
+              //     onTap: () async {
+              //       // setState(() {
+              //       //   tabCategory = 2;
+              //       // });
+              //
+              //       String url = await getCVV();
+              //       Get.to(() => FetchCVVScreen(url: url));
+              //     },
+              //     child: Container(
+              //       padding: const EdgeInsets.symmetric(vertical: 17),
+              //       // width: (screenWidth / 4) - 5,
+              //       // decoration: BoxDecoration(
+              //       // border: Border(
+              //       //     bottom: BorderSide(
+              //       //         width: 2,
+              //       //         color: tabCategory == 2
+              //       //             ? primaryColor
+              //       //             : Colors.transparent,
+              //       //         style: BorderStyle.solid))
+              //       // ),
+              //       child: Text(
+              //         "CVV",
+              //         textAlign: TextAlign.center,
+              //         style: TextStyle(
+              //           fontSize: 14,
+              //           fontWeight: FontWeight.bold,
+              //           color:
+              //               // tabCategory == 2 ? Colors.black87 :
+              //               Colors.grey,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
 
-                    String url = await getCVV();
-                    Get.to(() => FetchCVVScreen(url: url));
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    // width: (screenWidth / 4) - 5,
-                    // decoration: BoxDecoration(
-                    // border: Border(
-                    //     bottom: BorderSide(
-                    //         width: 2,
-                    //         color: tabCategory == 2
-                    //             ? primaryColor
-                    //             : Colors.transparent,
-                    //         style: BorderStyle.solid))
-                    // ),
-                    child: Text(
-                      "CVV",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            // tabCategory == 2 ? Colors.black87 :
-                            Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+
               // Expanded(
               //   child: InkWell(
               //     borderRadius: BorderRadius.circular(10),
@@ -933,6 +935,7 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                 height: screenHeight - 320,
                 child: Center(child: CommonApiLoader()))
             : WalletStatementList(
+                entityId:widget.walletDetails!.entityId.toString(),
                 fromDate: fromDateControl.text,
                 toDate: toDateControl.text,
               ),

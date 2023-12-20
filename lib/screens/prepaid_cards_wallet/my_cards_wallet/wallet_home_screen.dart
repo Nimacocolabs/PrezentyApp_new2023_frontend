@@ -64,9 +64,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       TextEditingController();
   TextEditingController _textEditingControllerEventID = TextEditingController();
   String cardUrl = "";
-  int? selectedCheckboxIndex;
-
-  List<String> checkboxItems = ['LOCK', 'UNLOCK', 'BLOCK',];
 
 
   @override
@@ -111,20 +108,20 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               ),
               onSelected: (v) {
                 if (v == 1) {
-                  if (_walletBloc.walletDetailsData == null ||
-                      (_walletBloc.walletDetailsData?.cardDetails ?? [])
-                          .isEmpty) {
+                  if (_walletBloc.walletDetailsData == null
+                      // ||
+                      // (_walletBloc.walletDetailsData?.cardDetails ?? [])
+                          ) {
                     return;
                   }
                   Get.to(() => RequestPhysicalCard(
                         kitNumber: _walletBloc.walletDetailsData!.kitNo!,
                         cardNumber: _walletBloc
-                            .walletDetailsData!.cardDetails![0].cardNumber!,
+                            .walletDetailsData!.cardDetails!.cardNumber!,
                       ));
                 } else if (v == 2) {
-                  _showBlockPopUp(context,_walletBloc
-                      .walletDetailsData,_walletBloc
-                      .walletDetailsData!.cardDetails!);
+                  _showBlockPopUp(context, _walletBloc.walletDetailsData,
+                      _walletBloc.walletDetailsData!.cardDetails!);
                   print("scd=>${enableRequestPhysicalCard.value}");
                 }
               },
@@ -270,7 +267,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .08,
                             top: screenWidth * .60,
                             child: Text(
-                              '${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(0, 4)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(4, 8)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(8, 12)} ${walletDetails.walletDetails!.cardDetails![0].cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
+                              '${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(0, 4)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(4, 8)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(8, 12)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -279,7 +276,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             left: screenWidth * .18,
                             top: screenWidth * .95,
                             child: Text(
-                              '${walletDetails.walletDetails!.cardDetails![0].expiry}',
+                              '${walletDetails.walletDetails!.cardDetails!.expiry}',
                               style:
                                   TextStyle(color: Colors.white, fontSize: 22),
                             )),
@@ -657,7 +654,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           ),
           WalletHomeTabs(
             walletDetails: walletDetails.walletDetails!,
-            cardDetail: walletDetails.walletDetails!.cardDetails![0],
+            cardDetail: walletDetails.walletDetails!.cardDetails!,
           ),
           SizedBox(
             height: 50,
@@ -706,75 +703,95 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   //       false; //if showDialouge had returned null, then return false
   // }
 
-  Future<bool> _showBlockPopUp(context,WalletDetails,CardDetails) async {
+  Future<bool> _showBlockPopUp(context, WalletDetails, CardDetails) async {
     return await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title:  Text('Card'),
-        titleTextStyle: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: secondaryColor),
-        content:  SizedBox(
-          height: 300,
-          child: Column(
-            children: [
-              Text("Current Status : ${CardDetails![0].status}",style: TextStyle(fontWeight: FontWeight.w500),),
-              SizedBox(height: 10,),
-              Text('Do you want to change the status in your card?'),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              itemCount: checkboxItems.length,
-              itemBuilder: (context, index) {
-                return CheckboxListTile(
-                  title: Text(checkboxItems[index]),
-                  value: selectedCheckboxIndex == index,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCheckboxIndex = value! ? index : null;
-                      print("Selected-->$selectedCheckboxIndex");
-                    });
-                  },
-                  contentPadding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                );
-              },
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Card'),
+            titleTextStyle: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: secondaryColor),
+            content: SizedBox(
+              height: 300,
+              child: Column(
+                children: [
+                  Text(
+                    "Current Status : ${CardDetails!.status}",
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text('Do you want to change the status in your card?'),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  if (CardDetails!.status == "ALLOCATED")
+                    Column(
+                      children: [
+                        SizedBox(
+                            width: screenWidth * 1,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"L","Card Lock");
+                                }, child: Text("LOCK"))),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                            width: screenWidth * 1,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"BL","Card Block");
+                                }, child: Text("BLOCK"))),
+                        if (CardDetails!.status == "BLOCKED")
+                          SizedBox(
+                              width: screenWidth * 1,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    _replaceCard(WalletDetails.entityId,WalletDetails.kitNo);
+                                  }, child: Text("REPLACE"))),
+                      ],
+                    ),
+                  // if(CardDetails![0].status=="LOCKED")
+                  //   SizedBox(
+                  //       width: screenWidth * 1,
+                  //       child: ElevatedButton(
+                  //           onPressed: () {
+                  //             _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"UL","Card Unlock");
+                  //           }, child: Text("UNLOCK"))),
+                ],
+              ),
             ),
+            contentTextStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+                color: secondaryColor),
+            // actions: [
+            //   ElevatedButton(
+            //     onPressed: () => Navigator.of(context).pop(false),
+            //     //return false when click on "NO"
+            //     child: const Text(
+            //       'No',
+            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //     ),
+            //   ),
+            //   ElevatedButton(
+            //     // onPressed:() =>
+            //     onPressed: () => _blockCard(accountId!),
+            //     //Navigator.of(context).pop(true),
+            //     //return true when click on "Yes"
+            //     child: const Text(
+            //       'Yes',
+            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //     ),
+            //   ),
+            // ],
           ),
-
-            ],
-          ),
-        ),
-        contentTextStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.normal,
-            color: secondaryColor),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            //return false when click on "NO"
-            child: const Text(
-              'No',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          ElevatedButton(
-            // onPressed:() =>
-            onPressed: () => _blockCard(accountId!),
-            //Navigator.of(context).pop(true),
-            //return true when click on "Yes"
-            child: const Text(
-              'Yes',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false; //if showDialouge had returned null, then return false
   }
-
-
 
   Future<bool> showExitPopup() async {
     return await showDialog(
@@ -819,7 +836,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   _checkEnableRequestPhysicalCard() async {
     enableRequestPhysicalCard.value =
         await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
-            _walletBloc.walletDetailsData!.cardDetails![0].cardNumber ?? '');
+            _walletBloc.walletDetailsData!.cardDetails!.cardNumber ?? '');
     setState(() {});
   }
 
@@ -882,19 +899,48 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
   }
 
-  Future<dynamic> _blockCard(String accountId) async {
+  Future<dynamic> _blockCard(String entityId,kitNo,flag,reason) async {
     AppDialogs.loading();
+    Map<String, dynamic> data = {
+      "entityId": "${entityId}",
+      "flag":"${flag}",
+      "kitNo": "${kitNo}",
+      "reason": "${reason}"
+    };
 
     try {
-      BlockCardResponse response = await _walletBloc.blockCard(accountId);
+      BlockCardResponse response = await _walletBloc.blockCard(json.encode(data));
       Get.back();
-      if (response.success!) {
+      if (response.statusCode == 200) {
         Get.back();
-
         AppDialogs.message(
-            "Your card is blocked successfully and send the request for new card");
+            "${response.message!}");
       } else {
-        // toastMessage('${response.message!}');
+        toastMessage('${response.message!}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
+  }
+
+  Future<dynamic> _replaceCard(String entityId,kitNo) async {
+    AppDialogs.loading();
+    Map<String, dynamic> data = {
+      "entityId": "${entityId}",
+      "oldKitNo": "${kitNo}",
+    };
+
+    try {
+      BlockCardResponse response = await _walletBloc.replaceCard(json.encode(data));
+      Get.back();
+      if (response.statusCode == 200) {
+        Get.back();
+        AppDialogs.message(
+            "${response.message!}");
+      } else {
+        toastMessage('${response.message!}');
       }
     } catch (e, s) {
       Completer().completeError(e, s);

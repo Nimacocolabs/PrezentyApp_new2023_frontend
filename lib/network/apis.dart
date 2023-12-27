@@ -115,7 +115,7 @@ class Apis {
   static String getCVV = "api/fetch-cvv";
   static String checkPhysicalCardExists = "api/check-enable-cardsetpin-button";
   static String checkEnableRequestPhysicalCard =
-      "api/check-enable-request-physicalcard";
+      "api/prepaid/cards/check-physical-card-request";
   static String setCardPin = 'api/prepaid/cards/set-pin';
   static String loadMoney = "";
   static String getWalletStatementList = "api/prepaid/cards/transactions";
@@ -163,7 +163,7 @@ class Apis {
   static String checkPrepaidUserOrNotToken = "api/prepaid/cards/get-token/";
   static String transferCoinToPrepaidCard = "api/transfer-coin-to-prepaid-card";
   static String userPermenantAddress = "api/get-user-permenant-address";
-  static String getPhysicalOrderId = "api/get-physical-order-id-amount";
+  static String getPhysicalOrderId = "api/prepaid/cards/get-physical-order-id-amount";
   static String getTermsAndConditions = "api/get-terms-condition";
 
   static String updatePanNumber = "api/update-pan-number";
@@ -171,7 +171,7 @@ class Apis {
   static String verifyPanAadhar = 'api/verify-pan-aadar';
   static String fetchPhysicalCardDetails = 'api/fetch-card-details-physic';
   static String getPhysicalCardRequestAmount =
-      'api/get-physical-card-request-amount';
+      'api/prepaid/cards/get-physical-card-request-amount';
   static String validatePrepaidCardNumber = "api/validate-prepaid-card-number";
   static String updateReferalCode = "api/update-referal-code";
   static String offerProductList = "api/get-offer-product-list";

@@ -471,7 +471,7 @@ class _PrepaidWalletDetailsScreenState
                                                             cardNumber: _walletBloc
                                                                 .walletDetailsData!
                                                                 .cardDetails!
-                                                                .cardNumber!,
+                                                                .cardNumber!,entityid: _walletBloc.walletDetailsData!.entityId!,
                                                           ));
                                                     
                                                   },

@@ -275,10 +275,10 @@ class WalletRepository {
 
   Future<bool> checkEnableRequestPhysicalCard(Map<String, String> body) async {
     final response = await apiProvider
-        .getJsonInstance()
+        .getJsonInstancecard()
         .post(Apis.checkEnableRequestPhysicalCard, data: body);
 
-    Map map = jsonDecode(response.data);
+    Map map = (response.data);
     return (map['statusCode'] == 200);
   }
 
@@ -365,8 +365,6 @@ class WalletRepository {
       Response response = await apiProvider.getMultipartInstance().post(
           Apis.getTouchPointWalletBalance,
           data: FormData.fromMap({'account_id': accountId}));
-      // print(response);
-
       return TouchPointWalletBalanceResponse.fromJson(
               json.decode(response.data))
           .data;
@@ -408,10 +406,10 @@ class WalletRepository {
 
   Future<ApplyCardTaxInfoResponse> getPhysicalCardRequestAmount(
       String accountId) async {
-    Response response = await apiProvider.getJsonInstance().post(
-        Apis.getPhysicalCardRequestAmount,
-        data: {'account_id': accountId});
-    return ApplyCardTaxInfoResponse.fromJson(jsonDecode(response.data));
+    Response response = await apiProvider.getJsonInstancecard().get(
+        Apis.getPhysicalCardRequestAmount,);
+
+    return ApplyCardTaxInfoResponse.fromJson(response.data);
   }
 
   Future<ValidateCardData?> validatePrepaidCardNumber(

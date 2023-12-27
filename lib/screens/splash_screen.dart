@@ -1,5 +1,6 @@
 
 import 'package:event_app/bloc/auth_bloc.dart';
+import 'package:event_app/bloc/profile_bloc.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/fetch_cvv.dart';
 import 'package:event_app/util/event_data.dart';
 import 'package:event_app/util/shared_prefs.dart';
@@ -29,6 +30,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      getPrepaidCardUserOrNotToken();
+      getPrepaidCardUserOrNot();
       setScreenDimensions(context);
       // iconWidth = screenWidth * .2;
       // showProgress = true;
@@ -55,6 +58,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
       
     });
+  }
+  String accountId = User.userId;
+  ProfileBloc _profileBloc = ProfileBloc();
+  bool? prepaidCardUserOrNot;
+  bool?prepaidCardUserOrNotToken;
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(accountId);
+    setState(() {});
+  }
+  getPrepaidCardUserOrNot() async {
+    prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(accountId);
+    setState(() {});
   }
 
   @override

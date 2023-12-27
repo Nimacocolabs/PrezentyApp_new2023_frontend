@@ -126,7 +126,7 @@ class AuthRepository {
         .getMultipartInstance()
         .get(Apis.getPopupImage);
   
-    return PopupImageModel.fromJson(json.decode(response.data));
+    return PopupImageModel.fromJson(response.data);
   }
 
   Future<SpinWheelRulesData?> spinWheelRules() async {

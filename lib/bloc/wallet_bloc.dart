@@ -331,11 +331,11 @@ class WalletBloc {
   }
 
   Future<bool> checkEnableRequestPhysicalCard(
-      String accountId, String cardNumber) async {
+      String entityId, String kitNo) async {
     try {
       AppDialogs.loading();
       return await _walletRepository!.checkEnableRequestPhysicalCard(
-          {"account_id": accountId, "card_number": cardNumber});
+          {"entity_id": entityId, "kit_no": kitNo});
     } catch (e, s) {
       Completer().completeError(e, s);
       return false;

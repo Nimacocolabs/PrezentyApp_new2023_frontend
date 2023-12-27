@@ -112,14 +112,14 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
     return url;
   }
 
-  checkPhysicalCardExists(String? userId, String? cardNumber) async {
-    CheckPhysicalCardExistsResponse response =
-        await _walletBloc.checkPhysicalCardExists(userId, cardNumber);
-    setState(() {
-      showSetPinButton = response.success!;
-      print("show set pin -->$showSetPinButton");
-    });
-  }
+  // checkPhysicalCardExists(String? userId, String? cardNumber) async {
+  //   CheckPhysicalCardExistsResponse response =
+  //       await _walletBloc.checkPhysicalCardExists(userId, cardNumber);
+  //   setState(() {
+  //     showSetPinButton = response.success!;
+  //     print("show set pin -->$showSetPinButton");
+  //   });
+  // }
   getTPDetails() async {
     touchpointsData = await _walletBloc.getTouchPointWalletBalance(accountId);
     print("ghshgshshshs ${touchpointsData?.touchPoints}");
@@ -176,44 +176,44 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
                   ),
                 ),
               ),
-              showSetPinButton
-                  ? Expanded(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(10),
-                        onTap: () async {
-                          // setState(() {
-                          //   tabCategory = 1;
-                          // });
-                          String url = await setCardPin();
-                          print("Correct---->${url}");
-                           Get.to(() => SetCardPin(url: url));
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 17),
-                          // width: (screenWidth / 4) - 5,
-                          // decoration: BoxDecoration(
-                          //     border: Border(
-                          //         bottom: BorderSide(
-                          //             width: 2,
-                          //             color: tabCategory == 1
-                          //                 ? primaryColor
-                          //                 : Colors.transparent,
-                          //             style: BorderStyle.solid))),
-                          child: Text(
-                            "Set PIN",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  // tabCategory == 1 ? Colors.black87 :
-                                  Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  : SizedBox(),
+              // showSetPinButton
+              //     ? Expanded(
+              //         child: InkWell(
+              //           borderRadius: BorderRadius.circular(10),
+              //           onTap: () async {
+              //             // setState(() {
+              //             //   tabCategory = 1;
+              //             // });
+              //             String url = await setCardPin();
+              //             print("Correct---->${url}");
+              //              Get.to(() => SetCardPin(url: url));
+              //           },
+              //           child: Container(
+              //             padding: const EdgeInsets.symmetric(vertical: 17),
+              //             // width: (screenWidth / 4) - 5,
+              //             // decoration: BoxDecoration(
+              //             //     border: Border(
+              //             //         bottom: BorderSide(
+              //             //             width: 2,
+              //             //             color: tabCategory == 1
+              //             //                 ? primaryColor
+              //             //                 : Colors.transparent,
+              //             //             style: BorderStyle.solid))),
+              //             child: Text(
+              //               "Set PIN",
+              //               textAlign: TextAlign.center,
+              //               style: TextStyle(
+              //                 fontSize: 14,
+              //                 fontWeight: FontWeight.bold,
+              //                 color:
+              //                     // tabCategory == 1 ? Colors.black87 :
+              //                     Colors.grey,
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       )
+              //     : SizedBox(),
 
               // Expanded(
               //   child: InkWell(
@@ -302,6 +302,43 @@ class _WalletHomeTabsState extends State<WalletHomeTabs> {
               //     ),
               //   ),
               // ),
+
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () async {
+                    // setState(() {
+                    //   tabCategory = 1;
+                    // });
+                    String url = await setCardPin();
+                    print("Correct---->${url}");
+                    Get.to(() => SetCardPin(url: url));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    // width: (screenWidth / 4) - 5,
+                    // decoration: BoxDecoration(
+                    //     border: Border(
+                    //         bottom: BorderSide(
+                    //             width: 2,
+                    //             color: tabCategory == 1
+                    //                 ? primaryColor
+                    //                 : Colors.transparent,
+                    //             style: BorderStyle.solid))),
+                    child: Text(
+                      "Set PIN",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color:
+                        // tabCategory == 1 ? Colors.black87 :
+                        Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              )
             ]),
           ),
         ),

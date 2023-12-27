@@ -28,10 +28,11 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class RequestPhysicalCard extends StatefulWidget {
   const RequestPhysicalCard(
-      {Key? key, required this.kitNumber, required this.cardNumber})
+      {Key? key, required this.kitNumber, required this.cardNumber,required this.entityid})
       : super(key: key);
   final String kitNumber;
   final String cardNumber;
+  final String entityid;
 
   @override
   State<RequestPhysicalCard> createState() => _RequestPhysicalCardState();
@@ -231,7 +232,7 @@ _requestPhysicalCardModalSheet() async {
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () async {
-                              await requestCardPayment(accountId);
+                              await requestCardPayment(widget.kitNumber,widget.entityid);
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -800,14 +801,14 @@ _requestPhysicalCardModalSheet() async {
     );
   }
 
- requestCardPayment(String accountId) async {
+ requestCardPayment(String kitNo,entityId) async {
 
     String key = await  getGatewayKey();
     if (key.isEmpty) {
       toastMessage('Unable to get payment key');
 
     } else {
-       orderModelData = await getPhycialCardOrderId(accountId);
+       orderModelData = await getPhycialCardOrderId(kitNo,entityId);
         String orderId = orderModelData?.orderId??'';
 
       if (orderId.isEmpty) {
@@ -903,11 +904,16 @@ _requestPhysicalCardModalSheet() async {
     return '';
   }
 
-  Future<OrderModel?>  getPhycialCardOrderId(String accountId)async {
+  Future<OrderModel?>  getPhycialCardOrderId(String kitNo,entityid)async {
+
     try {
       AppDialogs.loading();
-      final response = await ApiProviderPrepaidCards().getJsonInstance().get(
-          '${Apis.getPhysicalOrderId}?account_id=$accountId');
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+          '${Apis.getPhysicalOrderId}',
+          data: {
+            "entity_id":entityid,
+            "kit_no":kitNo
+      });
       OrderModel getPhysicalResponse =
           OrderModel.fromJson(jsonDecode(response.data));
 

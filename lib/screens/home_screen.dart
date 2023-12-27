@@ -72,7 +72,9 @@ String bank_info="";
       "https://prezentycards-live/public/app-assets/image/verified.png";
   String? sliderImageBaseUrl =
       "https://prezenty.in/prezentycards-live/public/app-assets/image/slider/";
-  Future bankbalcInfo()async{
+  bool? prepaidCardUserOrNot;
+  bool?prepaidCardUserOrNotToken;
+  Future bankbalcInfo() async{
     try {
 
       AppDialogs.loading();
@@ -104,6 +106,8 @@ String bank_info="";
   void initState() {
     super.initState();
     _reloadList();
+    getPrepaidCardUserOrNotToken();
+    getPrepaidCardUserOrNot();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
       bankbalcInfo();
@@ -114,6 +118,16 @@ String bank_info="";
       CommonMethods().setFavouritesUpdatedListener(this);
     });
   }
+
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(User.userId);
+    setState(() {});
+  }
+  getPrepaidCardUserOrNot() async {
+    prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(User.userId);
+    setState(() {});
+  }
+
   Future getData() async {
     dataValue = await _profileBloc.homeScreenCommonApi(User.userId);
     setState(() {});

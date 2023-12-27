@@ -65,6 +65,8 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
   // });
     _currentTab = widget.showTab;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      getPrepaidCardUserOrNotToken();
+      getPrepaidCardUserOrNot();
       refreshUIFn = () {
         if (mounted) {
           setState(() {});

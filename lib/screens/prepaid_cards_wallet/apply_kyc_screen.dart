@@ -1897,7 +1897,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       AppDialogs.loading();
       RegisterWalletResponse response = await _walletBloc.registerWallet(json.encode(body));
       Get.back();
-      print(response.data);
+      print("Response${response.data}");
       if (response.statusCode == 200) {
         toastMessage(response.message);
         print(response.data);

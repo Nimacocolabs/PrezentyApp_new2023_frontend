@@ -26,18 +26,26 @@ class CommonBottomNavigationWidget extends StatefulWidget implements PreferredSi
 class _CommonBottomNavigationWidgetState extends State<CommonBottomNavigationWidget> {
   ProfileBloc _profileBloc = ProfileBloc();
     bool? prepaidCardUserOrNot;
+   bool?prepaidCardUserOrNotToken;
 
 @override
 void initState() {
   super.initState();
   getPrepaidCardUserOrNot();
+  getPrepaidCardUserOrNotToken();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    getPrepaidCardUserOrNotToken();
+    getPrepaidCardUserOrNot();});
 }
 
- getPrepaidCardUserOrNot() async {
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(User.userId);
+    setState(() {});
+  }
+  getPrepaidCardUserOrNot() async {
     prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(User.userId);
     setState(() {});
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(

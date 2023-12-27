@@ -117,7 +117,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   Get.to(() => RequestPhysicalCard(
                         kitNumber: _walletBloc.walletDetailsData!.kitNo!,
                         cardNumber: _walletBloc
-                            .walletDetailsData!.cardDetails!.cardNumber!,
+                            .walletDetailsData!.cardDetails!.cardNumber!,entityid: _walletBloc.walletDetailsData!.entityId!,
+
                       ));
                 } else if (v == 2) {
                   _showBlockPopUp(context, _walletBloc.walletDetailsData,
@@ -835,8 +836,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
   _checkEnableRequestPhysicalCard() async {
     enableRequestPhysicalCard.value =
-        await _walletBloc.checkEnableRequestPhysicalCard(User.userId,
-            _walletBloc.walletDetailsData!.cardDetails!.cardNumber ?? '');
+        await _walletBloc.checkEnableRequestPhysicalCard( _walletBloc.walletDetailsData!.entityId ?? '',
+            _walletBloc.walletDetailsData!.cardDetails!.kitNo ?? '');
     setState(() {});
   }
 

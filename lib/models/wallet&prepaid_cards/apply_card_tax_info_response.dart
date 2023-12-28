@@ -18,7 +18,7 @@ class ApplyCardTaxInfoResponse {
 class ApplyCardTaxInfoData {
   int? cardId;
   String? userId;
-  String? amount;
+  int? amount;
   int? gst;
   String? payableAmount;
   String? discountPrice;

@@ -366,7 +366,7 @@ class WalletRepository {
           Apis.getTouchPointWalletBalance,
           data: FormData.fromMap({'account_id': accountId}));
       return TouchPointWalletBalanceResponse.fromJson(
-              json.decode(response.data))
+              response.data)
           .data;
     } catch (e, s) {
       // print("123456");

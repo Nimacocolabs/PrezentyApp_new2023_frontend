@@ -108,6 +108,7 @@ String bank_info="";
     _reloadList();
     getPrepaidCardUserOrNotToken();
     getPrepaidCardUserOrNot();
+    bankbalcInfo();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
       bankbalcInfo();

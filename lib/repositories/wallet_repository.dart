@@ -139,7 +139,7 @@ class WalletRepository {
     return WalletCreationAndPaymentStatus.fromJson(jsonDecode(response.data));
   }
 
-  Future<RegisterWalletResponse> registerWallet(String body) async {
+  Future<RegisterWalletResponse> registerWallet(Map<String, dynamic> body) async {
     Response response = await apiProvider
         .getJsonInstancecard()
         .post(Apis.registerWallet, data: body);

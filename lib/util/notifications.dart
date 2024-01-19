@@ -120,6 +120,7 @@ class Notifications {
     //         Completer().completeError(e, s);
     //       }
     //     });
+
     OneSignal.shared.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent event) {
       // Will be called whenever a notification is received in foreground

@@ -31,7 +31,6 @@ class _NotificationScreenState extends State<NotificationScreen>
   @override
   void initState() {
     super.initState();
-print("fsdfvsdfsgsdgsd");
     getCardList();
   _itemsScrollController = ScrollController();
     _itemsScrollController.addListener(_scrollListener);

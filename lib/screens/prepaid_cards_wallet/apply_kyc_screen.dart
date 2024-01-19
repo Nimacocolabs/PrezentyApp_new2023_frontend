@@ -1799,46 +1799,46 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
         "country": "INDIA",
         "pinCode": permanentpinNumberControl.text
       },
-      // if(categories == "HOME") {
-      //   "addressCategory":categories ,
-      //    "address1": homeAddress1Control.text,
-      //    "address2": homeAddress2Control.text,
-      //    "address3": homeAddress3Control.text,
-      //    "city": homecityControl.text,
-      //    "state_code": state,
-      //    "country": "INDIA",
-      //    "pinCode": homepinNumberControl.text.toString()
-      //  }else if(categories == "OFFICE"){
-      //   "addressCategory":categories ,
-      //   "address1": officeAddress1Control.text,
-      //   "address2": officeAddress2Control.text,
-      //   "address3": officeAddress3Control.text,
-      //   "city": officecityControl.text,
-      //   "state_code": state,
-      //   "country": "INDIA",
-      //   "pinCode": officepinNumberControl.text.toString()
-      // }
-      // else if(categories=="DELIVERY"){
-      //     "addressCategory":categories ,
-      //     "address1": deliveryAddress1Control.text,
-      //     "address2": deliveryAddress2Control.text,
-      //     "address3": deliveryAddress3Control.text,
-      //     "city": deliverycityControl.text,
-      //     "state_code": state,
-      //     "country": "INDIA",
-      //     "pinCode": deliverypinNumberControl.text.toString()
-      //
-      // }
-      // else{
-      //       "addressCategory":categories ,
-      //       "address1": communicationAddress1Control.text,
-      //       "address2": communicationAddress2Control.text,
-      //       "address3": communicationAddress3Control.text,
-      //       "city": communicationcityControl.text,
-      //       "state_code": state,
-      //       "country": "INDIA",
-      //       "pinCode": communicationpinNumberControl.text.toString()
-      //     }
+      if(categories == "HOME") {
+        "addressCategory":categories ,
+         "address1": homeAddress1Control.text,
+         "address2": homeAddress2Control.text,
+         "address3": homeAddress3Control.text,
+         "city": homecityControl.text,
+         "state_code": state,
+         "country": "INDIA",
+         "pinCode": homepinNumberControl.text.toString()
+       }else if(categories == "OFFICE"){
+        "addressCategory":categories ,
+        "address1": officeAddress1Control.text,
+        "address2": officeAddress2Control.text,
+        "address3": officeAddress3Control.text,
+        "city": officecityControl.text,
+        "state_code": state,
+        "country": "INDIA",
+        "pinCode": officepinNumberControl.text.toString()
+      }
+      else if(categories=="DELIVERY"){
+          "addressCategory":categories ,
+          "address1": deliveryAddress1Control.text,
+          "address2": deliveryAddress2Control.text,
+          "address3": deliveryAddress3Control.text,
+          "city": deliverycityControl.text,
+          "state_code": state,
+          "country": "INDIA",
+          "pinCode": deliverypinNumberControl.text.toString()
+
+      }
+      else{
+            "addressCategory":categories ,
+            "address1": communicationAddress1Control.text,
+            "address2": communicationAddress2Control.text,
+            "address3": communicationAddress3Control.text,
+            "city": communicationcityControl.text,
+            "state_code": state,
+            "country": "INDIA",
+            "pinCode": communicationpinNumberControl.text.toString()
+          }
     ];
 
 // communicationInfo array
@@ -1895,7 +1895,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     print("body->${otp}");
     try {
       AppDialogs.loading();
-      RegisterWalletResponse response = await _walletBloc.registerWallet(json.encode(body));
+      RegisterWalletResponse response = await _walletBloc.registerWallet(body);
       Get.back();
       print("Response${response.data}");
       if (response.statusCode == 200) {
@@ -1905,7 +1905,13 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
               isToLoadMoney: false,
             ));
       } else {
-        toastMessage('${response.message}');
+        if (response.statusCode == 400 && response.success == false) {
+          // Here, response.message will contain the error message
+          toastMessage(response.message);
+        } else {
+          // Handle other error scenarios
+          toastMessage('Error: ${response.message}');
+        }
       }
     } catch (e, s) {
       Completer().completeError(e, s);

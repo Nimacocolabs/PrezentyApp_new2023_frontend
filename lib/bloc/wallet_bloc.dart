@@ -399,7 +399,7 @@ class WalletBloc {
     }
   }
 
-  Future<RegisterWalletResponse> registerWallet(String body) async {
+  Future<RegisterWalletResponse> registerWallet(Map<String, dynamic> body) async {
     try {
       RegisterWalletResponse response =
           await _walletRepository!.registerWallet(body);

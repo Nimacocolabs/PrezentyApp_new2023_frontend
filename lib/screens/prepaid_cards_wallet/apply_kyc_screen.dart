@@ -1709,12 +1709,12 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
             setState(() {
               birthDate = datePick;
               isDateSelected = true;
-
               // put it here
               birthDateInString =
                   "${birthDate!.year}-${birthDate!.month}-${birthDate!.day}"; // 08/14/2019
               dobControl.text = birthDateInString!;
             });
+            print("DOB-->${birthDate}");
           }
         });
   }

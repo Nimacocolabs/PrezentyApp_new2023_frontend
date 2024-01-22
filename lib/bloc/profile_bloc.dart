@@ -372,7 +372,7 @@ class ProfileBloc {
     try {
       CommonResponse? response =
       await _repository.checkPrepaidUserOrNotToken(accountId);
-      print("response->${response}");
+      print("responseToken->${response}");
       return response.success ?? false;
     } catch (e, s) {
       Completer().completeError(e, s);

@@ -943,8 +943,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                               labelText: "Enter",
                               control: countryControl,
                               keyboardInputType: TextInputType.text,
-                              validate: formatAndValidate.formatName,
-                              format: formatAndValidate.formatName(),
+                              //validate: formatAndValidate.formatName,
+                              // format: formatAndValidate.formatName(),
                               enabled: false,
                             ),
                             kycDataWidget(
@@ -1126,8 +1126,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     labelText: "Enter",
                                     control: countryControl,
                                     keyboardInputType: TextInputType.text,
-                                    validate: formatAndValidate.formatName,
-                                    format: formatAndValidate.formatName(),
+                                    // validate: formatAndValidate.formatName,
+                                    // format: formatAndValidate.formatName(),
                                     enabled: false,
                                   ),
                                   kycDataWidget(
@@ -1200,8 +1200,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     labelText: "Enter",
                                     control: countryControl,
                                     keyboardInputType: TextInputType.text,
-                                    validate: formatAndValidate.formatName,
-                                    format: formatAndValidate.formatName(),
+                                    // validate: formatAndValidate.formatName,
+                                    // format: formatAndValidate.formatName(),
                                     enabled: false,
                                   ),
                                   kycDataWidget(
@@ -1274,8 +1274,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     labelText: "Enter",
                                     control: countryControl,
                                     keyboardInputType: TextInputType.text,
-                                    validate: formatAndValidate.formatName,
-                                    format: formatAndValidate.formatName(),
+                                    //validate: formatAndValidate.,
+                                    //format: formatAndValidate.formatName(),
                                     enabled: false,
                                   ),
                                   kycDataWidget(
@@ -1348,8 +1348,8 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                                     labelText: "Enter",
                                     control: countryControl,
                                     keyboardInputType: TextInputType.text,
-                                    validate: formatAndValidate.formatName,
-                                    format: formatAndValidate.formatName(),
+                                    // validate: formatAndValidate.formatName,
+                                    // format: formatAndValidate.formatName(),
                                     enabled: false,
                                   ),
                                   kycDataWidget(
@@ -1709,12 +1709,15 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
             setState(() {
               birthDate = datePick;
               isDateSelected = true;
+              print("daob=>${birthDate}");
+              print("daob=>${dobControl.text}");
               // put it here
               birthDateInString =
                   "${birthDate!.year}-${birthDate!.month}-${birthDate!.day}"; // 08/14/2019
               dobControl.text = birthDateInString!;
+              print("daob=>${birthDateInString}");
+              print("daob=>${dobControl.text}");
             });
-            print("DOB-->${birthDate}");
           }
         });
   }
@@ -1796,7 +1799,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
         "address3": permanentAddress3Control.text,
         "city": permanentcityControl.text,
         "state_code": state,
-        "country": "INDIA",
+        "country": countryControl.text,
         "pinCode": permanentpinNumberControl.text
       },
       if(categories == "HOME") {
@@ -1806,7 +1809,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
          "address3": homeAddress3Control.text,
          "city": homecityControl.text,
          "state_code": state,
-         "country": "INDIA",
+         "country": countryControl.text,
          "pinCode": homepinNumberControl.text.toString()
        }else if(categories == "OFFICE"){
         "addressCategory":categories ,
@@ -1815,7 +1818,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
         "address3": officeAddress3Control.text,
         "city": officecityControl.text,
         "state_code": state,
-        "country": "INDIA",
+        "country":countryControl.text,
         "pinCode": officepinNumberControl.text.toString()
       }
       else if(categories=="DELIVERY"){
@@ -1825,7 +1828,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
           "address3": deliveryAddress3Control.text,
           "city": deliverycityControl.text,
           "state_code": state,
-          "country": "INDIA",
+          "country": countryControl.text,
           "pinCode": deliverypinNumberControl.text.toString()
 
       }
@@ -1836,7 +1839,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
             "address3": communicationAddress3Control.text,
             "city": communicationcityControl.text,
             "state_code": state,
-            "country": "INDIA",
+            "country": countryControl.text,
             "pinCode": communicationpinNumberControl.text.toString()
           }
     ];
@@ -2033,7 +2036,7 @@ class FormatAndValidate {
             _dobRegExp.hasMatch(value)
         ? "Enter Date in format YYYY-MM-DD"
         : null;
-    print("1321");
+    print("1321=>${dob}");
     print(dob.toString());
     return dob;
   }

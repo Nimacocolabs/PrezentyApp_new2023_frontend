@@ -228,10 +228,11 @@ class _WalletPaymentScreenState extends State<WalletPaymentScreen> {
                               //  ClipRRect(
                               //      borderRadius: BorderRadius.circular(12),
                               //      child: Image.memory(base64Decode(_bloc.walletPaymentUpiResponse!.encodedDynamicQrCode!))),
-
+                              //
                               // SizedBox(
                               //   height: 50,
                               // ),
+
 
                               Column(
                                 // crossAxisAlignment: CrossAxisAlignment.stretch,

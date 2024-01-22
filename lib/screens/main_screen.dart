@@ -30,7 +30,7 @@ import 'package:badges/badges.dart' as badges;
 class MainScreen extends StatefulWidget {
   final int showTab;
   final bool fromSignUp;
-  const MainScreen({Key? key, this.showTab = 0,   this.fromSignUp=false}) : super(key: key);
+  const   MainScreen({Key? key, this.showTab = 0,   this.fromSignUp=false}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();

@@ -13,6 +13,7 @@ import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/api_response.dart';
 import 'package:event_app/network/apis.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/wallet_home_screen.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:event_app/util/user.dart';
@@ -25,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RequestPhysicalCard extends StatefulWidget {
   const RequestPhysicalCard(
@@ -232,7 +234,8 @@ _requestPhysicalCardModalSheet() async {
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () async {
-                              await requestCardPayment(widget.kitNumber,widget.entityid);
+                    //   await requestCardPayment(widget.kitNumber,widget.entityid);
+                              showPaymentConfirmationDialog(context);
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -245,6 +248,38 @@ _requestPhysicalCardModalSheet() async {
                     )),
           );
         });
+  }
+  void showPaymentConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard("10");
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
   }
   @override
   Widget build(BuildContext context) {
@@ -926,6 +961,47 @@ _requestPhysicalCardModalSheet() async {
     }
     return null;
   }
+
+
+  Future<paymentupiResponse?> getupcard(String amount) async {
+    try {
+      AppDialogs.loading();
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data: {
+          "amount": 5,
+          "type": "cardreq",
+        },
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+
+
+
+
+
   _onPaymentErrorFn(PaymentFailureResponse response) {
     Get.back();
     String msg = '';

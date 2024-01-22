@@ -75,11 +75,8 @@ String bank_info="";
   bool? prepaidCardUserOrNot;
   bool?prepaidCardUserOrNotToken;
   Future bankbalcInfo() async{
+
     try {
-
-      AppDialogs.loading();
-
-
       final response = await http.get(
         Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
         headers:{
@@ -87,8 +84,9 @@ String bank_info="";
         },
       );
       Map jsonResponse = json.decode(response.body);
+      print("response.body==>${jsonResponse}");
       bank_info = jsonResponse["balance"]["balance"];
-      print("response.body==>${jsonResponse["balance"]["balance"]}");
+
       Get.back();
       if (response.statusCode==200) {
         toastMessage(response.statusCode);
@@ -105,6 +103,7 @@ String bank_info="";
   @override
   void initState() {
     super.initState();
+
     _reloadList();
     getPrepaidCardUserOrNotToken();
     getPrepaidCardUserOrNot();

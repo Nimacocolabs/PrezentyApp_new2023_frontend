@@ -103,7 +103,6 @@ String bank_info="";
   @override
   void initState() {
     super.initState();
-
     _reloadList();
     getPrepaidCardUserOrNotToken();
     getPrepaidCardUserOrNot();
@@ -1471,7 +1470,15 @@ String bank_info="";
                                 borderRadius: BorderRadius.circular(6)),
                             padding: EdgeInsets.symmetric(
                                 vertical: 4, horizontal: 8),
-                            child: Text(
+                            child:prepiad_user== false ? Text(
+                              '${rupeeSymbol} 0.00',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
+                            ) :
+                            Text(
                               '${rupeeSymbol} ${bank_info ?? 0}',
                               style: TextStyle(
                                 color: Colors.white,

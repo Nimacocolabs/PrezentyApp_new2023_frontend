@@ -38,3 +38,36 @@ class SetCardPin extends StatelessWidget {
     );
   }
 }
+class ViewcardPin extends StatelessWidget {
+  final String url;
+
+  const ViewcardPin({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    print("page-->${url}");
+    return Scaffold(
+      // appBar: AppBar(
+      //   title: const Text('Set PIN'),
+      //   centerTitle: true,
+      // ),
+      appBar: CommonAppBarWidget(
+        title: 'Card',
+        onPressedFunction: () {
+          Get.back();
+        },
+        image: User.userImageUrl,
+      ),
+      body: SafeArea(
+        child: WebBrowser(
+          initialUrl: url,
+          javascriptEnabled: true,
+          interactionSettings: WebBrowserInteractionSettings(
+            topBar: null, bottomBar: null, gestureNavigationEnabled: false,
+
+          ),
+        ),
+      ),
+    );
+  }
+}

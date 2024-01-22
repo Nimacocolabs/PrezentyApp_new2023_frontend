@@ -12,6 +12,7 @@ import 'package:event_app/models/wallet&prepaid_cards/wallet_creation_and_paymen
 import 'package:event_app/models/wallet&prepaid_cards/wallet_payment_order_details.dart';
 import 'package:event_app/network/api_error_message.dart';
 import 'package:event_app/network/api_response.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/login/login_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_screen.dart';
@@ -404,6 +405,7 @@ class _ApplyPrepaidCardListScreenState
                   )
                 : GestureDetector(
                     onTap: () {
+
                       if (User.apiToken.isEmpty) {
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {

@@ -104,11 +104,11 @@ String bank_info="";
   void initState() {
     super.initState();
     _reloadList();
-    getPrepaidCardUserOrNotToken();
-    getPrepaidCardUserOrNot();
-    bankbalcInfo();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _profileBloc = ProfileBloc();
+      getPrepaidCardUserOrNotToken();
+      getPrepaidCardUserOrNot();
       bankbalcInfo();
       getData();
       await _profileBloc.getProfileInfo();

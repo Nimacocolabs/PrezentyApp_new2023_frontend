@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/main_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/set_pin.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
@@ -279,7 +280,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             child: Text(
                               '${walletDetails.walletDetails!.cardDetails!.expiry}',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 22),
+                                  TextStyle(color: Colors.white, fontSize: 22), 
                             )),
                         if (!isCardExpanded.value)
                           Positioned(
@@ -866,30 +867,30 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         Map jsonResponse = json.decode(response.body);
         cardUrl = jsonResponse['cardUrl'];
         print("entity->${cardUrl}");
-
+        Get.to(() => ViewcardPin(url: cardUrl));
         // Show the cardUrl in a WebView
-        Get.dialog(
-          AlertDialog(
-            title: Text('Card Widget'),
-            content: Container(
-              width: 600,
-              height: 600, // Adjust height as needed
-              child: WebView(
-                initialUrl: cardUrl,
-                javascriptMode: JavascriptMode.unrestricted,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  // Close the dialog
-                  Navigator.pop(context);
-                },
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        // Get.dialog(
+        //   AlertDialog(
+        //     title: Text('Card Widget'),
+        //     content: Container(
+        //       width: 600,
+        //       height: 600, // Adjust height as needed
+        //       child: WebView(
+        //         initialUrl: cardUrl,
+        //         javascriptMode: JavascriptMode.unrestricted,
+        //       ),
+        //     ),
+        //     actions: [
+        //       TextButton(
+        //         onPressed: () {
+        //           // Close the dialog
+        //           Navigator.pop(context);
+        //         },
+        //         child: Text('OK'),
+        //       ),
+        //     ],
+        //   ),
+        // );
       } else {
         toastMessage('${response.statusCode}');
       }

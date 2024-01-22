@@ -110,7 +110,7 @@ class Apis {
   static String walletCreationAndPaymentStatus = "api/check-paid-wallet-status";
   static String registerWallet = "api/prepaid/cards/wallet-registration";
   static String verifyWalletRegistrationOtp = "api/verify-registration";
-  static String walletRegistrationResendOtp = "api/resend-otp";
+     static String walletRegistrationResendOtp = "api/resend-otp";
   static String getWalletDetails = "api/prepaid/cards/wallet-details";
   static String getCVV = "api/fetch-cvv";
   static String checkPhysicalCardExists = "api/check-enable-cardsetpin-button";
@@ -238,7 +238,7 @@ class Apis {
   static String sendSmsEmailAccountVerificationSignup =
       "api/send-sms-email-account-verification-signup";
 
-
+static String upilink ="api/prepaid/cards/generate-upi-link";
 
 
 

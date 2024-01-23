@@ -82,8 +82,16 @@ class _RequestPhysicalCardState extends State<RequestPhysicalCard> {
       _getStateList();
       userPermanentAddress();
       getPhysicalCardRequestAmount();
-
+//getupcard("");
       setState(() {});
+    });
+    SystemChannels.lifecycle.setMessageHandler((msg) async {
+      if (msg == "AppLifecycleState.resumed") {
+        // The app has resumed from the background
+        // Call your API for status check here
+        await getupistatus();
+      }
+      return null;
     });
   }
 
@@ -966,7 +974,7 @@ _requestPhysicalCardModalSheet() async {
 int taxid= 0
 ;  Future<paymentupiResponse?> getupcard(String amount) async {
     try {
-      AppDialogs.loading();
+
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upilink}',
         data: {
@@ -988,7 +996,7 @@ int taxid= 0
 
         // Launch the URL
         await launch("${getupiResponse.data!.paymentLink}");
-        await getupistatus(taxid);
+
 
       }
 
@@ -1000,10 +1008,24 @@ int taxid= 0
     }
     return null;
   }
-
-  Future<UpiSucess?> getupistatus(int taxid) async {
+  // Future<void> checkPaymentStatus() async {
+  //   try {
+  //     final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+  //         '${Apis.upistatus}',
+  //         data: {
+  //           "txn_tbl_id": taxid,
+  //
+  //         },
+  //     );
+  //     print('API call for status check completed.');
+  //   } catch (e) {
+  //     // Handle errors
+  //     print('Error checking payment status: $e');
+  //   }
+  // }
+  Future<UpiSucess?> getupistatus() async {
     try {
-      AppDialogs.loading();
+
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upistatus}',
         data: {

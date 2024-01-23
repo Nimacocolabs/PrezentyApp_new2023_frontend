@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen>
   var searchText = '';
   String accountId = User.userId;
   HomscreenCommonApisModel? dataValue;
-String bank_info="";
+  String bank_info = "";
   String? coinBalance;
   String? imageBaseUrl =
       "https://prezenty.in/prezentycards-live/public/app-assets/image/prepaid_card_bg/";
@@ -73,14 +73,14 @@ String bank_info="";
   String? sliderImageBaseUrl =
       "https://prezenty.in/prezentycards-live/public/app-assets/image/slider/";
   bool? prepaidCardUserOrNot;
-  bool?prepaidCardUserOrNotToken;
-  Future bankbalcInfo() async{
-
+  bool? prepaidCardUserOrNotToken;
+  Future bankbalcInfo() async {
     try {
       final response = await http.get(
-        Uri.parse("https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
-        headers:{
-          "Authorization":"Bearer ${TokenPrepaidCard}",
+        Uri.parse(
+            "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
+        headers: {
+          "Authorization": "Bearer ${TokenPrepaidCard}",
         },
       );
       Map jsonResponse = json.decode(response.body);
@@ -88,9 +88,8 @@ String bank_info="";
       bank_info = jsonResponse["balance"]["balance"];
 
       Get.back();
-      if (response.statusCode==200) {
+      if (response.statusCode == 200) {
         toastMessage(response.statusCode);
-
       } else {
         toastMessage('${response.statusCode}');
       }
@@ -100,10 +99,10 @@ String bank_info="";
       toastMessage('Something went wrong. Please try again');
     }
   }
+
   @override
   void initState() {
     super.initState();
-
     _reloadList();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -123,6 +122,7 @@ String bank_info="";
     prepaidCardUserOrNotToken = await _profileBloc.tokencard(User.userId);
     setState(() {});
   }
+
   getPrepaidCardUserOrNot() async {
     prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(User.userId);
     setState(() {});
@@ -131,8 +131,8 @@ String bank_info="";
   Future getData() async {
     dataValue = await _profileBloc.homeScreenCommonApi(User.userId);
     setState(() {});
-
   }
+
   _reloadList() {
     _woohooBloc.getProductList("", false);
   }
@@ -156,43 +156,43 @@ String bank_info="";
         onWillPop: showExitAppPopup,
         child: SingleChildScrollView(
             child: Column(
-              children: [
-                Container(
-                  child: RefreshIndicator(
-                    color: Colors.white,
-                    backgroundColor: primaryColor,
-                    onRefresh: () {
-                      return _profileBloc.getProfileInfo();
-                    },
-                    child: StreamBuilder<ApiResponse<dynamic>>(
-                        stream: _profileBloc.profileStream,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data?.status != null) {
-                            switch (snapshot.data!.status) {
-                              case Status.LOADING:
-                                return CommonApiLoader();
-                              case Status.COMPLETED:
-                                UserSignUpResponse resp = snapshot.data?.data;
-                                return headerWidget(resp);
-                              case Status.ERROR:
-                                return CommonApiResultsEmptyWidget(
-                                    "${snapshot.data?.message ?? ""}",
-                                    textColorReceived: Colors.black);
-                              default:
-                                print("");
-                            }
-                          }
-                          return Container(
-                            child: Center(
-                              child: Text(""),
-                            ),
-                          );
-                        }),
-                  ),
-                ),
-                _buildHomeScreenContent(),
-              ],
-            )),
+          children: [
+            Container(
+              child: RefreshIndicator(
+                color: Colors.white,
+                backgroundColor: primaryColor,
+                onRefresh: () {
+                  return _profileBloc.getProfileInfo();
+                },
+                child: StreamBuilder<ApiResponse<dynamic>>(
+                    stream: _profileBloc.profileStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data?.status != null) {
+                        switch (snapshot.data!.status) {
+                          case Status.LOADING:
+                            return CommonApiLoader();
+                          case Status.COMPLETED:
+                            UserSignUpResponse resp = snapshot.data?.data;
+                            return headerWidget(resp);
+                          case Status.ERROR:
+                            return CommonApiResultsEmptyWidget(
+                                "${snapshot.data?.message ?? ""}",
+                                textColorReceived: Colors.black);
+                          default:
+                            print("");
+                        }
+                      }
+                      return Container(
+                        child: Center(
+                          child: Text(""),
+                        ),
+                      );
+                    }),
+              ),
+            ),
+            _buildHomeScreenContent(),
+          ],
+        )),
       ),
     );
   }
@@ -371,7 +371,7 @@ String bank_info="";
 
   Widget giftHiCardWidget() {
     return Padding(
-      padding: const EdgeInsets.only(top: 0,left: 12,right: 12,bottom: 12),
+      padding: const EdgeInsets.only(top: 0, left: 12, right: 12, bottom: 12),
       child: InkWell(
         onTap: () {
           Get.to(() => GiftingScreen(currentPageIndex: 1));
@@ -379,7 +379,7 @@ String bank_info="";
         child: Card(
           elevation: 2,
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
@@ -433,15 +433,16 @@ String bank_info="";
 
   Widget tambolaJoinWidget() {
     return Padding(
-      padding: const EdgeInsets.only(top: 0,left: 12,right: 12,bottom: 12),
+      padding: const EdgeInsets.only(top: 0, left: 12, right: 12, bottom: 12),
       child: InkWell(
         onTap: () {
           Get.to(() => TambolaGameScreen());
         },
         child: Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child:Container(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
             height: 200,
             width: 360,
             // padding: const EdgeInsets.all(20.0),
@@ -455,16 +456,20 @@ String bank_info="";
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Align(
-                   alignment: Alignment.bottomLeft,
+                  alignment: Alignment.bottomLeft,
                   child: InkWell(
-                    onTap: (){
+                    onTap: () {
                       Get.to(() => TambolaGameScreen());
                     },
                     child: Card(
                         child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Text("Join Now", style: TextStyle(fontWeight: FontWeight.w600,color: Colors.black),),
-                        )),
+                      padding: const EdgeInsets.all(5.0),
+                      child: Text(
+                        "Join Now",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, color: Colors.black),
+                      ),
+                    )),
                   )),
             ),
           ),
@@ -524,11 +529,9 @@ String bank_info="";
     );
   }
 
-
-
   Widget newPrePaidCardWdiget() {
     print("Card section");
-    if(dataValue?.prepaidCards == null){
+    if (dataValue?.prepaidCards == null) {
       return CommonApiResultsEmptyWidget("");
     } else {
       return Container(
@@ -543,98 +546,98 @@ String bank_info="";
           onPageChanged: (value) {},
           autoPlayInterval: 3000,
           isLoop: true,
-          children:
-          dataValue?.prepaidCards?.map((PrepaidCards? e) {
-            return Stack(children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20.0),
-                    child: CachedNetworkImage(
-                      fit: BoxFit.fill,
-                      width: double.infinity,
-                      height: 230,
-                      imageUrl: '${imageBaseUrl}${e!.bgImg ?? ""}',
-                      placeholder: (context, url) => Center(
-                        child: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
+          children: dataValue?.prepaidCards?.map((PrepaidCards? e) {
+                return Stack(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20.0),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.fill,
+                          width: double.infinity,
+                          height: 230,
+                          imageUrl: '${imageBaseUrl}${e!.bgImg ?? ""}',
+                          placeholder: (context, url) => Center(
+                            child: SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => SizedBox(
+                            child: Image.asset('assets/images/no_image.png'),
+                          ),
+                        )),
+                  ),
+                  Positioned(
+                    top: 50,
+                    left: 5,
+                    child: Text(
+                      "${e.title ?? ""}",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Positioned(
+                    top: 80,
+                    left: 5,
+                    child: Text(
+                      "${rupeeSymbol + e.amount.toString()}",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.purple.shade900,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Positioned(
+                      top: 150,
+                      left: 10,
+                      child: Container(
+                        height: 45,
+                        width: 180,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(
+                            colors: [primaryColor, secondaryColor],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
                           ),
                         ),
-                      ),
-                      errorWidget: (context, url, error) => SizedBox(
-                        child: Image.asset('assets/images/no_image.png'),
-                      ),
-                    )),
-              ),
-              Positioned(
-                top: 50,
-                left: 5,
-                child: Text(
-                  "${e.title ?? ""}",
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Positioned(
-                top: 80,
-                left: 5,
-                child: Text(
-                  "${rupeeSymbol + e.amount.toString()}",
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.purple.shade900,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Positioned(
-                  top: 150,
-                  left: 10,
-                  child: Container(
-                    height: 45,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      gradient: LinearGradient(
-                        colors: [primaryColor, secondaryColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                    ),
-                    child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12))),
-                        onPressed: () {
-                          Get.to(
-                                  () => ApplyPrepaidCardListScreen(isUpgrade: false));
-                        },
-                        child: Row(
-                          children: [
-                            Text(
-                              "Get your card",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 9, top: 2, bottom: 2, right: 5),
-                              child: Icon(Icons.arrow_forward,
-                                  size: 25, color: Colors.white),
-                            ),
-                          ],
-                        )),
-                  )),
-            ]);
-          }).toList() ?? [],
+                        child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12))),
+                            onPressed: () {
+                              Get.to(() =>
+                                  ApplyPrepaidCardListScreen(isUpgrade: false));
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Get your card",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 9, top: 2, bottom: 2, right: 5),
+                                  child: Icon(Icons.arrow_forward,
+                                      size: 25, color: Colors.white),
+                                ),
+                              ],
+                            )),
+                      )),
+                ]);
+              }).toList() ??
+              [],
         ),
       );
     }
-
   }
 
   hotDealsAndPromotionsWidget() {
@@ -654,7 +657,7 @@ String bank_info="";
         ),
         Padding(
           padding:
-          const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 5),
+              const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 5),
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(15)),
@@ -747,7 +750,7 @@ String bank_info="";
                       },
                       child: Image(
                         image:
-                        AssetImage('assets/images/FoodAndMovies_image.png'),
+                            AssetImage('assets/images/FoodAndMovies_image.png'),
                         width: 80,
                         height: 80,
                       ),
@@ -801,7 +804,7 @@ String bank_info="";
                       },
                       child: Image(
                         image:
-                        AssetImage('assets/images/BackToCampus_image.png'),
+                            AssetImage('assets/images/BackToCampus_image.png'),
                         width: 80,
                         height: 80,
                       ),
@@ -829,105 +832,123 @@ String bank_info="";
     );
   }
 
-
-
   moreOptionsWidget() {
     return Padding(
       padding: const EdgeInsets.only(top: 0, left: 15, right: 15),
       child: Container(
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(15)),
-
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 20,left: 15,right: 8,bottom: 35),
+              padding: const EdgeInsets.only(
+                  top: 20, left: 15, right: 8, bottom: 35),
               child: InkWell(
                 onTap: () {
-
-                  Get.to(() => CreateNewEventScreen(showAppBar: true,));
+                  Get.to(() => CreateNewEventScreen(
+                        showAppBar: true,
+                      ));
                 },
                 child: Container(
                   width: 95,
-                  decoration: BoxDecoration(
-                      color:   Color.fromRGBO(159, 20, 211, 0.1)
-
-
-                  ),
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(159, 20, 211, 0.1)),
                   child: Column(
-
                     children: [
-
-                      Image(image: AssetImage("assets/images/create_event_image.png"),
-                        width: 80,height: 60,
+                      Image(
+                        image:
+                            AssetImage("assets/images/create_event_image.png"),
+                        width: 80,
+                        height: 60,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 8,left: 10,right:8),
-                        child: Text("Create Event",
+                        padding: const EdgeInsets.only(
+                            bottom: 8, left: 10, right: 8),
+                        child: Text(
+                          "Create Event",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,fontSize: 17,fontWeight: FontWeight.w600),),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ],),
+                    ],
+                  ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20,left: 15,right: 8,bottom: 35),
+              padding: const EdgeInsets.only(
+                  top: 20, left: 15, right: 8, bottom: 35),
               child: InkWell(
-
                 onTap: () {
                   Get.to(() => GiftingScreen(currentPageIndex: 1));
                 },
                 child: Container(
                   width: 95,
-                  decoration: BoxDecoration(
-                      color:   Color.fromRGBO(159, 20, 211, 0.1)
-
-                  ),
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(159, 20, 211, 0.1)),
                   child: Column(
-
                     children: [
-
-                      Image(image: AssetImage("assets/images/gifting_image.png"),
-                        width: 80,height: 60,                   ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8,left: 8,right:8),
-                        child: Text("Gift\nNow",
-                          style: TextStyle(color: Colors.black,fontSize: 17,fontWeight: FontWeight.w600),),
+                      Image(
+                        image: AssetImage("assets/images/gifting_image.png"),
+                        width: 80,
+                        height: 60,
                       ),
-                    ],),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: 8, left: 8, right: 8),
+                        child: Text(
+                          "Gift\nNow",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20,left: 10,right: 10,bottom: 35),
+              padding: const EdgeInsets.only(
+                  top: 20, left: 10, right: 10, bottom: 35),
               child: InkWell(
-                onTap: (){
-                  Get.to(() => WalletHomeScreen(isToLoadMoney: true,));
+                onTap: () {
+                  Get.to(() => WalletHomeScreen(
+                        isToLoadMoney: true,
+                      ));
                   // Navigator.of(context).push(MaterialPageRoute(builder:(context) =>  WalletHomeScreen(isToLoadMoney: true,)));
-
                 },
                 child: Container(
                   width: 95,
-                  decoration: BoxDecoration(
-                      color:   Color.fromRGBO(159, 20, 211, 0.1)
-
-                  ),
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(159, 20, 211, 0.1)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-
-                      Image(image:AssetImage("assets/images/send_money_image.png"),
-                        width: 80,height: 60,
+                      Image(
+                        image: AssetImage("assets/images/send_money_image.png"),
+                        width: 80,
+                        height: 60,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 8,left: 10,right:8),
-                        child: Text("Send Money",
+                        padding: const EdgeInsets.only(
+                            bottom: 8, left: 10, right: 8),
+                        child: Text(
+                          "Send Money",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,fontSize: 17,fontWeight: FontWeight.w600),),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ],),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1042,22 +1063,22 @@ String bank_info="";
                                     child: CachedNetworkImage(
                                         fit: BoxFit.fill,
                                         imageUrl: wohooCardData[index].image !=
-                                            null
+                                                null
                                             ? '${imgUrl}${wohooCardData[index].image}'
                                             : wohooCardData[index]
-                                            .imageMobile ??
-                                            '',
+                                                    .imageMobile ??
+                                                '',
                                         // productList[index].imageMobile ?? '',
                                         placeholder: (context, url) => Center(
-                                          child: SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child:
-                                            CircularProgressIndicator(
-                                              strokeWidth: 2,
+                                              child: SizedBox(
+                                                height: 20,
+                                                width: 20,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
                                         errorWidget: (context, url, error) =>
                                             SizedBox(
                                                 child: Image.asset(
@@ -1098,8 +1119,10 @@ String bank_info="";
                               borderRadius: BorderRadius.circular(12))),
                       onPressed: () {
                         Get.to(() => WoohooVoucherListScreen(
-                          redeemData: RedeemData.buyVoucher(),
-                          showBackButton: true,showAppBar: true,));
+                              redeemData: RedeemData.buyVoucher(),
+                              showBackButton: true,
+                              showAppBar: true,
+                            ));
                         // Get.to(() => SpinGiftsWonScreen());
                         // Get.to(() => WoohooVoucherListScreen(
                         //       redeemData: RedeemData.buyVoucher(),
@@ -1123,8 +1146,6 @@ String bank_info="";
     );
   }
 
-
-
   sliderBannerWidget() {
     return Container(
       padding: EdgeInsets.only(top: 10, left: 5, right: 5, bottom: 5),
@@ -1138,36 +1159,37 @@ String bank_info="";
         onPageChanged: (value) {},
         isLoop: true,
         children: dataValue?.sliderImages?.map((SliderImages? e) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: InkWell(
-                onTap: () async {
-                  // Get.to(() => DealsForYouDetailsScreen(
-                  //     isDealsForYou: false, isBackToCampus: true));
-                },
-                child: CachedNetworkImage(
-                  imageUrl: '${sliderImageBaseUrl}${e!.image}',
-                  width: double.infinity,
-                  height: screenHeight * 0.20,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) => Center(
-                    child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: InkWell(
+                    onTap: () async {
+                      // Get.to(() => DealsForYouDetailsScreen(
+                      //     isDealsForYou: false, isBackToCampus: true));
+                    },
+                    child: CachedNetworkImage(
+                      imageUrl: '${sliderImageBaseUrl}${e!.image}',
+                      width: double.infinity,
+                      height: screenHeight * 0.20,
+                      fit: BoxFit.fill,
+                      placeholder: (context, url) => Center(
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        ),
                       ),
+                      errorWidget: (context, url, error) => SizedBox(
+                          child: Image.asset('assets/images/no_image.png')),
                     ),
                   ),
-                  errorWidget: (context, url, error) => SizedBox(
-                      child: Image.asset('assets/images/no_image.png')),
                 ),
-              ),
-            ),
-          );
-        }).toList() ?? [],
+              );
+            }).toList() ??
+            [],
       ),
     );
   }
@@ -1237,7 +1259,6 @@ String bank_info="";
             onTap: () {
               Get.to(() => HelpAndSupportScreen());
               //Get.to(() => SuccessOrFailedScreen());
-
             },
           ),
         ),
@@ -1315,7 +1336,6 @@ String bank_info="";
                 height: screenHeight * 0.1,
                 child: Column(
                   children: [
-
                     // Padding(
                     //     padding: const EdgeInsets.only(
                     //         top: 0,right: 290, bottom: 10),
@@ -1344,7 +1364,7 @@ String bank_info="";
                             child: CachedNetworkImage(
                                 width: 33,
                                 imageUrl:
-                                'https://prezenty.in/prezentycards-live/public/app-assets/image/verified.png'),
+                                    'https://prezenty.in/prezentycards-live/public/app-assets/image/verified.png'),
                           ),
                       ],
                     ),
@@ -1389,172 +1409,179 @@ String bank_info="";
                   ),
                   dataValue?.checkCardUserOrNot == "no"
                       ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(
-                        height: 15,
-                      ),
-                      InkWell(
-                          onTap: () async {
-                            Get.to(() => ApplyPrepaidCardListScreen(
-                                isUpgrade: false));
-                          },
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(40)),
-                          child: Container(
-                            width: 100,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [primaryColor, secondaryColor],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: 15,
+                            ),
+                            InkWell(
+                                onTap: () async {
+                                  Get.to(() => ApplyPrepaidCardListScreen(
+                                      isUpgrade: false));
+                                },
                                 borderRadius:
-                                BorderRadius.circular(40.0)),
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                Get.to(() => ApplyPrepaidCardListScreen(
-                                    isUpgrade: false));
-                              },
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(40))),
-                              ),
-                              child: Text(
-                                "Get your card",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          )),
-                    ],
-                  )
+                                    BorderRadius.all(Radius.circular(40)),
+                                child: Container(
+                                  width: 100,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [primaryColor, secondaryColor],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(40.0)),
+                                  child: OutlinedButton(
+                                    onPressed: () async {
+                                      Get.to(() => ApplyPrepaidCardListScreen(
+                                          isUpgrade: false));
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(40))),
+                                    ),
+                                    child: Text(
+                                      "Get your card",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                          ],
+                        )
                       : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Image(
-                            image: AssetImage(
-                                'assets/cards/horizontal_with_logo.png'),
-                            height: 28,
-                            width: 28,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text("Wallet Balance",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  // fontWeight: FontWeight.w500,
-                                  fontSize: 16)),
-                          Spacer(),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: primaryColor.shade300,
-                                gradient: LinearGradient(
-                                  colors: [primaryColor, secondaryColor],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: BorderRadius.circular(6)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            child: Text(
-                              '${rupeeSymbol} ${bank_info ?? 0}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: 5,
                             ),
-                          ),
-                          // SizedBox(
-                          //   width: 5,
-                          // ),
-                          IconButton(
-                              onPressed: () {
-
-                                _infoButtonContent(isWalletContent: true);
-                              },
-                              icon: Icon(
-                                Icons.info_outline_rounded,
-                                size: 22,
-                              )),
-                        ],
-                      ),
-                      // Divider(
-                      //  thickness: 1,
-                      // ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Image(
-                            image: AssetImage(
-                                'assets/cards/hi_card_blank.jpg'),
-                            height: 28,
-                            width: 28,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text("H! Rewards",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  // fontWeight: FontWeight.w500,
-                                  fontSize: 16)),
-                          Spacer(),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: primaryColor.shade300,
-                                gradient: LinearGradient(
-                                  colors: [primaryColor, secondaryColor],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: 5,
                                 ),
-                                borderRadius: BorderRadius.circular(6)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            child: Text(
-                              '${User.userHiCardBalance}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
+                                Image(
+                                  image: AssetImage(
+                                      'assets/cards/horizontal_with_logo.png'),
+                                  height: 28,
+                                  width: 28,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text("Wallet Balance",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        // fontWeight: FontWeight.w500,
+                                        fontSize: 16)),
+                                Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: primaryColor.shade300,
+                                      gradient: LinearGradient(
+                                        colors: [primaryColor, secondaryColor],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(6)),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 8),
+                                  child: prepiad_user == false
+                                      ? Text(
+                                          '${rupeeSymbol} 0.00',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        )
+                                      : Text(
+                                          '${rupeeSymbol} ${bank_info ?? 0}',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                ),
+                                // SizedBox(
+                                //   width: 5,
+                                // ),
+                                IconButton(
+                                    onPressed: () {
+                                      _infoButtonContent(isWalletContent: true);
+                                    },
+                                    icon: Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 22,
+                                    )),
+                              ],
                             ),
-                          ),
-                          // SizedBox(
-                          //   width: 16,
-                          // ),
-                          IconButton(
-                              onPressed: () {
-
-                                _infoButtonContent(
-                                    isWalletContent: false);
-                              },
-                              icon: Icon(
-                                Icons.info_outline_rounded,
-                                size: 22,
-                              )),
-                        ],
-                      ),
-                    ],
-                  )
+                            // Divider(
+                            //  thickness: 1,
+                            // ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Image(
+                                  image: AssetImage(
+                                      'assets/cards/hi_card_blank.jpg'),
+                                  height: 28,
+                                  width: 28,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text("H! Rewards",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        // fontWeight: FontWeight.w500,
+                                        fontSize: 16)),
+                                Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: primaryColor.shade300,
+                                      gradient: LinearGradient(
+                                        colors: [primaryColor, secondaryColor],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(6)),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 4, horizontal: 8),
+                                  child: Text(
+                                    '${User.userHiCardBalance}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                // SizedBox(
+                                //   width: 16,
+                                // ),
+                                IconButton(
+                                    onPressed: () {
+                                      _infoButtonContent(
+                                          isWalletContent: false);
+                                    },
+                                    icon: Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 22,
+                                    )),
+                              ],
+                            ),
+                          ],
+                        )
                 ],
               ),
             ),
@@ -1577,7 +1604,11 @@ String bank_info="";
               children: [
                 Text(
                   "${isWalletContent ?? false ? "${dataValue?.touchWalletDetails!.iButtonWallet ?? ""}" : "${dataValue?.touchWalletDetails!.iButtonRewards ?? ""}"}",
-                  style: TextStyle(color: Colors.black, fontSize: 16,fontFamily:"Ubuntu",fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontFamily: "Ubuntu",
+                      fontWeight: FontWeight.normal),
                 ),
                 SizedBox(
                   height: 16,
@@ -1597,41 +1628,41 @@ String bank_info="";
 
   Future<bool> showExitAppPopup() async {
     return await showDialog(
-      //show confirm dialogue
-      //the return value will be from "Yes" or "No" options
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Exit app?'),
-        // titleTextStyle: TextStyle(
-        //     fontSize: 12,
-        //     fontWeight: FontWeight.bold,
-        //     color: secondaryColor),
-        content: const Text('Do you want to exit from Prezenty?'),
-        // contentTextStyle: TextStyle(
-        //     // fontSize: 18,
-        //     fontWeight: FontWeight.normal,
-        //     color: secondaryColor),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            //return false when click on "NO"
-            child: const Text(
-              'No',
-              // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+          //show confirm dialogue
+          //the return value will be from "Yes" or "No" options
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit app?'),
+            // titleTextStyle: TextStyle(
+            //     fontSize: 12,
+            //     fontWeight: FontWeight.bold,
+            //     color: secondaryColor),
+            content: const Text('Do you want to exit from Prezenty?'),
+            // contentTextStyle: TextStyle(
+            //     // fontSize: 18,
+            //     fontWeight: FontWeight.normal,
+            //     color: secondaryColor),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                //return false when click on "NO"
+                child: const Text(
+                  'No',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => SystemNavigator.pop(),
+                //Navigator.of(context).pop(true),
+                //return true when click on "Yes"
+                child: const Text(
+                  'Yes',
+                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => SystemNavigator.pop(),
-            //Navigator.of(context).pop(true),
-            //return true when click on "Yes"
-            child: const Text(
-              'Yes',
-              // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false; //if showDialouge had returned null, then return false
   }
 
@@ -1640,9 +1671,6 @@ String bank_info="";
     throw UnimplementedError();
   }
 }
-
-
-
 
 //@override
 // refreshHome() {

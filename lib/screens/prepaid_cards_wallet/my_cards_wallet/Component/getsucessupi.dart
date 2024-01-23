@@ -2,15 +2,22 @@ class UpiSucess {
   bool? success;
   int? statusCode;
   String? message;
-  Data? data;
+  int? txnTblId;
+  String? amount;
 
-  UpiSucess({this.success, this.statusCode, this.message, this.data});
+  UpiSucess(
+      {this.success,
+        this.statusCode,
+        this.message,
+        this.txnTblId,
+        this.amount});
 
   UpiSucess.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     statusCode = json['status_code'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    txnTblId = json['txn_tbl_id'];
+    amount = json['amount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -18,28 +25,8 @@ class UpiSucess {
     data['success'] = this.success;
     data['status_code'] = this.statusCode;
     data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
-    return data;
-  }
-}
-
-class Data {
-  bool? status;
-  String? message;
-
-  Data({this.status, this.message});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    message = json['message'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['message'] = this.message;
+    data['txn_tbl_id'] = this.txnTblId;
+    data['amount'] = this.amount;
     return data;
   }
 }

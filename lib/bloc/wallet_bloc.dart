@@ -34,11 +34,14 @@ import 'package:event_app/models/wallet&prepaid_cards/wallet_creation_and_paymen
 import 'package:event_app/models/wallet&prepaid_cards/wallet_details_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/wallet_statement_response.dart';
 import 'package:event_app/network/api_error_message.dart';
+import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/api_response.dart';
 import 'package:event_app/repositories/wallet_repository.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:event_app/widgets/app_dialogs.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/block_card_response.dart';
 import '../models/offer_response.dart';
@@ -975,6 +978,43 @@ class WalletBloc {
     } finally {
       Get.back();
     }
+  }
+  int taxid= 0
+  ;  Future<paymentupiResponse?> getupcard(String amount) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data: {
+          "amount": amount,
+          "type": "cardreq",
+        },
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
   }
 
   // Future<String?> walletUPIPayment(

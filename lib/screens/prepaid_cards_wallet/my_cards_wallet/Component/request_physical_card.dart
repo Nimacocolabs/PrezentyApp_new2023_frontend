@@ -979,7 +979,7 @@ int taxid= 0
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upilink}',
         data: {
-          "amount": 5,
+          "amount": amount,
           "type": "cardreq",
         },
       );
@@ -997,7 +997,7 @@ int taxid= 0
 
         // Launch the URL
         await launch("${getupiResponse.data!.paymentLink}");
-        Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+
 
       }
 
@@ -1044,12 +1044,11 @@ int taxid= 0
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.data!.message}");
-
-      toastMessage("${getupiResponse.data!.message}");
+        showStatusAlert("${getupiResponse.message}");
+        Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
 
       }else{
-        showStatusAlert("${getupiResponse.data!.message}");
+        showStatusAlert("${getupiResponse.message}");
       }
 
       return getupiResponse;

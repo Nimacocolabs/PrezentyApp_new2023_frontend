@@ -1,8 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:event_app/network/api_error_message.dart';
+import 'package:event_app/network/api_provider_prepaid_cards.dart';
+import 'package:event_app/network/apis.dart';
 import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/main_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/set_pin.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
@@ -26,6 +32,7 @@ import 'package:event_app/widgets/common_bottom_navigation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../models/block_card_response.dart';
 import '../../../widgets/app_dialogs.dart';
@@ -77,6 +84,15 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       widget.isToLoadMoney ?? false
           ? Navigator.pushReplacement(context, loadMoneyWidget())
           : null;
+    });
+    SystemChannels.lifecycle.setMessageHandler((msg) async {
+      if (msg == "AppLifecycleState.resumed") {
+        // The app has resumed from the background
+        // Call your API for status check here
+        await getupistatus();
+
+      }
+      return null;
     });
   }
 
@@ -854,8 +870,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
         headers: {
           "Authorization": "Bearer ${TokenPrepaidCard}",
-        },
-        body: data,
+                 },
+          body: data,
       );
       Get.back(); // Close any existing dialogs
 
@@ -1506,17 +1522,180 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       String? currentBalance = walletData?.balanceInfo?.balance.toString();
       if (validateWalletData.statusCode == 200) {
-        Get.off(WalletPaymentScreen(
-          accountid: User.userId,
-          amount: amountTyped,
-          availableWalletBalance: currentBalance,
-          walletNumber: validateWalletData.walletNumber,
-          eventId: eventIdTyped,
-          type: type,
-        ));
+        showPaymentConfirmationDialog(context);
+        // Get.off(WalletPaymentScreen(
+        //   accountid: User.userId,
+        //   amount: amountTyped,
+        //   availableWalletBalance: currentBalance,
+        //   walletNumber: validateWaletData.walletNumber,
+        //   eventId: eventIdTyped,
+        //   type: type,
+        // )
+
+
       } else {
         toastMessage("${validateWalletData.message}");
       }
     }
+  }
+  void showPaymentConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard("10");
+                Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  int taxid= 0;
+  String getamount = "";
+  Future<paymentupiResponse?> getupcard(String amount) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data: {
+          "amount": amount,
+          "type": "self",
+        },
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<UpiSucess?> getupistatus() async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatus}',
+        data: {
+          "txn_tbl_id": 1022,
+        },
+      );
+
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      getamount  =  getupiResponse.amount!;
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        showStatusAlert("${getupiResponse.message}");
+
+
+       // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+      }else{
+        showStatusAlert("${getupiResponse.message}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<UpiSucess?> getupisucess(String amount) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatusucsess}',
+        data: {
+          "txn_tbl_id": 1022,
+          "entityId": _walletBloc.walletDetailsData!.entityId!,
+          "amount":10.45
+        },
+      );
+
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        showStatusAlert("${getupiResponse.message}");
+
+
+      }else{
+        showStatusAlert("${getupiResponse.message}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  void showStatusAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await  getupisucess(getamount);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
   }
 }

@@ -239,7 +239,7 @@ class Apis {
       "api/send-sms-email-account-verification-signup";
 
 static String upilink ="api/prepaid/cards/generate-upi-link";
-
+  static String upistatus ="api/prepaid/cards/upi-transaction-status";
 
 
   /////Additional api set from public live/////////

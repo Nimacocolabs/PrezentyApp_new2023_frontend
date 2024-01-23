@@ -1043,12 +1043,12 @@ int taxid= 0
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-
+        showStatusAlert("${getupiResponse.data!.message}");
 
       toastMessage("${getupiResponse.data!.message}");
 
       }else{
-        toastMessage("${getupiResponse.data!.message}");
+        showStatusAlert("${getupiResponse.data!.message}");
       }
 
       return getupiResponse;
@@ -1060,7 +1060,24 @@ int taxid= 0
     return null;
   }
 
-
+  void showStatusAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
+  }
 
   _onPaymentErrorFn(PaymentFailureResponse response) {
     Get.back();

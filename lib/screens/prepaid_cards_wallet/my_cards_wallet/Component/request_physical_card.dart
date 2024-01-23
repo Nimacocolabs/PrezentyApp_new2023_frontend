@@ -13,6 +13,7 @@ import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/api_response.dart';
 import 'package:event_app/network/apis.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/wallet_home_screen.dart';
 import 'package:event_app/util/app_helper.dart';
@@ -962,8 +963,8 @@ _requestPhysicalCardModalSheet() async {
     return null;
   }
 
-
-  Future<paymentupiResponse?> getupcard(String amount) async {
+int taxid= 0
+;  Future<paymentupiResponse?> getupcard(String amount) async {
     try {
       AppDialogs.loading();
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
@@ -977,7 +978,7 @@ _requestPhysicalCardModalSheet() async {
       paymentupiResponse getupiResponse =
       paymentupiResponse.fromJson(response.data);
       print("response->${getupiResponse}");
-
+      taxid = getupiResponse.data!.txnTblId!;
 
 
       // Check if the API call was successful before launching the URL
@@ -987,6 +988,8 @@ _requestPhysicalCardModalSheet() async {
 
         // Launch the URL
         await launch("${getupiResponse.data!.paymentLink}");
+        await getupistatus(taxid);
+
       }
 
       return getupiResponse;
@@ -998,7 +1001,42 @@ _requestPhysicalCardModalSheet() async {
     return null;
   }
 
+  Future<UpiSucess?> getupistatus(int taxid) async {
+    try {
+      AppDialogs.loading();
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatus}',
+        data: {
+          "txn_tbl_id": taxid,
 
+        },
+      );
+
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+
+
+      toastMessage("${getupiResponse.data!.message}");
+
+      }else{
+        toastMessage("${getupiResponse.data!.message}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
 
 
 

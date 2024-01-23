@@ -1582,6 +1582,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           "amount": amount,
           "type": "self",
         },
+
       );
 
       paymentupiResponse getupiResponse =

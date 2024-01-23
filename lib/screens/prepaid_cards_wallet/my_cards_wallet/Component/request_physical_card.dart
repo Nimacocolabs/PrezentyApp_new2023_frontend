@@ -243,7 +243,7 @@ _requestPhysicalCardModalSheet() async {
                                   borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () async {
-                    //   await requestCardPayment(widget.kitNumber,widget.entityid);
+                      // await requestCardPayment(widget.kitNumber,widget.entityid);
                               showPaymentConfirmationDialog(context);
                             },
                             child: Padding(
@@ -269,6 +269,7 @@ _requestPhysicalCardModalSheet() async {
             TextButton(
               onPressed: () async{
                 await getupcard("10");
+                Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
                 // If the payment is successful, you can close the dialog
@@ -996,7 +997,7 @@ int taxid= 0
 
         // Launch the URL
         await launch("${getupiResponse.data!.paymentLink}");
-
+        Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
 
       }
 

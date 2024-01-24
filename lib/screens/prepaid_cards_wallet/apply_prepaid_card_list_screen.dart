@@ -478,7 +478,7 @@ class _ApplyPrepaidCardListScreenState
               cardId: response.data!.cardId!.toString(),
               panNumber: response.data?.panNumber ?? '',
               firstName: response.data?.firstName ?? '',
-              lastName: response.data?.lastName ?? ''));
+              lastName: response.data?.lastName ?? '', tx_id: 0,));
         } else {
           Get.to(() => WalletHomeScreen(isToLoadMoney: false,));
         }
@@ -640,7 +640,7 @@ class _ApplyPrepaidCardListScreenState
                             cardId: scratchValidOrNot.data?.cardId ?? '',
                             firstName: "",
                             lastName: "",
-                            panNumber: ""));
+                            panNumber: "", tx_id: 0,));
                       } else {
                         toastMessage("Entered Coupon code is invalid");
                       }
@@ -1277,7 +1277,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard("10");
+                await getupcard("5");
 
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
@@ -1358,12 +1358,13 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}");
+        toastMessage("${getupiResponse.message}");
+        Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "",tx_id: taxid,));
 
 
         // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
       }else{
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlert("");
       }
 
       return getupiResponse;
@@ -1446,7 +1447,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                     cardId: selectedCard!.id.toString(),
                     panNumber: panNumber,
                     firstName: firstName,
-                    lastName: lastName));
+                    lastName: lastName, tx_id: 0,));
               }
             });
           });
@@ -1810,7 +1811,7 @@ _upgradeCardGetTaxInfo();
                             ),
                             onPressed: () {
 
-                              ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',);
+                              ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,);
                               // _upgradeInitPayment(
                               //     couponCode, taxData.amount.toString());
                             },

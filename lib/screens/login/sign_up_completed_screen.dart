@@ -450,7 +450,7 @@ class _SignUpCompletedScreenState extends State<SignUpCompletedScreen> {
                                   cardId: scratchValidOrNot.data?.cardId ?? '',
                                   firstName: "",
                                   lastName: "",
-                                  panNumber: ""));
+                                  panNumber: "", tx_id: 0,));
                             } else {
                               toastMessage("Entered Coupon code is invalid");
                             }

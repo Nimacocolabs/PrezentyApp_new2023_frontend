@@ -33,13 +33,15 @@ class ApplyKycScreen extends StatefulWidget {
       required this.cardId,
       required this.firstName,
       required this.lastName,
-      required this.panNumber})
+      required this.panNumber,
+      required this.tx_id})
       : super(key: key);
   final String? razorPayId;
   final String cardId;
   final String firstName;
   final String lastName;
   final String panNumber;
+  final int tx_id;
 
   @override
   State<ApplyKycScreen> createState() => _ApplyKycScreenState();
@@ -1888,6 +1890,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     // body["rzr_pay_id"] = widget.razorPayId!;
     body["referred_by"] = User.userId;
     body["prepaid_card_id"] = 5;
+    body["txn_tbl_id"] = widget.tx_id;
     body["gender"] = gender!.toUpperCase();
     body["addressInfo"] = addressInfo;
     body["communicationInfo"] = communicationInfo;

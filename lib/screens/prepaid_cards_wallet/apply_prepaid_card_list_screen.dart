@@ -1355,16 +1355,18 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
 
 
       // Check if the API call was successful before launching the URL
-      if (getupiResponse != null && getupiResponse.statusCode==200) {
-        // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}");
-        Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "",tx_id: taxid,));
-
-
-        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
-      }else{
-        showStatusAlert("${getupiResponse.message}");
-        Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "",tx_id: taxid,));
+      if (getupiResponse != null) {
+        if (getupiResponse.message == "PENDING") {
+          showStatusAlert("${getupiResponse.message}");
+        } else if (getupiResponse.message == "SUCCESS") {
+          showStatusAlert("${getupiResponse.message}");
+          Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "", tx_id: taxid,));
+          // Handle another case
+          // Get.offAll(AnotherScreen());
+        } else {
+          // Handle other cases
+          showStatusAlert("${getupiResponse.message}");
+        }
       }
 
       return getupiResponse;

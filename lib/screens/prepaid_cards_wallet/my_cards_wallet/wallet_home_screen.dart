@@ -1522,7 +1522,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       String? currentBalance = walletData?.balanceInfo?.balance.toString();
       if (validateWalletData.statusCode == 200) {
-        showPaymentConfirmationDialog(context);
+        showPaymentConfirmationDialog(context,amountTyped);
         // Get.off(WalletPaymentScreen(
         //   accountid: User.userId,
         //   amount: amountTyped,
@@ -1538,7 +1538,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       }
     }
   }
-  void showPaymentConfirmationDialog(BuildContext context) {
+  void showPaymentConfirmationDialog(BuildContext context,String amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1548,8 +1548,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard("10");
-                Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                await getupcard(amount);
+             //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
                 // If the payment is successful, you can close the dialog
@@ -1609,13 +1609,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
+
   Future<UpiSucess?> getupistatus() async {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upistatus}',
         data: {
-          "txn_tbl_id": 1022,
+          "txn_tbl_id": taxid,
         },
       );
 
@@ -1651,9 +1652,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upistatusucsess}',
         data: {
-          "txn_tbl_id": 1022,
+          "txn_tbl_id": taxid,
           "entityId": _walletBloc.walletDetailsData!.entityId!,
-          "amount":10.45
+          "amount":amount
         },
       );
 

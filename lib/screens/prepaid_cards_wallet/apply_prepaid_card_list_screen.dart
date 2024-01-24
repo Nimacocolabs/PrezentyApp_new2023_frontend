@@ -16,6 +16,8 @@ import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/login/login_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/apply_kyc_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/wallet_home_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/prepaid_card_offer_list_screen.dart';
 import 'package:event_app/util/app_helper.dart';
@@ -24,9 +26,11 @@ import 'package:event_app/widgets/CommonApiLoader.dart';
 import 'package:event_app/widgets/app_dialogs.dart';
 import 'package:event_app/widgets/common_appbar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/check_scratchcard_valid_or_not_model.dart';
 import '../../models/gateway_key_response.dart';
@@ -88,6 +92,15 @@ class _ApplyPrepaidCardListScreenState
       } else {
         _walletBloc.getAvailableCardList();
       }
+    });
+    SystemChannels.lifecycle.setMessageHandler((msg) async {
+      if (msg == "AppLifecycleState.resumed") {
+        // The app has resumed from the background
+        // Call your API for status check here
+        await getupistatus();
+
+      }
+      return null;
     });
   }
 
@@ -410,8 +423,8 @@ class _ApplyPrepaidCardListScreenState
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {
                         selectedCard = cardDetailsData;
-                         // _applyCardCheckWalletCreationAndPayment();
-                  Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
+                       _applyCardCheckWalletCreationAndPayment();
+                //  Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
                       }
                     },
                     child: Container(
@@ -448,6 +461,7 @@ class _ApplyPrepaidCardListScreenState
           await _walletBloc.walletCreationAndPaymentStatus(
               User.userId, selectedCard!.id.toString());
       Get.back();
+      print("f->${response}");
       if (response.success!) {
         if (response.data!.paymentStatus != true) {
           haveAScratchCodeOrNot();
@@ -1229,12 +1243,13 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                                   .checkEventVaCreated(User.userId);
 
                               if (b) {
-                                _applyCardInitPayment(couponCode,
-                                    taxData.amount.toString(), state,
-                                    insTableId: taxData.insTableId ?? 0,
-                                    panNumber: panNumber,
-                                    firstName: firstName,
-                                    lastName: lastName);
+                                showPaymentConfirmationDialog(context);
+                                // _applyCardInitPayment(couponCode,
+                                //     taxData.amount.toString(), state,
+                                //     insTableId: taxData.insTableId ?? 0,
+                                //     panNumber: panNumber,
+                                //     firstName: firstName,
+                                //     lastName: lastName);
                               } else {
                                 toastMessage(
                                     "This phone number has already registered.Please use a different mobile number");
@@ -1252,7 +1267,132 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           );
         });
   }
+  void showPaymentConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard("10");
 
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  int taxid= 0;
+  String getamount = "";
+  Future<paymentupiResponse?> getupcard(String amount) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data: {
+          "amount": amount,
+          "type": "cardbuy",
+        },
+
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<UpiSucess?> getupistatus() async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatus}',
+        data: {
+          "txn_tbl_id": 1022,
+        },
+      );
+
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      getamount  =  getupiResponse.amount!;
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        showStatusAlert("${getupiResponse.message}");
+
+
+        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+      }else{
+        showStatusAlert("${getupiResponse.message}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  void showStatusAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+               // await  getupisucess(getamount);
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
+  }
   _applyCardInitPayment(String couponCode, String amount, States? state,
       {required int insTableId,
       required String firstName,

@@ -1341,30 +1341,30 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
   Future<UpiSucess?> getupistatus() async {
     try {
 
-      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
-        '${Apis.upistatus}',
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post('${Apis.upistatus}',
         data: {
-          "txn_tbl_id": 1022,
+          "txn_tbl_id": taxid,
         },
       );
 
       UpiSucess getupiResponse =
       UpiSucess.fromJson(response.data);
       getamount  =  getupiResponse.amount!;
-      print("response->${getupiResponse}");
+      print("response->${getupiResponse.message}");
 
 
 
       // Check if the API call was successful before launching the URL
-      if (getupiResponse != null && getupiResponse.statusCode==200) {
+      if (getupiResponse != null && getupiResponse.message== "PENDING") {
         // Replace 'your_url_here' with the actual URL you want to launch
-        toastMessage("${getupiResponse.message}");
+        showStatusAlert("${getupiResponse.message}");
         Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "",tx_id: taxid,));
 
 
         // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
       }else{
-        showStatusAlert("");
+        showStatusAlert("${getupiResponse.message}");
+        Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "",tx_id: taxid,));
       }
 
       return getupiResponse;

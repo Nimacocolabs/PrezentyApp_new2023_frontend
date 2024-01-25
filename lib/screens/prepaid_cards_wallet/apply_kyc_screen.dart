@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'dart:async';
 import '../../util/app_helper.dart';
@@ -966,413 +967,413 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
                 SizedBox(
                   height: 10,
                 ),
-                Text("Add another address",
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54)),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        width: 2, color: primaryColor), // Outer border styling
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ExpansionTileCard(
-                    shadowColor: primaryColor,
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(10),
-                    baseColor: Colors.grey[300],
-                    title: Text(
-                      "Address",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(
-                            10), // Adjust the padding for the children
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Divider(
-                              thickness: 1.5,
-                              height: 1.0,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Container(
-                            //   height: 48,
-                            //   width: screenWidth - 20,
-                            //   decoration: BoxDecoration(
-                            //       border: Border.all(
-                            //         width: 2,
-                            //         color: primaryColor,
-                            //       ),
-                            //       borderRadius: BorderRadius.circular(8)),
-                            //   child: DropdownButtonHideUnderline(
-                            //     child: DropdownButton(
-                            //       alignment: Alignment.centerLeft,
-                            //       underline: Container(),
-                            //       elevation: 0,
-                            //       // isDense: true,
-                            //       iconSize: 30,
-                            //       //  icon: Icon(Icons.arrow_downward_rounded),
-                            //       style: TextStyle(
-                            //           fontWeight: FontWeight.bold,
-                            //           color: Colors.black54,
-                            //           fontSize: 16),
-                            //       value: _addressValue,
-                            //       items: [
-                            //         DropdownMenuItem(
-                            //           child: Text("select"),
-                            //           value: 0,
-                            //         ),
-                            //         DropdownMenuItem(
-                            //           child: Text("HOME"),
-                            //           value: 1,
-                            //         ),
-                            //         DropdownMenuItem(
-                            //           child: Text("OFFICE"),
-                            //           value: 2,
-                            //         ),
-                            //         DropdownMenuItem(
-                            //           child: Text("DELIVERY"),
-                            //           value: 3,
-                            //         ),
-                            //         DropdownMenuItem(
-                            //           child: Text("COMMUNICATION"),
-                            //           value: 4,
-                            //         )
-                            //       ],
-                            //       onChanged: (value) {
-                            //         setState(() {
-                            //           _addressValue = value as int;
-                            //           value == 1
-                            //               ? address_status = "HOME"
-                            //               : value == 2
-                            //               ? marital_status = "OFFICE"
-                            //               : value == 3 ? marital_status = "DELIVERY"
-                            //               : marital_status = "COMMUNICATION";
-                            //           _addressValue = value as int;
-                            //         });
-                            //         print(_maritalStatusValue.toString);
-                            //       },
-                            //     ),
-                            //   ),
-                            // ),
-                            Text(
-                              'Select Address Categories:',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 10),
-                            buildCategoryRadioButton('HOME'),
-                            if (selectedCategories.contains('HOME'))
-                              Column(
-                                children: [
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 1",
-                                      labelText: "Enter",
-                                      control: homeAddress1Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 2",
-                                      labelText: "Enter",
-                                      control: homeAddress2Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 3",
-                                      labelText: "Enter",
-                                      control: homeAddress3Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "City",
-                                      labelText: "Enter",
-                                      control: homecityControl,
-                                      validate: formatAndValidate.validateName,
-                                      keyboardInputType: TextInputType.name),
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: Text(
-                                      "State",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  _stateList(),
-                                  kycDataWidget(
-                                    //focus,
-                                    field: "Country",
-                                    labelText: "Enter",
-                                    control: countryControl,
-                                    keyboardInputType: TextInputType.text,
-                                    // validate: formatAndValidate.formatName,
-                                    // format: formatAndValidate.formatName(),
-                                    enabled: false,
-                                  ),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Pin Code",
-                                      labelText: "Enter",
-                                      control: homepinNumberControl,
-                                      keyboardInputType: TextInputType.number,
-                                      validate:
-                                          formatAndValidate.validatePinCode,
-                                      format:
-                                          formatAndValidate.formatPinCode()),
-                                ],
-                              ),
-                            buildCategoryRadioButton('OFFICE'),
-                            if (selectedCategories.contains('OFFICE'))
-                              Column(
-                                children: [
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 1",
-                                      labelText: "Enter",
-                                      control: officeAddress1Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 2",
-                                      labelText: "Enter",
-                                      control: officeAddress2Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 3",
-                                      labelText: "Enter",
-                                      control: officeAddress3Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "City",
-                                      labelText: "Enter",
-                                      control: officecityControl,
-                                      validate: formatAndValidate.validateName,
-                                      keyboardInputType: TextInputType.name),
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: Text(
-                                      "State",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  _stateList(),
-                                  kycDataWidget(
-                                    //focus,
-                                    field: "Country",
-                                    labelText: "Enter",
-                                    control: countryControl,
-                                    keyboardInputType: TextInputType.text,
-                                    // validate: formatAndValidate.formatName,
-                                    // format: formatAndValidate.formatName(),
-                                    enabled: false,
-                                  ),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Pin Code",
-                                      labelText: "Enter",
-                                      control: officepinNumberControl,
-                                      keyboardInputType: TextInputType.number,
-                                      validate:
-                                          formatAndValidate.validatePinCode,
-                                      format:
-                                          formatAndValidate.formatPinCode()),
-                                ],
-                              ),
-                            buildCategoryRadioButton('DELIVERY'),
-                            if (selectedCategories.contains('DELIVERY'))
-                              Column(
-                                children: [
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 1",
-                                      labelText: "Enter",
-                                      control: deliveryAddress1Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 2",
-                                      labelText: "Enter",
-                                      control: deliveryAddress2Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 3",
-                                      labelText: "Enter",
-                                      control: deliveryAddress3Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "City",
-                                      labelText: "Enter",
-                                      control: deliverycityControl,
-                                      validate: formatAndValidate.validateName,
-                                      keyboardInputType: TextInputType.name),
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: Text(
-                                      "State",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  _stateList(),
-                                  kycDataWidget(
-                                    //focus,
-                                    field: "Country",
-                                    labelText: "Enter",
-                                    control: countryControl,
-                                    keyboardInputType: TextInputType.text,
-                                    //validate: formatAndValidate.,
-                                    //format: formatAndValidate.formatName(),
-                                    enabled: false,
-                                  ),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Pin Code",
-                                      labelText: "Enter",
-                                      control: deliverypinNumberControl,
-                                      keyboardInputType: TextInputType.number,
-                                      validate:
-                                          formatAndValidate.validatePinCode,
-                                      format:
-                                          formatAndValidate.formatPinCode()),
-                                ],
-                              ),
-                            buildCategoryRadioButton('COMMUNICATION'),
-                            if (selectedCategories.contains('COMMUNICATION'))
-                              Column(
-                                children: [
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 1",
-                                      labelText: "Enter",
-                                      control: communicationAddress1Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 2",
-                                      labelText: "Enter",
-                                      control: communicationAddress2Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Address 3",
-                                      labelText: "Enter",
-                                      control: communicationAddress3Control,
-                                      validate:
-                                          formatAndValidate.validateAddress,
-                                      format:
-                                          formatAndValidate.formatAddress()),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "City",
-                                      labelText: "Enter",
-                                      control: communicationcityControl,
-                                      validate: formatAndValidate.validateName,
-                                      keyboardInputType: TextInputType.name),
-                                  Align(
-                                    alignment: AlignmentDirectional.topStart,
-                                    child: Text(
-                                      "State",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  _stateList(),
-                                  kycDataWidget(
-                                    //focus,
-                                    field: "Country",
-                                    labelText: "Enter",
-                                    control: countryControl,
-                                    keyboardInputType: TextInputType.text,
-                                    // validate: formatAndValidate.formatName,
-                                    // format: formatAndValidate.formatName(),
-                                    enabled: false,
-                                  ),
-                                  kycDataWidget(
-                                      //focus,
-                                      field: "Pin Code",
-                                      labelText: "Enter",
-                                      control: communicationpinNumberControl,
-                                      keyboardInputType: TextInputType.number,
-                                      validate:
-                                          formatAndValidate.validatePinCode,
-                                      format:
-                                          formatAndValidate.formatPinCode()),
-                                ],
-                              ),
-                            SizedBox(height: 20),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Text("Add another address",
+                //     style: TextStyle(
+                //         fontSize: 15,
+                //         fontWeight: FontWeight.bold,
+                //         color: Colors.black54)),
+                // SizedBox(
+                //   height: 10,
+                // ),
+                // Container(
+                //   decoration: BoxDecoration(
+                //     border: Border.all(
+                //         width: 2, color: primaryColor), // Outer border styling
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                //   child: ExpansionTileCard(
+                //     shadowColor: primaryColor,
+                //     elevation: 8,
+                //     borderRadius: BorderRadius.circular(10),
+                //     baseColor: Colors.grey[300],
+                //     title: Text(
+                //       "Address",
+                //       style:
+                //           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                //     ),
+                //     children: [
+                //       Container(
+                //         padding: EdgeInsets.all(
+                //             10), // Adjust the padding for the children
+                //         child: Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             Divider(
+                //               thickness: 1.5,
+                //               height: 1.0,
+                //             ),
+                //             SizedBox(
+                //               height: 10,
+                //             ),
+                //             // Container(
+                //             //   height: 48,
+                //             //   width: screenWidth - 20,
+                //             //   decoration: BoxDecoration(
+                //             //       border: Border.all(
+                //             //         width: 2,
+                //             //         color: primaryColor,
+                //             //       ),
+                //             //       borderRadius: BorderRadius.circular(8)),
+                //             //   child: DropdownButtonHideUnderline(
+                //             //     child: DropdownButton(
+                //             //       alignment: Alignment.centerLeft,
+                //             //       underline: Container(),
+                //             //       elevation: 0,
+                //             //       // isDense: true,
+                //             //       iconSize: 30,
+                //             //       //  icon: Icon(Icons.arrow_downward_rounded),
+                //             //       style: TextStyle(
+                //             //           fontWeight: FontWeight.bold,
+                //             //           color: Colors.black54,
+                //             //           fontSize: 16),
+                //             //       value: _addressValue,
+                //             //       items: [
+                //             //         DropdownMenuItem(
+                //             //           child: Text("select"),
+                //             //           value: 0,
+                //             //         ),
+                //             //         DropdownMenuItem(
+                //             //           child: Text("HOME"),
+                //             //           value: 1,
+                //             //         ),
+                //             //         DropdownMenuItem(
+                //             //           child: Text("OFFICE"),
+                //             //           value: 2,
+                //             //         ),
+                //             //         DropdownMenuItem(
+                //             //           child: Text("DELIVERY"),
+                //             //           value: 3,
+                //             //         ),
+                //             //         DropdownMenuItem(
+                //             //           child: Text("COMMUNICATION"),
+                //             //           value: 4,
+                //             //         )
+                //             //       ],
+                //             //       onChanged: (value) {
+                //             //         setState(() {
+                //             //           _addressValue = value as int;
+                //             //           value == 1
+                //             //               ? address_status = "HOME"
+                //             //               : value == 2
+                //             //               ? marital_status = "OFFICE"
+                //             //               : value == 3 ? marital_status = "DELIVERY"
+                //             //               : marital_status = "COMMUNICATION";
+                //             //           _addressValue = value as int;
+                //             //         });
+                //             //         print(_maritalStatusValue.toString);
+                //             //       },
+                //             //     ),
+                //             //   ),
+                //             // ),
+                //             Text(
+                //               'Select Address Categories:',
+                //               style: TextStyle(
+                //                   fontSize: 18, fontWeight: FontWeight.bold),
+                //             ),
+                //             SizedBox(height: 10),
+                //             buildCategoryRadioButton('HOME'),
+                //             if (selectedCategories.contains('HOME'))
+                //               Column(
+                //                 children: [
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 1",
+                //                       labelText: "Enter",
+                //                       control: homeAddress1Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 2",
+                //                       labelText: "Enter",
+                //                       control: homeAddress2Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 3",
+                //                       labelText: "Enter",
+                //                       control: homeAddress3Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "City",
+                //                       labelText: "Enter",
+                //                       control: homecityControl,
+                //                       validate: formatAndValidate.validateName,
+                //                       keyboardInputType: TextInputType.name),
+                //                   Align(
+                //                     alignment: AlignmentDirectional.topStart,
+                //                     child: Text(
+                //                       "State",
+                //                       style: TextStyle(
+                //                           fontSize: 15,
+                //                           fontWeight: FontWeight.bold,
+                //                           color: Colors.black54),
+                //                     ),
+                //                   ),
+                //                   SizedBox(
+                //                     height: 10,
+                //                   ),
+                //                   _stateList(),
+                //                   kycDataWidget(
+                //                     //focus,
+                //                     field: "Country",
+                //                     labelText: "Enter",
+                //                     control: countryControl,
+                //                     keyboardInputType: TextInputType.text,
+                //                     // validate: formatAndValidate.formatName,
+                //                     // format: formatAndValidate.formatName(),
+                //                     enabled: false,
+                //                   ),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Pin Code",
+                //                       labelText: "Enter",
+                //                       control: homepinNumberControl,
+                //                       keyboardInputType: TextInputType.number,
+                //                       validate:
+                //                           formatAndValidate.validatePinCode,
+                //                       format:
+                //                           formatAndValidate.formatPinCode()),
+                //                 ],
+                //               ),
+                //             buildCategoryRadioButton('OFFICE'),
+                //             if (selectedCategories.contains('OFFICE'))
+                //               Column(
+                //                 children: [
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 1",
+                //                       labelText: "Enter",
+                //                       control: officeAddress1Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 2",
+                //                       labelText: "Enter",
+                //                       control: officeAddress2Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 3",
+                //                       labelText: "Enter",
+                //                       control: officeAddress3Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "City",
+                //                       labelText: "Enter",
+                //                       control: officecityControl,
+                //                       validate: formatAndValidate.validateName,
+                //                       keyboardInputType: TextInputType.name),
+                //                   Align(
+                //                     alignment: AlignmentDirectional.topStart,
+                //                     child: Text(
+                //                       "State",
+                //                       style: TextStyle(
+                //                           fontSize: 15,
+                //                           fontWeight: FontWeight.bold,
+                //                           color: Colors.black54),
+                //                     ),
+                //                   ),
+                //                   SizedBox(
+                //                     height: 10,
+                //                   ),
+                //                   _stateList(),
+                //                   kycDataWidget(
+                //                     //focus,
+                //                     field: "Country",
+                //                     labelText: "Enter",
+                //                     control: countryControl,
+                //                     keyboardInputType: TextInputType.text,
+                //                     // validate: formatAndValidate.formatName,
+                //                     // format: formatAndValidate.formatName(),
+                //                     enabled: false,
+                //                   ),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Pin Code",
+                //                       labelText: "Enter",
+                //                       control: officepinNumberControl,
+                //                       keyboardInputType: TextInputType.number,
+                //                       validate:
+                //                           formatAndValidate.validatePinCode,
+                //                       format:
+                //                           formatAndValidate.formatPinCode()),
+                //                 ],
+                //               ),
+                //             buildCategoryRadioButton('DELIVERY'),
+                //             if (selectedCategories.contains('DELIVERY'))
+                //               Column(
+                //                 children: [
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 1",
+                //                       labelText: "Enter",
+                //                       control: deliveryAddress1Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 2",
+                //                       labelText: "Enter",
+                //                       control: deliveryAddress2Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 3",
+                //                       labelText: "Enter",
+                //                       control: deliveryAddress3Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "City",
+                //                       labelText: "Enter",
+                //                       control: deliverycityControl,
+                //                       validate: formatAndValidate.validateName,
+                //                       keyboardInputType: TextInputType.name),
+                //                   Align(
+                //                     alignment: AlignmentDirectional.topStart,
+                //                     child: Text(
+                //                       "State",
+                //                       style: TextStyle(
+                //                           fontSize: 15,
+                //                           fontWeight: FontWeight.bold,
+                //                           color: Colors.black54),
+                //                     ),
+                //                   ),
+                //                   SizedBox(
+                //                     height: 10,
+                //                   ),
+                //                   _stateList(),
+                //                   kycDataWidget(
+                //                     //focus,
+                //                     field: "Country",
+                //                     labelText: "Enter",
+                //                     control: countryControl,
+                //                     keyboardInputType: TextInputType.text,
+                //                     //validate: formatAndValidate.,
+                //                     //format: formatAndValidate.formatName(),
+                //                     enabled: false,
+                //                   ),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Pin Code",
+                //                       labelText: "Enter",
+                //                       control: deliverypinNumberControl,
+                //                       keyboardInputType: TextInputType.number,
+                //                       validate:
+                //                           formatAndValidate.validatePinCode,
+                //                       format:
+                //                           formatAndValidate.formatPinCode()),
+                //                 ],
+                //               ),
+                //             buildCategoryRadioButton('COMMUNICATION'),
+                //             if (selectedCategories.contains('COMMUNICATION'))
+                //               Column(
+                //                 children: [
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 1",
+                //                       labelText: "Enter",
+                //                       control: communicationAddress1Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 2",
+                //                       labelText: "Enter",
+                //                       control: communicationAddress2Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Address 3",
+                //                       labelText: "Enter",
+                //                       control: communicationAddress3Control,
+                //                       validate:
+                //                           formatAndValidate.validateAddress,
+                //                       format:
+                //                           formatAndValidate.formatAddress()),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "City",
+                //                       labelText: "Enter",
+                //                       control: communicationcityControl,
+                //                       validate: formatAndValidate.validateName,
+                //                       keyboardInputType: TextInputType.name),
+                //                   Align(
+                //                     alignment: AlignmentDirectional.topStart,
+                //                     child: Text(
+                //                       "State",
+                //                       style: TextStyle(
+                //                           fontSize: 15,
+                //                           fontWeight: FontWeight.bold,
+                //                           color: Colors.black54),
+                //                     ),
+                //                   ),
+                //                   SizedBox(
+                //                     height: 10,
+                //                   ),
+                //                   _stateList(),
+                //                   kycDataWidget(
+                //                     //focus,
+                //                     field: "Country",
+                //                     labelText: "Enter",
+                //                     control: countryControl,
+                //                     keyboardInputType: TextInputType.text,
+                //                     // validate: formatAndValidate.formatName,
+                //                     // format: formatAndValidate.formatName(),
+                //                     enabled: false,
+                //                   ),
+                //                   kycDataWidget(
+                //                       //focus,
+                //                       field: "Pin Code",
+                //                       labelText: "Enter",
+                //                       control: communicationpinNumberControl,
+                //                       keyboardInputType: TextInputType.number,
+                //                       validate:
+                //                           formatAndValidate.validatePinCode,
+                //                       format:
+                //                           formatAndValidate.formatPinCode()),
+                //                 ],
+                //               ),
+                //             SizedBox(height: 20),
+                //           ],
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 SizedBox(
                   height: 10,
                 ),
@@ -1714,8 +1715,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
               print("daob=>${birthDate}");
               print("daob=>${dobControl.text}");
               // put it here
-              birthDateInString =
-                  "${birthDate!.year}-${birthDate!.month}-${birthDate!.day}"; // 08/14/2019
+              // birthDateInString =
+              //     "${birthDate!.year}-${birthDate!.month}-${birthDate!.day}";
+              birthDateInString = DateFormat('yyyy-MM-dd').format(birthDate!);// 08/14/2019
               dobControl.text = birthDateInString!;
               print("daob=>${birthDateInString}");
               print("daob=>${dobControl.text}");
@@ -1804,46 +1806,46 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
         "country": countryControl.text,
         "pinCode": permanentpinNumberControl.text
       },
-      if(categories == "HOME") {
-        "addressCategory":categories ,
-         "address1": homeAddress1Control.text,
-         "address2": homeAddress2Control.text,
-         "address3": homeAddress3Control.text,
-         "city": homecityControl.text,
-         "state_code": state,
-         "country": countryControl.text,
-         "pinCode": homepinNumberControl.text.toString()
-       }else if(categories == "OFFICE"){
-        "addressCategory":categories ,
-        "address1": officeAddress1Control.text,
-        "address2": officeAddress2Control.text,
-        "address3": officeAddress3Control.text,
-        "city": officecityControl.text,
-        "state_code": state,
-        "country":countryControl.text,
-        "pinCode": officepinNumberControl.text.toString()
-      }
-      else if(categories=="DELIVERY"){
-          "addressCategory":categories ,
-          "address1": deliveryAddress1Control.text,
-          "address2": deliveryAddress2Control.text,
-          "address3": deliveryAddress3Control.text,
-          "city": deliverycityControl.text,
-          "state_code": state,
-          "country": countryControl.text,
-          "pinCode": deliverypinNumberControl.text.toString()
-
-      }
-      else{
-            "addressCategory":categories ,
-            "address1": communicationAddress1Control.text,
-            "address2": communicationAddress2Control.text,
-            "address3": communicationAddress3Control.text,
-            "city": communicationcityControl.text,
-            "state_code": state,
-            "country": countryControl.text,
-            "pinCode": communicationpinNumberControl.text.toString()
-          }
+      // if(categories == "HOME") {
+      //   "addressCategory":categories ,
+      //    "address1": homeAddress1Control.text,
+      //    "address2": homeAddress2Control.text,
+      //    "address3": homeAddress3Control.text,
+      //    "city": homecityControl.text,
+      //    "state_code": state,
+      //    "country": countryControl.text,
+      //    "pinCode": homepinNumberControl.text.toString()
+      //  }else if(categories == "OFFICE"){
+      //   "addressCategory":categories ,
+      //   "address1": officeAddress1Control.text,
+      //   "address2": officeAddress2Control.text,
+      //   "address3": officeAddress3Control.text,
+      //   "city": officecityControl.text,
+      //   "state_code": state,
+      //   "country":countryControl.text,
+      //   "pinCode": officepinNumberControl.text.toString()
+      // }
+      // else if(categories=="DELIVERY"){
+      //     "addressCategory":categories ,
+      //     "address1": deliveryAddress1Control.text,
+      //     "address2": deliveryAddress2Control.text,
+      //     "address3": deliveryAddress3Control.text,
+      //     "city": deliverycityControl.text,
+      //     "state_code": state,
+      //     "country": countryControl.text,
+      //     "pinCode": deliverypinNumberControl.text.toString()
+      //
+      // }
+      // else{
+      //       "addressCategory":categories ,
+      //       "address1": communicationAddress1Control.text,
+      //       "address2": communicationAddress2Control.text,
+      //       "address3": communicationAddress3Control.text,
+      //       "city": communicationcityControl.text,
+      //       "state_code": state,
+      //       "country": countryControl.text,
+      //       "pinCode": communicationpinNumberControl.text.toString()
+      //     }
     ];
 
 // communicationInfo array
@@ -1890,7 +1892,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     // body["rzr_pay_id"] = widget.razorPayId!;
     body["referred_by"] = User.userId;
     body["prepaid_card_id"] = 5;
-    body["txn_tbl_id"] = widget.tx_id;
+    body["txn_tbl_id"] = 1116;
     body["gender"] = gender!.toUpperCase();
     body["addressInfo"] = addressInfo;
     body["communicationInfo"] = communicationInfo;
@@ -1902,7 +1904,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
     try {
       AppDialogs.loading();
       RegisterWalletResponse response = await _walletBloc.registerWallet(body);
-      Get.back();
+
       print("Response${response.data}");
       if (response.statusCode == 200) {
         toastMessage(response.message);

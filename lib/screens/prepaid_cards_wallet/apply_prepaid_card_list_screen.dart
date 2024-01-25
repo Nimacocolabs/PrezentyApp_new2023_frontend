@@ -423,8 +423,8 @@ class _ApplyPrepaidCardListScreenState
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {
                         selectedCard = cardDetailsData;
-                       _applyCardCheckWalletCreationAndPayment();
-                //  Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '',));
+                 //      _applyCardCheckWalletCreationAndPayment();
+                 Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,));
                       }
                     },
                     child: Container(
@@ -1360,7 +1360,11 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           showStatusAlert("${getupiResponse.message}");
         } else if (getupiResponse.message == "SUCCESS") {
           showStatusAlert("${getupiResponse.message}");
-          Get.offAll(ApplyKycScreen(razorPayId: "", cardId: "", firstName: "", lastName: "", panNumber: "", tx_id: taxid,));
+          Get.offAll(ApplyKycScreen( razorPayId:" response.data!.razorpayId!.toString()",
+            cardId: response.data!.cardId!.toString(),
+            panNumber: response.data?.panNumber ?? '',
+            firstName: response.data?.firstName ?? '',
+            lastName: response.data?.lastName ?? '',tx_id: taxid,));
           // Handle another case
           // Get.offAll(AnotherScreen());
         } else {

@@ -1256,11 +1256,12 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                                 toastMessage(
                                                     "Enter an amount greater than zero");
                                               } else {
-                                                _validate(
-                                                  type: "self",
-                                                  amountTyped:
-                                                      loadingAmount.toString(),
-                                                );
+                                                showPaymentConfirmationDialog(context,loadingAmount.toString(),"");
+                                                // _validate(
+                                                //   type: "self",
+                                                //   amountTyped:
+                                                //       loadingAmount.toString(),
+                                                // );
                                               }
                                             },
                                             child: Text("Load Money")),
@@ -1313,7 +1314,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Text(
-                                              "Enter the Wallet Number",
+                                              "Enter the PhoneNo/Wallet Number",
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w600,
@@ -1355,7 +1356,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                           Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Text(
-                                              "Confirm  Wallet Number",
+                                              "Confirm  PhoneNo/WWallet Number",
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w600,
@@ -1450,28 +1451,32 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                         right: 120,
                                         bottom: 5),
                                     child: ElevatedButton(
-                                        onPressed: () {
-                                          _validate(
-                                            receiverWalletNo:
-                                                _textEditingControllerReceiverWalletNo
-                                                    .value.text
-                                                    .trim(),
-                                            confrimWalletNo:
-                                                _textEditingControllerConfrimReceiverWalletNo
-                                                    .value.text
-                                                    .trim(),
-                                            amountTyped:
-                                                _textEditingControllerAmount
-                                                    .value.text
-                                                    .trim(),
-                                            eventIdTyped:
-                                                _textEditingControllerEventID
-                                                    .value.text
-                                                    .trim(),
-                                            type: selectedRadioValue == 3
-                                                ? "event"
-                                                : "others",
-                                          );
+                                        onPressed: () {showPaymentConfirmationDialog1(context,     _textEditingControllerAmount
+                                            .value.text
+                                            .trim(),       _textEditingControllerConfrimReceiverWalletNo
+                                            .value.text
+                                            .trim(),);
+                                          // _validate(
+                                          //   receiverWalletNo:
+                                          //       _textEditingControllerReceiverWalletNo
+                                          //           .value.text
+                                          //           .trim(),
+                                          //   confrimWalletNo:
+                                          //       _textEditingControllerConfrimReceiverWalletNo
+                                          //           .value.text
+                                          //           .trim(),
+                                          //   amountTyped:
+                                          //       _textEditingControllerAmount
+                                          //           .value.text
+                                          //           .trim(),
+                                          //   eventIdTyped:
+                                          //       _textEditingControllerEventID
+                                          //           .value.text
+                                          //           .trim(),
+                                          //   type: selectedRadioValue == 3
+                                          //       ? "event"
+                                          //       : "others",
+                                          // );
                                         },
                                         child: Text("Submit")),
                                   )
@@ -1522,7 +1527,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       String? currentBalance = walletData?.balanceInfo?.balance.toString();
       if (validateWalletData.statusCode == 200) {
-        showPaymentConfirmationDialog(context,amountTyped);
+
         // Get.off(WalletPaymentScreen(
         //   accountid: User.userId,
         //   amount: amountTyped,
@@ -1538,7 +1543,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       }
     }
   }
-  void showPaymentConfirmationDialog(BuildContext context,String amount) {
+  void showPaymentConfirmationDialog1(BuildContext context,String amount,phnno) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1548,7 +1553,40 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard(amount);
+                await getupothercard(amount,phnno);
+                //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void showPaymentConfirmationDialog(BuildContext context,String amount,phnno) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard(amount,phnno);
              //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
@@ -1573,14 +1611,64 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   }
   int taxid= 0;
   String getamount = "";
-  Future<paymentupiResponse?> getupcard(String amount) async {
+  Map<int, String> typeMapping = {
+    1: "self",
+    2: "others",
+    3: "event",
+  };
+  Future<paymentupiResponse?> getupcard(String amount,phno) async {
+
+
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upilink}',
-        data: {
+        data:
+
+     {
           "amount": amount,
-          "type": "self",
+          "type": typeMapping[selectedRadioValue],
+        }
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<paymentupiResponse?> getupothercard(String amount,phno) async {
+
+
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data:
+
+  {
+          "amount":amount,
+          "type":typeMapping[selectedRadioValue],
+          "wallet_number":phno,
+          "wallet_number_confirmation":phno
         },
 
       );
@@ -1609,7 +1697,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
-
   Future<UpiSucess?> getupistatus() async {
     try {
 
@@ -1630,7 +1717,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}");
+     selectedRadioValue==1?   showStatusAlert("${getupiResponse.message}"): showStatusAlert1("${getupiResponse.message}");
 
 
        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
@@ -1669,8 +1756,48 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         // Replace 'your_url_here' with the actual URL you want to launch
         showStatusAlert("${getupiResponse.message}");
 
+      }
 
-      }else{
+      else{
+        showStatusAlert("${getupiResponse.message}");
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<UpiSucess?> getupiotherssucess(String amount) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatusucsess}',
+        data:
+             {
+            "wallet_number":   "${_textEditingControllerReceiverWalletNo.text}",
+            "wallet_number_confirmation":_textEditingControllerConfrimReceiverWalletNo.text,
+            "amount":amount,
+            "txn_tbl_id":taxid
+            }
+      );
+
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      print("response->${getupiResponse}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        showStatusAlert("${getupiResponse.message}");
+
+      }
+
+      else{
         showStatusAlert("${getupiResponse.message}");
       }
 
@@ -1693,6 +1820,24 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             TextButton(
               onPressed: () async{
                 await  getupisucess(getamount);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
+  }
+  void showStatusAlert1(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await  getupiotherssucess(getamount);
               },
               child: Text('OK'),
             ),

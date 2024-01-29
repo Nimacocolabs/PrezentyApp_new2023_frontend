@@ -273,7 +273,7 @@ class _CreateEventPreviewScreenState extends State<CreateEventPreviewScreen> {
         toastMessage('${response.message}');
 
         if(needShare){
-           _share(response.detail!.id!,response.detail!.imageUrl,EventData.title??'');
+            _share(response.detail!.id!,response.detail!.imageUrl,EventData.title??'');
         }
         Get.offAll(MainScreen());
 

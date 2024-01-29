@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:event_app/network/api_error_message.dart';
 import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/apis.dart';
@@ -8,6 +9,7 @@ import 'package:event_app/screens/main_screen.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/set_pin.dart';
 import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
+import 'package:event_app/services/dynamic_link_service.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -32,6 +34,7 @@ import 'package:event_app/widgets/common_bottom_navigation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../models/block_card_response.dart';
@@ -96,6 +99,11 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     });
   }
 
+  _share () async {
+    Uri url = await DynamicLinkService().createDynamic1Link();
+    log(url.toString());
+    await Share.share('You are invited to this${url.toString()}');
+  }
   Future _getWalletDetails() async {
     walletData = await _walletBloc.getWalletDetails(User.userId);
 
@@ -203,6 +211,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             ),
           ),
         ),
+        ElevatedButton(onPressed: (){  _share();}, child: Text("share"))
         // CommonAppBarWidget(
         //       onPressedFunction: (){
         //         Get.back();

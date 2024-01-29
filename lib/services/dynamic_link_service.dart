@@ -143,6 +143,23 @@ class DynamicLinkService {
     // return shortUrl;
   }
 
+  Future<dynamic> createDynamic1Link(
+     ) async {
+    Uri uri = Uri.parse(
+      'https://prezenty.page.link/?link=https://prezenty.in/WalletHomeScreen/&apn=com.cocoalabs.event_app&ibi=com.cocoalabs.event&sd=To%20participate%2FOnline%20gifting');
+    final ShortDynamicLink shortenedLink0 =
+    await DynamicLinkParameters.shortenUrl(
+      uri,
+      DynamicLinkParametersOptions(
+          shortDynamicLinkPathLength: ShortDynamicLinkPathLength.unguessable),
+    );
+
+    print(uri.toString());
+    print(shortenedLink0.shortUrl);
+
+    return shortenedLink0.shortUrl;
+  }
+
   void showPage(Uri? deepLink) async {
     if (deepLink != null) {
       await SharedPrefs.clearNotificationData();

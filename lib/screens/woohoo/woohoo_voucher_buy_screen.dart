@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:event_app/bloc/payment_bloc.dart';
 import 'package:event_app/bloc/profile_bloc.dart';
@@ -658,7 +659,7 @@ class _WoohooVoucherBuyScreenState extends State<WoohooVoucherBuyScreen> {
                               fontSize: 15)),
                     ),
 
-                 widget.eventId!.isEmpty ? 
+                 widget.eventId==null?
                  
                     AppTextBox(
                       enabled: true,
@@ -1173,7 +1174,7 @@ class _WoohooVoucherBuyScreenState extends State<WoohooVoucherBuyScreen> {
                     state: state,
                     orderType: orderType,
                     insTableId: taxData.insTableId,
-                    eventIdValue:  widget.eventId!.isEmpty ?  eventId : widget.eventId);
+                    eventIdValue:  widget.eventId== null ?  eventId : widget.eventId);
               });
             }
           }
@@ -1864,8 +1865,9 @@ else{
           orderId = await _getGatewayOrderIdConfirmVoucherAmount(
               amount ?? '${voucherAmount!.amountIncTax}', insTableId ?? 0);
         } else {
-          orderId = await _getGatewayOrderId(
-              amount ?? '${voucherAmount!.amountIncTax}');
+          showPaymentConfirmationDialog(context,"${voucherAmount!.amountIncTax}",orderId);
+          // orderId = await _getGatewayOrderId(
+          //     amount ?? '${voucherAmount!.amountIncTax}');
         }
         if (orderId.isEmpty) {
           toastMessage('Unable to get order');
@@ -1899,6 +1901,7 @@ else{
             TextButton(
               onPressed: () async{
                 await getupcard(amount,orderId);
+
                 // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
@@ -1921,18 +1924,55 @@ else{
       },
     );
   }
+  void showPaymentConfirmationDialog1(BuildContext context,String? amount,orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard(amount,orderId);
 
+                // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   int taxid= 0;
   Future<paymentupiResponse?> getupcard(String? amount,orderId) async {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upilink}',
+        options: Options(
+          followRedirects: true,
+        ),
         data: {
           "amount": amount,
-          "type": "gift",
-          "order_id":orderId,
+          "type": "spin",
+
         },
+
       );
 
       paymentupiResponse getupiResponse =
@@ -2141,7 +2181,7 @@ String decentro_txn_id= "";
       if (getupiResponse.message=="SUCCESS") {
         _createOrder(
             decentro_txn_id: decentro_txn_id,
-            orderType: orderType,
+            orderType: "BUY",
             touchPoint: touchPoint,
             amount: amount,enteredEventId: eventID);
         // Future.delayed(Duration(milliseconds: 500), () {
@@ -2152,7 +2192,7 @@ String decentro_txn_id= "";
         // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
 
       }else{
-        // showStatusAlert("${getupiResponse.message}");
+        _showOrderRetryDialog();
       }
 
       return getupiResponse;
@@ -2254,16 +2294,17 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
 
   _createOrder(
    
-      {int? redeemTransactionId,
-      String? rzpPaymentId,
-      String? state,
-      String? orderType,
-      String? touchPoint,
-      String? amount,
-      String? hiCardNo,
-      String? hiCardPinNumber,
-      String? hiCardPayableAmnt,
-      String? enteredEventId, required decentro_txn_id}) async {
+      {
+        int? redeemTransactionId,
+        String? rzpPaymentId,
+        String? state,
+        String? orderType,
+        String? touchPoint,
+        String? amount,
+        String? hiCardNo,
+        String? hiCardPinNumber,
+        String? hiCardPayableAmnt,
+        String? enteredEventId, required decentro_txn_id}) async {
     try {
       createBody = getBody();
      
@@ -2295,9 +2336,9 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
         if (response.success ?? false) {
           if (response.data!.status == 'COMPLETE') {
             //goToHomeScreen();
-
             // Get.offAll(() => WoohooVoucherListScreen(
             //     redeemData: RedeemData.buyVoucher(), showBackButton: false));
+
             Get.to(() => SuccessOrFailedScreen(isSuccess: true,content: "Your order placed successfully.\nAnd the voucher will be sent to the provided email shortly.",));
           //_showSuccessDialog();
           } else if (response.data!.status == 'PROCESSING') {

@@ -972,8 +972,8 @@ _requestPhysicalCardModalSheet() async {
     return null;
   }
 
-int taxid= 0
-;  Future<paymentupiResponse?> getupcard(String amount) async {
+int taxid= 0;
+  Future<paymentupiResponse?> getupcard(String amount) async {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(

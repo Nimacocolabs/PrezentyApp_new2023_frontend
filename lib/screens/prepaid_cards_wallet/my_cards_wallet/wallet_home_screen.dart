@@ -1181,32 +1181,32 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                         });
                                       }),
                                 )),
-                                Expanded(
-                                    child: ListTile(
-                                  contentPadding: EdgeInsets.all(0),
-                                  dense: false,
-                                  title: const Text('To Event ',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600)),
-                                  leading: Radio<int?>(
-                                      value: 3,
-                                      groupValue: selectedRadioValue,
-                                      onChanged: (v) {
-                                        setState(() {
-                                          selectedRadioValue = v ?? 3;
-                                          isLoadMyWallet = false;
-
-                                          _textEditingControllerLoadingAmount
-                                              .clear();
-                                          _textEditingControllerReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerConfrimReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerAmount.clear();
-                                        });
-                                      }),
-                                )),
+                                // Expanded(
+                                //     child: ListTile(
+                                //   contentPadding: EdgeInsets.all(0),
+                                //   dense: false,
+                                //   title: const Text('To Event ',
+                                //       style: TextStyle(
+                                //           color: Colors.black,
+                                //           fontWeight: FontWeight.w600)),
+                                //   leading: Radio<int?>(
+                                //       value: 3,
+                                //       groupValue: selectedRadioValue,
+                                //       onChanged: (v) {
+                                //         setState(() {
+                                //           selectedRadioValue = v ?? 3;
+                                //           isLoadMyWallet = false;
+                                //
+                                //           _textEditingControllerLoadingAmount
+                                //               .clear();
+                                //           _textEditingControllerReceiverWalletNo
+                                //               .clear();
+                                //           _textEditingControllerConfrimReceiverWalletNo
+                                //               .clear();
+                                //           _textEditingControllerAmount.clear();
+                                //         });
+                                //       }),
+                                // )),
                               ],
                             ),
                             Divider(

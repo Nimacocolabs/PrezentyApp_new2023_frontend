@@ -146,7 +146,8 @@ class DynamicLinkService {
   Future<dynamic> createDynamic1Link(
      ) async {
     Uri uri = Uri.parse(
-      'https://prezenty.page.link/?link=https://prezenty.in/WalletHomeScreen/&apn=com.cocoalabs.event_app&ibi=com.cocoalabs.event&sd=To%20participate%2FOnline%20gifting');
+        'https://prezenty.page.link/?link=https://prezenty.in/WalletHomeScreen/&apn=com.cocoalabs.event_app&ibi=com.cocoalabs.event&sd=To%20participate%2FOnline%20gifting');
+
     final ShortDynamicLink shortenedLink0 =
     await DynamicLinkParameters.shortenUrl(
       uri,

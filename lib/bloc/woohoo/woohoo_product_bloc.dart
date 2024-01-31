@@ -217,6 +217,7 @@ WoohooProductBloc() {
       int? upiTransactionId,
       String? rzpPaymentId,
       String? stateForRedeem,
+        String ?decentro_txn_id,
       int? themeId,
         String? orderType, String? touchPoint, String? payAmount,
      int? insTableId,
@@ -241,6 +242,7 @@ WoohooProductBloc() {
         "payable_amount":payableAmnt,
         "ins_table_id": insTableId, // spin ins table id. default 0
         "product_id": woohooProductId,
+        "decentro_txn_id":decentro_txn_id,
         "user_id": userId,
         "event_id":eventId,
         "state": stateForRedeem,

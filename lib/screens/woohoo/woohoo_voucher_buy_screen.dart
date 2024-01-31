@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:event_app/bloc/payment_bloc.dart';
@@ -17,9 +16,12 @@ import 'package:event_app/models/woohoo/woohoo_create_order_response.dart';
 import 'package:event_app/models/woohoo/woohoo_product_detail_response.dart';
 import 'package:event_app/network/api_error_message.dart';
 import 'package:event_app/network/api_provider.dart';
+import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/apis.dart';
 import 'package:event_app/screens/login/select_country_dialog_screen.dart';
 import 'package:event_app/screens/payment/payment_v2_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 import 'package:event_app/screens/woohoo/woohoo_voucher_list_screen.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:event_app/util/string_validator.dart';
@@ -32,6 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/woohoo/check_voucher_code_valid_or_notmodel.dart';
 import '../payment/payment_v2_screen.dart';
@@ -127,6 +130,15 @@ class _WoohooVoucherBuyScreenState extends State<WoohooVoucherBuyScreen> {
           '${widget.redeemData.denomination}';
       _textFieldControlQty.controller.text = '1';
     }
+    SystemChannels.lifecycle.setMessageHandler((msg) async {
+      if (msg == "AppLifecycleState.resumed") {
+        // The app has resumed from the background
+        // Call your API for status check here
+        String key = await _getGatewayKey();
+        await _startPayment(key, orderId);
+      }
+      return null;
+    });
   }
 
   @override
@@ -1371,7 +1383,7 @@ else{
         hiCardNo: User.userHiCardNo,
         hiCardPinNumber: User.userHiCardPin,
         hiCardPayableAmnt: payableAmount.toString(),
-        enteredEventId: _textFieldControlEventId.controller.text.trim(),
+        enteredEventId: _textFieldControlEventId.controller.text.trim(), decentro_txn_id: null,
       );
     }
   }
@@ -1698,7 +1710,7 @@ else{
                             orderType: 'TOUCHPOINT_ONLY',
                             touchPoint: _textControllerTouchPoints
                                 .controller.text
-                                .trim());
+                                .trim(), decentro_txn_id: null);
                       }
                     } else {
                       toastMessage('Choose any method to pay');
@@ -1828,7 +1840,7 @@ else{
     //           ));
     //     });
   }
-
+  String orderId="";
   _startPayOrRedeem(
       {String? state,
       String? orderType,
@@ -1836,7 +1848,8 @@ else{
       String? amount,
       int? insTableId,
       String? eventIdValue}) async {
-       
+    print("First amount -${amount}");
+
     if ([
       RedeemType.BUY_VOUCHER,
       RedeemType.REDEEM_TOUCHPOINT,
@@ -1846,7 +1859,7 @@ else{
       if (key.isEmpty) {
         toastMessage('Unable to get payment key');
       } else {
-        String orderId;
+
         if (widget.redeemData.redeemType == RedeemType.BUY_VOUCHER) {
           orderId = await _getGatewayOrderIdConfirmVoucherAmount(
               amount ?? '${voucherAmount!.amountIncTax}', insTableId ?? 0);
@@ -1857,11 +1870,13 @@ else{
         if (orderId.isEmpty) {
           toastMessage('Unable to get order');
         } else {
-          _startPayment(key, orderId,
-              state: state,
-              orderType: orderType,
-              touchPoint: touchPoint,
-              amount: amount,eventID: eventIdValue);
+          print("Amount-->${amount}");
+        showPaymentConfirmationDialog(context,"${voucherAmount!.amountIncTax}",orderId);
+        //   _startPayment(key, orderId,
+        //       state: state,
+        //       orderType: orderType,
+        //       touchPoint: touchPoint,
+        //       amount: amount,eventID: eventIdValue);
         }
       }
     } else if (widget.redeemData.redeemType == RedeemType.GIFT_REDEEM) {
@@ -1873,6 +1888,116 @@ else{
       }
     }
   }
+  void showPaymentConfirmationDialog(BuildContext context,String? amount,orderId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Confirmation'),
+          content: Text('Are you sure you want to make the payment?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                await getupcard(amount,orderId);
+                // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                // Perform the payment logic here
+                // For example, you can call a function to initiate the payment
+                // If the payment is successful, you can close the dialog
+                // If the payment fails, you can show an error message or handle it accordingly
+                // For this example, let's just close the dialog
+
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () async{
+                Navigator.of(context).pop();
+
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  int taxid= 0;
+  Future<paymentupiResponse?> getupcard(String? amount,orderId) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        data: {
+          "amount": amount,
+          "type": "gift",
+          "order_id":orderId,
+        },
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+String decentro_txn_id= "";
+  // Future<UpiSucess?> getupistatus() async {
+  //   try {
+  //
+  //     final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+  //       '${Apis.upistatus}',
+  //       data: {
+  //         "txn_tbl_id": taxid,
+  //       },
+  //     );
+  //
+  //     UpiSucess getupiResponse =
+  //     UpiSucess.fromJson(response.data);
+  //     decentro_txn_id = getupiResponse.decentro_txn_id!;
+  //     print("response->${decentro_txn_id}");
+  //
+  //
+  //
+  //     // Check if the API call was successful before launching the URL
+  //     if (getupiResponse != null && getupiResponse.statusCode==200) {
+  //
+  //       // Replace 'your_url_here' with the actual URL you want to launch
+  //       // showStatusAlert("${getupiResponse.message}");
+  //       // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+  //
+  //     }else{
+  //       // showStatusAlert("${getupiResponse.message}");
+  //     }
+  //
+  //     return getupiResponse;
+  //   } catch (e, s) {
+  //     Get.back();
+  //     Completer().completeError(e, s);
+  //     toastMessage(ApiErrorMessage.getNetworkError(e));
+  //   }
+  //   return null;
+  // }
+
 
   Future<String> _getGatewayKey() async {
     try {
@@ -1934,69 +2059,111 @@ else{
   }
 
   _startPayment(String key, String orderId,
-      {String? state, String? orderType, String? touchPoint, String? amount,String? eventID}) {
-    _razorPay = Razorpay();
+      {String? state, String? orderType, String? touchPoint, String? amount,String? eventID}) async {
+
+    // try {
+    //   _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+    //       (PaymentSuccessResponse paymentSuccessResponse) {
+    //    // toastMessage('Payment successful');
+    //     Get.back();
+    //     Future.delayed(Duration(milliseconds: 500), () {
+    //       _createOrder(
+    //           rzpPaymentId: paymentSuccessResponse.paymentId,
+    //           orderType: orderType,
+    //           touchPoint: touchPoint,
+    //           amount: amount,enteredEventId: eventID);
+    //     });
+    //   });
+    //   _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
+    //       (PaymentFailureResponse paymentFailureResponse) {
+    //     _onPaymentErrorFn(paymentFailureResponse);
+    //   });
+    //
+    //   _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
+    //
+    //   int amt = 0;
+    //   if (amount == null) {
+    //     amt = (voucherAmount!.amountIncTax * 100).floor();
+    //   } else {
+    //     amt = (double.parse(amount) * 100).floor();
+    //   }
+    //
+    //   var options = {
+    //     'key': key,
+    //     'amount': amt,
+    //     'order_id': orderId,
+    //     'currency': "INR",
+    //     'name': 'Prezenty',
+    //     'description': 'Payment',
+    //     'prefill': {
+    //       'name': '${User.userName}',
+    //       'contact': '${_country.phoneCode}${User.userMobile}',
+    //       'email': '${User.userEmail}'
+    //     },
+    //     'notes': {
+    //       "type": "BUY_VOUCHER",
+    //       "user_id": User.userId,
+    //       "product_id": widget.productId,
+    //       "amount": voucherAmount!.amountIncTax,
+    //       "state": state,
+    //       "discount": voucherAmount!.discountPercent,
+    //       "discount_amt": voucherAmount!.discountPercentAmt,
+    //       "org_amount": voucherAmount!.totalVoucherAmount,
+    //     }
+    //   };
+    //
+    //   debugPrint(jsonEncode(options));
+    //
+    //   _razorPay.open(options);
+    //   return true;
+    // } catch (e, s) {
+    //   Completer().completeError(e, s);
+    //   toastMessage('Unable to start payment. Please try again');
+    //   return false;
+    // }
     try {
-      _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-          (PaymentSuccessResponse paymentSuccessResponse) {
-       // toastMessage('Payment successful');
-        Get.back();
-        Future.delayed(Duration(milliseconds: 500), () {
-          _createOrder(
-              rzpPaymentId: paymentSuccessResponse.paymentId,
-              orderType: orderType,
-              touchPoint: touchPoint,
-              amount: amount,enteredEventId: eventID);
-        });
-      });
-      _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
-          (PaymentFailureResponse paymentFailureResponse) {
-        _onPaymentErrorFn(paymentFailureResponse);
-      });
 
-      _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatus}',
+        data: {
+          "txn_tbl_id": taxid,
+        },
+      );
 
-      int amt = 0;
-      if (amount == null) {
-        amt = (voucherAmount!.amountIncTax * 100).floor();
-      } else {
-        amt = (double.parse(amount) * 100).floor();
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
+      decentro_txn_id = getupiResponse.decentro_txn_id!;
+      print("response->${decentro_txn_id}");
+
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse.message=="SUCCESS") {
+        _createOrder(
+            decentro_txn_id: decentro_txn_id,
+            orderType: orderType,
+            touchPoint: touchPoint,
+            amount: amount,enteredEventId: eventID);
+        // Future.delayed(Duration(milliseconds: 500), () {
+        //
+        // });
+        // Replace 'your_url_here' with the actual URL you want to launch
+        // showStatusAlert("${getupiResponse.message}");
+        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+
+      }else{
+        // showStatusAlert("${getupiResponse.message}");
       }
 
-      var options = {
-        'key': key,
-        'amount': amt,
-        'order_id': orderId,
-        'currency': "INR",
-        'name': 'Prezenty',
-        'description': 'Payment',
-        'prefill': {
-          'name': '${User.userName}',
-          'contact': '${_country.phoneCode}${User.userMobile}',
-          'email': '${User.userEmail}'
-        },
-        'notes': {
-          "type": "BUY_VOUCHER",
-          "user_id": User.userId,
-          "product_id": widget.productId,
-          "amount": voucherAmount!.amountIncTax,
-          "state": state,
-          "discount": voucherAmount!.discountPercent,
-          "discount_amt": voucherAmount!.discountPercentAmt,
-          "org_amount": voucherAmount!.totalVoucherAmount,
-        }
-      };
-
-      debugPrint(jsonEncode(options));
-
-      _razorPay.open(options);
-      return true;
+      return getupiResponse;
     } catch (e, s) {
+      Get.back();
       Completer().completeError(e, s);
-      toastMessage('Unable to start payment. Please try again');
-      return false;
+      toastMessage(ApiErrorMessage.getNetworkError(e));
     }
+    return null;
   }
+
 
   _showOrderRetryDialog() {
     //goToHomeScreen();
@@ -2096,7 +2263,7 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
       String? hiCardNo,
       String? hiCardPinNumber,
       String? hiCardPayableAmnt,
-      String? enteredEventId}) async {
+      String? enteredEventId, required decentro_txn_id}) async {
     try {
       createBody = getBody();
      
@@ -2115,7 +2282,9 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
           hiCardNo: hiCardNo,
           hiCardPinNumber: hiCardPinNumber,
           payableAmnt: hiCardPayableAmnt,
-          eventId: enteredEventId);
+          eventId: enteredEventId,
+        decentro_txn_id: decentro_txn_id
+      );
 
       if (response == null) {
         _showOrderRetryDialog();
@@ -2301,7 +2470,7 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
         toastMessage('Insufficient balance');
         _textFieldControlDenomination.focusNode.requestFocus();
       } else {
-        _createOrder(redeemTransactionId: redeemId, state: state);
+        _createOrder(redeemTransactionId: redeemId, state: state, decentro_txn_id: null);
       }
     }
   }

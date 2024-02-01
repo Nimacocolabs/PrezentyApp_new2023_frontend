@@ -1828,7 +1828,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await  getupisucess(getamount);
+                Get.to(WalletHomeScreen());
+               // await  getupisucess(getamount);
               },
               child: Text('OK'),
             ),
@@ -1846,7 +1847,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await  getupiotherssucess(getamount);
+                Get.to(WalletHomeScreen());
+               // await  getupiotherssucess(getamount);
               },
               child: Text('OK'),
             ),

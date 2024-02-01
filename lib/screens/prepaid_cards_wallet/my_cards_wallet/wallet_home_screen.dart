@@ -92,7 +92,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       if (msg == "AppLifecycleState.resumed") {
         // The app has resumed from the background
         // Call your API for status check here
-        await getupistatus();
+        typeMapping[selectedRadioValue] =="self"?        await getupistatus(): await getupistatus1();
 
       }
       return null;
@@ -1708,13 +1708,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upistatus}',
-        data: selectedRadioValue ==1?
+        data:
         {
           "txn_tbl_id": taxid,
-          "entity_id":_walletBloc.walletDetailsData!.entityId!
+          "entity_id":_walletBloc.walletDetailsData!.entityId!,
+          "type":"self"
 
-        }: {
-          "txn_tbl_id": taxid},
+        }
+
       );
 
       UpiSucess getupiResponse =
@@ -1725,9 +1726,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       // Check if the API call was successful before launching the URL
       if (getupiResponse.message=="SUCCESS") {
-        // Replace 'your_url_here' with the actual URL you want to launch
+
         showStatusAlert("${getupiResponse.message}",getamount);
-       // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+
 
       }else{
         showStatusAlertpending("${getupiResponse.message}");
@@ -1741,56 +1742,18 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
-  Future<UpiSucess?> getupisucess(String amount) async {
-    try {
-
-      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post('${Apis.upistatusucsess}',
-
-        data: {
-          "txn_tbl_id": taxid,
-          "entityId": _walletBloc.walletDetailsData!.entityId!,
-          "amount":amount
-           },
-
-      );
-
-      UpiSucess getupiResponse =
-      UpiSucess.fromJson(response.data);
-      print("response->${getupiResponse}");
-
-
-
-      // Check if the API call was successful before launching the URL
-      if (getupiResponse != null && getupiResponse.statusCode==200) {
-        // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}",5);
-
-      }
-
-      else{
-        showStatusAlert("${getupiResponse.message}","");
-      }
-
-      return getupiResponse;
-    } catch (e, s) {
-      Get.back();
-      Completer().completeError(e, s);
-      toastMessage(ApiErrorMessage.getNetworkError(e));
-    }
-    return null;
-  }
-  Future<UpiSucess?> getupiotherssucess(String amount) async {
+  Future<UpiSucess?> getupistatus1() async {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
-        '${Apis.upistatusucsess}',
+        '${Apis.upistatus}',
         data:
-             {
-            "wallet_number":   "${_textEditingControllerReceiverWalletNo.text}",
-            "wallet_number_confirmation":_textEditingControllerConfrimReceiverWalletNo.text,
-            "amount":amount,
-            "txn_tbl_id":taxid
-            }
+        {
+          "txn_tbl_id": taxid,
+          "wallet_number": "${_textEditingControllerReceiverWalletNo.text}",
+          "wallet_number_confirmation":_textEditingControllerConfrimReceiverWalletNo.text,
+          "type":"others"
+        },
       );
 
       UpiSucess getupiResponse =
@@ -1800,14 +1763,13 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
 
       // Check if the API call was successful before launching the URL
-      if (getupiResponse != null && getupiResponse.statusCode==200) {
-        // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}",amount);
+      if (getupiResponse.message=="SUCCESS") {
 
-      }
+        showStatusAlertpending("${getupiResponse.message}",);
 
-      else{
-        showStatusAlert("${getupiResponse.message}","");
+
+      }else{
+        showStatusAlertpending("${getupiResponse.message}");
       }
 
       return getupiResponse;
@@ -1818,6 +1780,83 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
+  // Future<UpiSucess?> getupisucess(String amount) async {
+  //   try {
+  //
+  //     final response = await ApiProviderPrepaidCards().getJsonInstancecard().post('${Apis.upistatusucsess}',
+  //
+  //       data: {
+  //         "txn_tbl_id": taxid,
+  //         "entityId": _walletBloc.walletDetailsData!.entityId!,
+  //         "amount":amount
+  //          },
+  //
+  //     );
+  //
+  //     UpiSucess getupiResponse =
+  //     UpiSucess.fromJson(response.data);
+  //     print("response->${getupiResponse}");
+  //
+  //
+  //
+  //     // Check if the API call was successful before launching the URL
+  //     if (getupiResponse != null && getupiResponse.statusCode==200) {
+  //       // Replace 'your_url_here' with the actual URL you want to launch
+  //       showStatusAlert("${getupiResponse.message}",5);
+  //
+  //     }
+  //
+  //     else{
+  //       showStatusAlert("${getupiResponse.message}","");
+  //     }
+  //
+  //     return getupiResponse;
+  //   } catch (e, s) {
+  //     Get.back();
+  //     Completer().completeError(e, s);
+  //     toastMessage(ApiErrorMessage.getNetworkError(e));
+  //   }
+  //   return null;
+  // }
+  // Future<UpiSucess?> getupiotherssucess(String amount) async {
+  //   try {
+  //
+  //     final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+  //       '${Apis.upitransferamount}',
+  //       data:
+  //            {
+  //           "wallet_number":   "${_textEditingControllerReceiverWalletNo.text}",
+  //           "wallet_number_confirmation":_textEditingControllerConfrimReceiverWalletNo.text,
+  //           "amount":amount,
+  //           "txn_tbl_id":taxid
+  //           }
+  //     );
+  //
+  //     UpiSucess getupiResponse =
+  //     UpiSucess.fromJson(response.data);
+  //     print("response->${getupiResponse}");
+  //
+  //
+  //
+  //     // Check if the API call was successful before launching the URL
+  //     if (getupiResponse != null && getupiResponse.statusCode==200) {
+  //       // Replace 'your_url_here' with the actual URL you want to launch
+  //       showStatusAlert("${getupiResponse.message}",amount);
+  //
+  //     }
+  //
+  //     else{
+  //       showStatusAlert("${getupiResponse.message}","");
+  //     }
+  //
+  //     return getupiResponse;
+  //   } catch (e, s) {
+  //     Get.back();
+  //     Completer().completeError(e, s);
+  //     toastMessage(ApiErrorMessage.getNetworkError(e));
+  //   }
+  //   return null;
+  // }
   void showStatusAlert(String message,amount) {
     showDialog(
       context: context,
@@ -1866,7 +1905,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-               Navigator.pop(context);
+              Get.to(WalletHomeScreen());
               },
               child: Text('OK'),
             ),

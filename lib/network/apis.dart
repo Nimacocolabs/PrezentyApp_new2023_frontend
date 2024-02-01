@@ -241,6 +241,7 @@ class Apis {
 static String upilink ="api/prepaid/cards/generate-upi-link";
   static String upistatus ="api/prepaid/cards/upi-transaction-status";
   static String upistatusucsess ="api/prepaid/cards/load-wallet";
+  static String upitransferamount = "api/prepaid/cards/transfer-amount";
 
   /////Additional api set from public live/////////
   static String notificationread = "api/notification-read";

@@ -1708,9 +1708,13 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upistatus}',
-        data: {
+        data: selectedRadioValue ==1?
+        {
           "txn_tbl_id": taxid,
-        },
+          "entity_id":_walletBloc.walletDetailsData!.entityId!
+
+        }: {
+          "txn_tbl_id": taxid},
       );
 
       UpiSucess getupiResponse =
@@ -1740,13 +1744,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   Future<UpiSucess?> getupisucess(String amount) async {
     try {
 
-      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
-        '${Apis.upistatusucsess}',
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post('${Apis.upistatusucsess}',
+
         data: {
           "txn_tbl_id": taxid,
           "entityId": _walletBloc.walletDetailsData!.entityId!,
           "amount":amount
-        },
+           },
+
       );
 
       UpiSucess getupiResponse =
@@ -1758,7 +1763,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}",amount);
+        showStatusAlert("${getupiResponse.message}",5);
 
       }
 

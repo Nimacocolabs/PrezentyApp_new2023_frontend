@@ -1045,7 +1045,7 @@ int taxid= 0;
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
         showStatusAlert("${getupiResponse.message}");
-        Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+     //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
 
       }else{
         showStatusAlert("${getupiResponse.message}");
@@ -1070,7 +1070,7 @@ int taxid= 0;
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
               },
               child: Text('OK'),
             ),

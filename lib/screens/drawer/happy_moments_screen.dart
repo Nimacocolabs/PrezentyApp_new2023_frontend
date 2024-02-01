@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
 import 'package:event_app/models/gateway_key_response.dart';
 import 'package:event_app/models/hi_card/check_hi_card_balance_model.dart';
@@ -15,6 +16,7 @@ import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/apis.dart';
 import 'package:event_app/screens/hi_card/hi_reward_info_screen.dart';
 import 'package:event_app/screens/main_screen.dart';
+import 'package:event_app/screens/prepaid_cards_wallet/my_cards_wallet/Component/getsucessupi.dart';
 import 'package:event_app/screens/woohoo/woohoo_voucher_list_screen.dart';
 import 'package:event_app/util/app_helper.dart';
 import 'package:event_app/widgets/common_appbar_widget.dart';
@@ -31,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../bloc/profile_bloc.dart';
 import '../../models/coin_statement_response.dart';
@@ -41,6 +44,8 @@ import '../../util/user.dart';
 import '../../widgets/CommonApiErrorWidget.dart';
 import '../../widgets/CommonApiLoader.dart';
 import 'package:dio/dio.dart' as dio;
+
+import '../prepaid_cards_wallet/my_cards_wallet/Component/upiresponse.dart';
 
 class HappyMomentsScreen extends StatefulWidget {
   const HappyMomentsScreen({Key? key}) : super(key: key);
@@ -112,6 +117,15 @@ class _HappyMomentsScreenState extends State<HappyMomentsScreen> {
       _profileBloc.checkHiCardDetails(User.userHiCardNo, User.userHiCardPin);
       // getVirtualAccountBalance();
       //getWalletBalance();
+      SystemChannels.lifecycle.setMessageHandler((msg) async {
+        if (msg == "AppLifecycleState.resumed") {
+          // The app has resumed from the background
+          // Call your API for status check here
+         // String key = await _getGatewayKey();
+          await getupcardsucess();
+        }
+        return null;
+      });
     });
   }
 
@@ -1479,12 +1493,15 @@ class _HappyMomentsScreenState extends State<HappyMomentsScreen> {
           amount: typedAmount);
 
       int? insTableId = hiCardData?.insTableId;
+      String? decentro_txn_id = hiCardData?.decentro_txn_id;
 
       if (hiCardData?.statusCode == 200) {
         startLoadingMoney(
             accountId: User.userId,
             amount: typedAmount,
-            insTableIdPassed: insTableId);
+            insTableIdPassed: insTableId,
+            dectaxid:decentro_txn_id,
+        );
       }
     }
   }
@@ -1557,77 +1574,171 @@ class _HappyMomentsScreenState extends State<HappyMomentsScreen> {
     }
   }
 
-  startLoadingMoney(
-      {String? accountId, String? amount, int? insTableIdPassed}) async {
-    String amountEntered = amount!;
-    String key = await getGatewayKey();
-    if (key.isEmpty) {
-      toastMessage('Unable to get payment key');
-    } else {
-      print("the amount entered is ${amountEntered}");
-      paymentOrderDetails = await _getGatewayOrderId(amountEntered);
-      String orderId = paymentOrderDetails?.orderId ?? "";
+  Future<UpiSucess?> getupcardsucess() async {
+    try {
 
-      if (orderId.isEmpty) {
-        toastMessage('Unable to get order');
-      } else {
-        try {
-          _razorPay = Razorpay();
-          _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-              (PaymentSuccessResponse paymentSuccessResponse) {
-            toastMessage('Payment successful');
-            Get.close(2);
-            Get.back();
-            Get.to(() => SuccessOrFailedScreen(
-                isSuccess: true,
-                content:
-                    "You have successfully loaded money to your H! card.\nEnjoy more features of H! card."));
-            
-            Future.delayed(Duration(milliseconds: 100), () async {});
-          });
-          _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
-              (PaymentFailureResponse paymentFailureResponse) {
-            _onPaymentErrorFn(paymentFailureResponse);
-          });
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upistatus}',
+        data: {
+          "txn_tbl_id": taxid,
+        },
+      );
 
-          _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
+      UpiSucess getupiResponse =
+      UpiSucess.fromJson(response.data);
 
-          var options = {
-            'key': key,
-            "amount": paymentOrderDetails?.convertedAmount,
-            'order_id': paymentOrderDetails?.orderId,
-            'currency': "INR",
-            'name': 'Prezenty',
-            'description': 'Payment',
-            'prefill': {
-              'name': '${User.userName}',
-              'contact': '${User.userMobile}',
-              'email': '${User.userEmail}'
-            },
-            'notes': {
-              "type": "LOADHICARD",
-              "user_id": User.userId,
-              "ins_table_id": insTableIdPassed,
-              // 'order_id': paymentOrderDetails?.orderId,
-              //"gift_amount":amountEntered,
-              "load_amount": amountEntered,
-              // 'state_code': permanentAddress ? permanentStateCode :stateCode ,
-              // 'address': permanentAddress ? permanentAddressValue : addressControl.text,
-            }
-          };
 
-          debugPrint('options:' + jsonEncode(options));
 
-          _razorPay.open(options);
-          return true;
-        } catch (e, s) {
-          Completer().completeError(e, s);
-          toastMessage('Unable to start payment. Please try again');
-          return false;
-        }
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse.message=="SUCCESS") {
+        showStatusAlertpending("${getupiResponse.message}");
+        // Future.delayed(Duration(milliseconds: 500), () {
+        //
+        // });
+        // Replace 'your_url_here' with the actual URL you want to launch
+        // showStatusAlert("${getupiResponse.message}");
+        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+
+      }else{
+        _showOrderRetryDialog();
       }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
     }
+    return null;
   }
+  void showStatusAlertpending(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
+  }
+  _showOrderRetryDialog() {
+    //goToHomeScreen();
+    Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create happy moments.Please try again later.",));}
+int? taxid;
+  startLoadingMoney(
+      {String? accountId, String? amount,dectaxid, int? insTableIdPassed}) async {
+    String amountEntered = amount!;
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        options: Options(
+          followRedirects: true,
+        ),
+        data: {
+          "amount": amount,
+          "type": "hi",
+          "decentro_txn_id":dectaxid
+        },
+
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+    // //String key = await getGatewayKey();
+    // if (key.isEmpty) {
+    //   toastMessage('Unable to get payment key');
+    // } else {
+    //   print("the amount entered is ${amountEntered}");
+    //   paymentOrderDetails = await _getGatewayOrderId(amountEntered);
+    //   String orderId = paymentOrderDetails?.orderId ?? "";
+    //
+    //   if (orderId.isEmpty) {
+    //     toastMessage('Unable to get order');
+    //   } else {
+    //     try {
+    //       _razorPay = Razorpay();
+    //       _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+    //           (PaymentSuccessResponse paymentSuccessResponse) {
+    //         toastMessage('Payment successful');
+    //         Get.close(2);
+    //         Get.back();
+    //         Get.to(() => SuccessOrFailedScreen(
+    //             isSuccess: true,
+    //             content:
+    //                 "You have successfully loaded money to your H! card.\nEnjoy more features of H! card."));
+    //
+    //         Future.delayed(Duration(milliseconds: 100), () async {});
+    //       });
+    //       _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
+    //           (PaymentFailureResponse paymentFailureResponse) {
+    //         _onPaymentErrorFn(paymentFailureResponse);
+    //       });
+    //
+    //       _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
+    //
+    //       var options = {
+    //         'key': key,
+    //         "amount": paymentOrderDetails?.convertedAmount,
+    //         'order_id': paymentOrderDetails?.orderId,
+    //         'currency': "INR",
+    //         'name': 'Prezenty',
+    //         'description': 'Payment',
+    //         'prefill': {
+    //           'name': '${User.userName}',
+    //           'contact': '${User.userMobile}',
+    //           'email': '${User.userEmail}'
+    //         },
+    //         'notes': {
+    //           "type": "LOADHICARD",
+    //           "user_id": User.userId,
+    //           "ins_table_id": insTableIdPassed,
+    //           // 'order_id': paymentOrderDetails?.orderId,
+    //           //"gift_amount":amountEntered,
+    //           "load_amount": amountEntered,
+    //           // 'state_code': permanentAddress ? permanentStateCode :stateCode ,
+    //           // 'address': permanentAddress ? permanentAddressValue : addressControl.text,
+    //         }
+    //       };
+    //
+    //       debugPrint('options:' + jsonEncode(options));
+    //
+    //       _razorPay.open(options);
+          return true;
+
+      }
+
+
 
   Future<String> getGatewayKey() async {
     try {

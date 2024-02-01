@@ -1865,7 +1865,7 @@ else{
           orderId = await _getGatewayOrderIdConfirmVoucherAmount(
               amount ?? '${voucherAmount!.amountIncTax}', insTableId ?? 0);
         } else {
-          showPaymentConfirmationDialog(context,"${voucherAmount!.amountIncTax}",orderId);
+         widget.redeemData.redeemType=="BUY" ?showPaymentConfirmationDialog(context,"${voucherAmount!.amountIncTax}",orderId):showPaymentConfirmationDialog1(context,"${voucherAmount!.amountIncTax}",orderId);
           // orderId = await _getGatewayOrderId(
           //     amount ?? '${voucherAmount!.amountIncTax}');
         }
@@ -1934,7 +1934,7 @@ else{
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard(amount,orderId);
+                await getupcardspin(amount,orderId);
 
                 // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
@@ -1959,7 +1959,7 @@ else{
     );
   }
   int taxid= 0;
-  Future<paymentupiResponse?> getupcard(String? amount,orderId) async {
+  Future<paymentupiResponse?> getupcardspin(String? amount,orderId) async {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
@@ -1971,6 +1971,47 @@ else{
           "amount": amount,
           "type": "spin",
 
+        },
+
+      );
+
+      paymentupiResponse getupiResponse =
+      paymentupiResponse.fromJson(response.data);
+      print("response->${getupiResponse}");
+      taxid = getupiResponse.data!.txnTblId!;
+
+
+      // Check if the API call was successful before launching the URL
+      if (getupiResponse != null && getupiResponse.statusCode==200) {
+        // Replace 'your_url_here' with the actual URL you want to launch
+        String url = 'your_url_here';
+
+        // Launch the URL
+        await launch("${getupiResponse.data!.paymentLink}");
+
+
+      }
+
+      return getupiResponse;
+    } catch (e, s) {
+      Get.back();
+      Completer().completeError(e, s);
+      toastMessage(ApiErrorMessage.getNetworkError(e));
+    }
+    return null;
+  }
+  Future<paymentupiResponse?> getupcard(String? amount,orderId) async {
+    try {
+
+      final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
+        '${Apis.upilink}',
+        options: Options(
+          followRedirects: true,
+        ),
+        data: {
+          "amount": amount,
+          "type": "gift",
+          "order_id":orderId
         },
 
       );
@@ -2324,7 +2365,7 @@ Get.to(() => SuccessOrFailedScreen(isSuccess: false,content: "Unable to create o
           hiCardPinNumber: hiCardPinNumber,
           payableAmnt: hiCardPayableAmnt,
           eventId: enteredEventId,
-        decentro_txn_id: decentro_txn_id
+          decentro_txn_id: decentro_txn_id
       );
 
       if (response == null) {

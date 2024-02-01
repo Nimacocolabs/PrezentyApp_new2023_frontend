@@ -9,7 +9,7 @@ class WoohooCreateOrderResponse {
     this.success});
 
   WoohooCreateOrderResponse.fromJson(dynamic json) {
-    statusCode = json-['statusCode'];
+    statusCode = json['statusCode'];
     data = json['data'] != null ? WoohooCreateOrderData.fromJson(json['data']) : null;
     success = json['success'];
   }

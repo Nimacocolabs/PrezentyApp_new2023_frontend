@@ -34,6 +34,7 @@ import '../util/user.dart';
 int unreadCount= 0;
 String TokenPrepaidCard="";
 bool prepiad_user = false;
+String? prepaidcardcheck="";
 class ProfileRepository {
   late ApiProvider apiProvider;
   late ApiProviderPrepaidCards apiProviderPPCards;
@@ -128,6 +129,7 @@ class ProfileRepository {
         .getJsonInstancecard()
         .get("${Apis.checkPrepaidUserOrNot}${userId}",);
     prepiad_user = response.data["prepaid_user"];
+    prepaidcardcheck = response.data["message"];
     //Map map = jsonDecode(response.data);
     return CommonResponse.fromJson(response.data);
   }

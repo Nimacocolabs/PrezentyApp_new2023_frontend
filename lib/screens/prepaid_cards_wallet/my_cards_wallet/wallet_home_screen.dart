@@ -211,7 +211,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             ),
           ),
         ),
-        ElevatedButton(onPressed: (){  _share();}, child: Text("share"))
+
         // CommonAppBarWidget(
         //       onPressedFunction: (){
         //         Get.back();
@@ -1626,15 +1626,11 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     3: "event",
   };
   Future<paymentupiResponse?> getupcard(String amount,phno) async {
-
-
     try {
-
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
         '${Apis.upilink}',
         data:
-
-     {
+        {
           "amount": amount,
           "type": typeMapping[selectedRadioValue],
         }
@@ -1706,6 +1702,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
+
   Future<UpiSucess?> getupistatus() async {
     try {
 
@@ -1718,20 +1715,18 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
       UpiSucess getupiResponse =
       UpiSucess.fromJson(response.data);
-      getamount  =  getupiResponse.amount!;
       print("response->${getupiResponse}");
 
 
 
       // Check if the API call was successful before launching the URL
-      if (getupiResponse != null && getupiResponse.statusCode==200) {
+      if (getupiResponse.message=="SUCCESS") {
         // Replace 'your_url_here' with the actual URL you want to launch
-     selectedRadioValue==1?   showStatusAlert("${getupiResponse.message}"): showStatusAlert1("${getupiResponse.message}");
-
-
+        showStatusAlert("${getupiResponse.message}",getamount);
        // Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+
       }else{
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlertpending("${getupiResponse.message}");
       }
 
       return getupiResponse;
@@ -1763,12 +1758,12 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlert("${getupiResponse.message}",amount);
 
       }
 
       else{
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlert("${getupiResponse.message}","");
       }
 
       return getupiResponse;
@@ -1802,12 +1797,12 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       // Check if the API call was successful before launching the URL
       if (getupiResponse != null && getupiResponse.statusCode==200) {
         // Replace 'your_url_here' with the actual URL you want to launch
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlert("${getupiResponse.message}",amount);
 
       }
 
       else{
-        showStatusAlert("${getupiResponse.message}");
+        showStatusAlert("${getupiResponse.message}","");
       }
 
       return getupiResponse;
@@ -1818,7 +1813,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     }
     return null;
   }
-  void showStatusAlert(String message) {
+  void showStatusAlert(String message,amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1847,6 +1842,24 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             TextButton(
               onPressed: () async{
                 await  getupiotherssucess(getamount);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },);
+  }
+  void showStatusAlertpending(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Status'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async{
+               Navigator.pop(context);
               },
               child: Text('OK'),
             ),

@@ -244,7 +244,7 @@ _requestPhysicalCardModalSheet() async {
                             ),
                             onPressed: () async {
                       // await requestCardPayment(widget.kitNumber,widget.entityid);
-                              showPaymentConfirmationDialog(context);
+                              showPaymentConfirmationDialog(context,"${taxInfoData?.payableAmount ?? 0}");
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(16),
@@ -258,7 +258,7 @@ _requestPhysicalCardModalSheet() async {
           );
         });
   }
-  void showPaymentConfirmationDialog(BuildContext context) {
+  void showPaymentConfirmationDialog(BuildContext context, String amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -268,8 +268,8 @@ _requestPhysicalCardModalSheet() async {
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard("10");
-                Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                await getupcard(amount);
+              //  Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
                 // If the payment is successful, you can close the dialog

@@ -423,8 +423,8 @@ class _ApplyPrepaidCardListScreenState
                         Get.to(() => LoginScreen(isFromWoohoo: false));
                       } else {
                         selectedCard = cardDetailsData;
-                 //      _applyCardCheckWalletCreationAndPayment();
-                 Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,));
+                      _applyCardCheckWalletCreationAndPayment();
+                // Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,));
                       }
                     },
                     child: Container(
@@ -1243,7 +1243,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                                   .checkEventVaCreated(User.userId);
 
                               if (b) {
-                                showPaymentConfirmationDialog(context);
+                                showPaymentConfirmationDialog(context,'${taxData.amount}');
                                 // _applyCardInitPayment(couponCode,
                                 //     taxData.amount.toString(), state,
                                 //     insTableId: taxData.insTableId ?? 0,
@@ -1267,7 +1267,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           );
         });
   }
-  void showPaymentConfirmationDialog(BuildContext context) {
+  void showPaymentConfirmationDialog(BuildContext context,String amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1277,7 +1277,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-                await getupcard("5");
+                await getupcard(amount);
 
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment

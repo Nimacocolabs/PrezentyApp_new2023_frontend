@@ -2752,7 +2752,6 @@ class VoucherAmount {
   int get netAmt => (denomination * quantity);
 
   get totalVoucherAmount => denomination * quantity;
-
   get discountPercentAmt => (discountPercent != 1.0)
       ? (denomination * discountPercent) / 100
       : denomination;

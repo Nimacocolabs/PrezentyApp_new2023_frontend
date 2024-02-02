@@ -105,8 +105,9 @@ class _HomeScreenState extends State<HomeScreen>
     super.initState();
     _reloadList();
     getPrepaidCardUserOrNotToken();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
 
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       getPrepaidCardUserOrNotToken();
       getPrepaidCardUserOrNot();
       _profileBloc = ProfileBloc();

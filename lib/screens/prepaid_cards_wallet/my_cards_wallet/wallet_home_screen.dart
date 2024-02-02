@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:event_app/bloc/profile_bloc.dart';
 import 'package:event_app/network/api_error_message.dart';
 import 'package:event_app/network/api_provider_prepaid_cards.dart';
 import 'package:event_app/network/apis.dart';
@@ -51,7 +52,7 @@ class WalletHomeScreen extends StatefulWidget {
 
 class _WalletHomeScreenState extends State<WalletHomeScreen> {
   late WalletBloc _walletBloc;
-
+  ProfileBloc _profileBloc = ProfileBloc();
   bool permanentAddress = true;
   String? accountId = User.userId;
   RxBool enableRequestPhysicalCard = false.obs;
@@ -65,14 +66,16 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   bool _passwordVisible = true;
   String? currentBalance;
   GetLoadMoneyContent? loadMoneyData;
+  bool? prepaidCardUserOrNot;
+  bool? prepaidCardUserOrNotToken;
 
   TextEditingController _textEditingControllerReceiverWalletNo =
-      TextEditingController();
+  TextEditingController();
   TextEditingController _textEditingControllerConfrimReceiverWalletNo =
-      TextEditingController();
+  TextEditingController();
   TextEditingController _textEditingControllerAmount = TextEditingController();
   TextEditingController _textEditingControllerLoadingAmount =
-      TextEditingController();
+  TextEditingController();
   TextEditingController _textEditingControllerEventID = TextEditingController();
   String cardUrl = "";
 
@@ -81,7 +84,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   void initState() {
     super.initState();
     _walletBloc = WalletBloc();
-
+    getPrepaidCardUserOrNotToken();
+    getPrepaidCardUserOrNot();
+    _profileBloc = ProfileBloc();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _getWalletDetails();
       widget.isToLoadMoney ?? false
@@ -112,6 +117,16 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     setState(() {});
   }
 
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(User.userId);
+    setState(() {});
+  }
+
+  getPrepaidCardUserOrNot() async {
+    prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(User.userId);
+    setState(() {});
+  }
+
   @override
   void dispose() {
     _walletBloc.dispose();
@@ -124,7 +139,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       appBar: AppBar(actions: [
         if (_walletBloc.walletDetailsData != null)
           PopupMenuButton(
-              // color:Colors.purple.shade100,
+            // color:Colors.purple.shade100,
               offset: Offset(60, 50),
               icon: Icon(
                 Icons.settings_outlined,
@@ -134,17 +149,17 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               onSelected: (v) {
                 if (v == 1) {
                   if (_walletBloc.walletDetailsData == null
-                      // ||
-                      // (_walletBloc.walletDetailsData?.cardDetails ?? [])
-                          ) {
+                  // ||
+                  // (_walletBloc.walletDetailsData?.cardDetails ?? [])
+                  ) {
                     return;
                   }
                   Get.to(() => RequestPhysicalCard(
-                        kitNumber: _walletBloc.walletDetailsData!.kitNo!,
-                        cardNumber: _walletBloc
-                            .walletDetailsData!.cardDetails!.cardNumber!,entityid: _walletBloc.walletDetailsData!.entityId!,
+                    kitNumber: _walletBloc.walletDetailsData!.kitNo!,
+                    cardNumber: _walletBloc
+                        .walletDetailsData!.cardDetails!.cardNumber!,entityid: _walletBloc.walletDetailsData!.entityId!,
 
-                      ));
+                  ));
                 } else if (v == 2) {
                   _showBlockPopUp(context, _walletBloc.walletDetailsData,
                       _walletBloc.walletDetailsData!.cardDetails!);
@@ -152,22 +167,22 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                 }
               },
               itemBuilder: (context) => [
-                    if (enableRequestPhysicalCard.value = true)
-                      PopupMenuItem(
-                        value: 1,
-                        child: Text(
-                          "Request Physical card",
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                        ),
-                      ),
-                    PopupMenuItem(
-                      child: Text(
-                        "Block and Replace your card",
-                        style: TextStyle(color: Colors.black, fontSize: 18),
-                      ),
-                      value: 2,
+                if (enableRequestPhysicalCard.value = true)
+                  PopupMenuItem(
+                    value: 1,
+                    child: Text(
+                      "Request Physical card",
+                      style: TextStyle(color: Colors.black, fontSize: 18),
                     ),
-                  ]),
+                  ),
+                PopupMenuItem(
+                  child: Text(
+                    "Block and Replace your card",
+                    style: TextStyle(color: Colors.black, fontSize: 18),
+                  ),
+                  value: 2,
+                ),
+              ]),
 
         // IconButton(
         //     onPressed: () => Get.offAll(() => MainScreen()),
@@ -270,7 +285,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               isCardExpanded(!isCardExpanded.value);
             },
             child: Obx(
-              () => Column(
+                  () => Column(
                 children: [
                   AnimatedContainer(
                       duration: Duration(milliseconds: 200),
@@ -283,29 +298,29 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             alignment: Alignment.topCenter,
                             fit: BoxFit.fitWidth,
                             height:
-                                isCardExpanded.value ? screenHeight * 0.9 : 170,
+                            isCardExpanded.value ? screenHeight * 0.9 : 170,
                             image: AssetImage(
                                 "assets/cards/prepaid_card_blank.png"),
                             width: screenWidth,
                           ),
                         ),
                         Positioned(
-                            //right: 0,
+                          //right: 0,
                             left: screenWidth * .08,
                             top: screenWidth * .60,
                             child: Text(
                               '${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(0, 4)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(4, 8)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(8, 12)} ${walletDetails.walletDetails!.cardDetails!.cardNumber!.substring(12, 16)}\n\n${(userData?.cardname ?? "").toUpperCase()}',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 22),
+                              TextStyle(color: Colors.white, fontSize: 22),
                             )),
                         Positioned(
-                            //right: 0,
+                          //right: 0,
                             left: screenWidth * .18,
                             top: screenWidth * .95,
                             child: Text(
                               '${walletDetails.walletDetails!.cardDetails!.expiry}',
                               style:
-                                  TextStyle(color: Colors.white, fontSize: 22), 
+                              TextStyle(color: Colors.white, fontSize: 22),
                             )),
                         if (!isCardExpanded.value)
                           Positioned(
@@ -426,7 +441,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               child: Container(
                 height: 60,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -483,7 +498,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                 ),
                 height: 60,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -504,7 +519,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           ),
           Padding(
             padding:
-                const EdgeInsets.only(top: 0, left: 6, right: 6, bottom: 5),
+            const EdgeInsets.only(top: 0, left: 6, right: 6, bottom: 5),
             child: Container(
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(15)),
@@ -546,7 +561,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                         },
                         child: Image(
                           image:
-                              AssetImage('assets/images/load_money_image.png'),
+                          AssetImage('assets/images/load_money_image.png'),
                           width: 80,
                           height: 80,
                         ),
@@ -572,8 +587,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       child: InkWell(
                         onTap: () {
                           Get.to(() => LoadMoneyTransactionHistoryScreen(
-                                loadMoneyType: "event",
-                              ));
+                            loadMoneyType: "event",
+                          ));
                         },
                         child: Container(
                           color: Colors.grey.shade200,
@@ -601,8 +616,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       child: InkWell(
                         onTap: () {
                           Get.to(() => LoadMoneyTransactionHistoryScreen(
-                                loadMoneyType: "event",
-                              ));
+                            loadMoneyType: "event",
+                          ));
                         },
                         child: ShaderMask(
                           blendMode: BlendMode.srcIn,
@@ -631,8 +646,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       child: InkWell(
                         onTap: () {
                           Get.to(() => LoadMoneyTransactionHistoryScreen(
-                                loadMoneyType: "load",
-                              ));
+                            loadMoneyType: "load",
+                          ));
                         },
                         child: Container(
                           color: Colors.grey.shade200,
@@ -659,8 +674,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       child: InkWell(
                         onTap: () {
                           Get.to(() => LoadMoneyTransactionHistoryScreen(
-                                loadMoneyType: "load",
-                              ));
+                            loadMoneyType: "load",
+                          ));
                         },
                         child: Image(
                           image: AssetImage(
@@ -732,138 +747,138 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
   Future<bool> _showBlockPopUp(context, WalletDetails, CardDetails) async {
     return await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Card'),
-            titleTextStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: secondaryColor),
-            content: SizedBox(
-              height: 300,
-              child: Column(
-                children: [
-                  Text(
-                    "Current Status : ${CardDetails!.status}",
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text('Do you want to change the status in your card?'),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  if (CardDetails!.status == "ALLOCATED")
-                    Column(
-                      children: [
-                        SizedBox(
-                            width: screenWidth * 1,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"L","Card Lock");
-                                }, child: Text("LOCK"))),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                            width: screenWidth * 1,
-                            child: ElevatedButton(
-                                onPressed: () {
-                                  _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"BL","Card Block");
-                                }, child: Text("BLOCK"))),
-                        if (CardDetails!.status == "BLOCKED")
-                          SizedBox(
-                              width: screenWidth * 1,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    _replaceCard(WalletDetails.entityId,WalletDetails.kitNo);
-                                  }, child: Text("REPLACE"))),
-                      ],
-                    ),
-                  // if(CardDetails![0].status=="LOCKED")
-                  //   SizedBox(
-                  //       width: screenWidth * 1,
-                  //       child: ElevatedButton(
-                  //           onPressed: () {
-                  //             _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"UL","Card Unlock");
-                  //           }, child: Text("UNLOCK"))),
-                ],
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Card'),
+        titleTextStyle: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: secondaryColor),
+        content: SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              Text(
+                "Current Status : ${CardDetails!.status}",
+                style: TextStyle(fontWeight: FontWeight.w500),
               ),
-            ),
-            contentTextStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-                color: secondaryColor),
-            // actions: [
-            //   ElevatedButton(
-            //     onPressed: () => Navigator.of(context).pop(false),
-            //     //return false when click on "NO"
-            //     child: const Text(
-            //       'No',
-            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //     ),
-            //   ),
-            //   ElevatedButton(
-            //     // onPressed:() =>
-            //     onPressed: () => _blockCard(accountId!),
-            //     //Navigator.of(context).pop(true),
-            //     //return true when click on "Yes"
-            //     child: const Text(
-            //       'Yes',
-            //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //     ),
-            //   ),
-            // ],
+              SizedBox(
+                height: 10,
+              ),
+              Text('Do you want to change the status in your card?'),
+              SizedBox(
+                height: 20,
+              ),
+              if (CardDetails!.status == "ALLOCATED")
+                Column(
+                  children: [
+                    SizedBox(
+                        width: screenWidth * 1,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"L","Card Lock");
+                            }, child: Text("LOCK"))),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                        width: screenWidth * 1,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"BL","Card Block");
+                            }, child: Text("BLOCK"))),
+                    if (CardDetails!.status == "BLOCKED")
+                      SizedBox(
+                          width: screenWidth * 1,
+                          child: ElevatedButton(
+                              onPressed: () {
+                                _replaceCard(WalletDetails.entityId,WalletDetails.kitNo);
+                              }, child: Text("REPLACE"))),
+                  ],
+                ),
+              // if(CardDetails![0].status=="LOCKED")
+              //   SizedBox(
+              //       width: screenWidth * 1,
+              //       child: ElevatedButton(
+              //           onPressed: () {
+              //             _blockCard(WalletDetails.entityId,WalletDetails.kitNo,"UL","Card Unlock");
+              //           }, child: Text("UNLOCK"))),
+            ],
           ),
-        ) ??
+        ),
+        contentTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.normal,
+            color: secondaryColor),
+        // actions: [
+        //   ElevatedButton(
+        //     onPressed: () => Navigator.of(context).pop(false),
+        //     //return false when click on "NO"
+        //     child: const Text(
+        //       'No',
+        //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        //     ),
+        //   ),
+        //   ElevatedButton(
+        //     // onPressed:() =>
+        //     onPressed: () => _blockCard(accountId!),
+        //     //Navigator.of(context).pop(true),
+        //     //return true when click on "Yes"
+        //     child: const Text(
+        //       'Yes',
+        //       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        //     ),
+        //   ),
+        // ],
+      ),
+    ) ??
         false; //if showDialouge had returned null, then return false
   }
 
   Future<bool> showExitPopup() async {
     return await showDialog(
-          //show confirm dialogue
-          //the return value will be from "Yes" or "No" options
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Exit Wallet?'),
-            // titleTextStyle: TextStyle(
-            //     fontSize: 12,
-            //     fontWeight: FontWeight.bold,
-            //     color: secondaryColor),
-            content: const Text('Do you want to exit Wallet?'),
-            // contentTextStyle: TextStyle(
-            //     // fontSize: 18,
-            //     fontWeight: FontWeight.normal,
-            //     color: secondaryColor),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                //return false when click on "NO"
-                child: const Text(
-                  'No',
-                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Get.offAll(() => MainScreen()),
-                //Navigator.of(context).pop(true),
-                //return true when click on "Yes"
-                child: const Text(
-                  'Yes',
-                  // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+      //show confirm dialogue
+      //the return value will be from "Yes" or "No" options
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Exit Wallet?'),
+        // titleTextStyle: TextStyle(
+        //     fontSize: 12,
+        //     fontWeight: FontWeight.bold,
+        //     color: secondaryColor),
+        content: const Text('Do you want to exit Wallet?'),
+        // contentTextStyle: TextStyle(
+        //     // fontSize: 18,
+        //     fontWeight: FontWeight.normal,
+        //     color: secondaryColor),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            //return false when click on "NO"
+            child: const Text(
+              'No',
+              // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
-        ) ??
+          ElevatedButton(
+            onPressed: () => Get.offAll(() => MainScreen()),
+            //Navigator.of(context).pop(true),
+            //return true when click on "Yes"
+            child: const Text(
+              'Yes',
+              // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    ) ??
         false; //if showDialouge had returned null, then return false
   }
 
   _checkEnableRequestPhysicalCard() async {
     enableRequestPhysicalCard.value =
-        await _walletBloc.checkEnableRequestPhysicalCard( _walletBloc.walletDetailsData!.entityId ?? '',
-            _walletBloc.walletDetailsData!.cardDetails!.kitNo ?? '');
+    await _walletBloc.checkEnableRequestPhysicalCard( _walletBloc.walletDetailsData!.entityId ?? '',
+        _walletBloc.walletDetailsData!.cardDetails!.kitNo ?? '');
     setState(() {});
   }
 
@@ -879,8 +894,8 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/card-widget"),
         headers: {
           "Authorization": "Bearer ${TokenPrepaidCard}",
-                 },
-          body: data,
+        },
+        body: data,
       );
       Get.back(); // Close any existing dialogs
 
@@ -993,7 +1008,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           return SingleChildScrollView(
             child: StatefulBuilder(
                 builder: ((BuildContext context, setState) => SafeArea(
-                        child: Padding(
+                    child: Padding(
                       padding: MediaQuery.of(context).viewInsets,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -1003,76 +1018,76 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                               padding: const EdgeInsets.all(18.0),
                               child: Center(
                                   child: selectedRadioValue == 1 ||
-                                          selectedRadioValue == 3
+                                      selectedRadioValue == 3
                                       ? Text("Load Money",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20))
+                                      : Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: [
+                                      Text("Load Money",
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 20))
-                                      : Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text("Load Money",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 20)),
-                                            IconButton(
-                                                onPressed: () async {
-                                                  loadMoneyData =
-                                                      await _walletBloc
-                                                          .getLoadMoneyContent();
-                                                  Get.dialog(Center(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Material(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(22),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Text(
-                                                                "${loadMoneyData?.data ?? ""}",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 16,
-                                                              ),
-                                                              ElevatedButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    Get.back();
-                                                                  },
-                                                                  child: Text(
-                                                                      "OK"))
-                                                            ],
-                                                          ),
+                                              fontSize: 20)),
+                                      IconButton(
+                                          onPressed: () async {
+                                            loadMoneyData =
+                                            await _walletBloc
+                                                .getLoadMoneyContent();
+                                            Get.dialog(Center(
+                                              child: Padding(
+                                                padding:
+                                                const EdgeInsets.all(
+                                                    8.0),
+                                                child: Material(
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(12),
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets
+                                                        .all(22),
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                      MainAxisSize
+                                                          .min,
+                                                      children: [
+                                                        Text(
+                                                          "${loadMoneyData?.data ?? ""}",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black,
+                                                              fontSize:
+                                                              16,
+                                                              fontWeight:
+                                                              FontWeight
+                                                                  .w500),
                                                         ),
-                                                      ),
+                                                        SizedBox(
+                                                          height: 16,
+                                                        ),
+                                                        ElevatedButton(
+                                                            onPressed:
+                                                                () {
+                                                              Get.back();
+                                                            },
+                                                            child: Text(
+                                                                "OK"))
+                                                      ],
                                                     ),
-                                                  ));
-                                                },
-                                                icon: Icon(
-                                                    Icons.info_outline_rounded))
-                                          ],
-                                        )),
+                                                  ),
+                                                ),
+                                              ),
+                                            ));
+                                          },
+                                          icon: Icon(
+                                              Icons.info_outline_rounded))
+                                    ],
+                                  )),
                             ),
                             Text(
                               "NOTE: Your monthly load limit is ${rupeeSymbol} 10,000.",
@@ -1083,41 +1098,41 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             widget.isToLoadMoney ?? false
                                 ? Container()
                                 : Divider(
-                                    thickness: 2,
-                                  ),
+                              thickness: 2,
+                            ),
                             widget.isToLoadMoney ?? false
                                 ? Container()
                                 : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text("For IMPS",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w700)),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text(
-                                          "Account Number : ${userData?.vaNumber ?? ""} ",
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text(
-                                            "IFSC Code : ${userData?.vaIfsc ?? 0} ",
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                            )),
-                                      ),
-                                    ],
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text("For IMPS",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w700)),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                    "Account Number : ${userData?.vaNumber ?? ""} ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
                                   ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                      "IFSC Code : ${userData?.vaIfsc ?? 0} ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      )),
+                                ),
+                              ],
+                            ),
                             Divider(
                               thickness: 2,
                             ),
@@ -1129,58 +1144,58 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                               children: [
                                 Expanded(
                                     child: ListTile(
-                                  contentPadding: EdgeInsets.all(0),
-                                  dense: false,
-                                  title: const Text(
-                                    'Self',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  leading: Radio<int?>(
-                                      value: 1,
-                                      groupValue: selectedRadioValue,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          selectedRadioValue = val ?? 1;
-                                          isLoadMyWallet = true;
-                                          _textEditingControllerReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerConfrimReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerAmount.clear();
-                                        });
-                                      }),
-                                )),
+                                      contentPadding: EdgeInsets.all(0),
+                                      dense: false,
+                                      title: const Text(
+                                        'Self',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      leading: Radio<int?>(
+                                          value: 1,
+                                          groupValue: selectedRadioValue,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              selectedRadioValue = val ?? 1;
+                                              isLoadMyWallet = true;
+                                              _textEditingControllerReceiverWalletNo
+                                                  .clear();
+                                              _textEditingControllerConfrimReceiverWalletNo
+                                                  .clear();
+                                              _textEditingControllerAmount.clear();
+                                            });
+                                          }),
+                                    )),
                                 Expanded(
                                     child: ListTile(
-                                  contentPadding: EdgeInsets.all(0),
-                                  dense: false,
-                                  title: const Text('Others ',
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600)),
-                                  leading: Radio<int?>(
-                                      value: 2,
-                                      groupValue: selectedRadioValue,
-                                      onChanged: (v) {
-                                        setState(() {
-                                          selectedRadioValue = v ?? 2;
-                                          isLoadMyWallet = false;
-                                          _textEditingControllerLoadingAmount
-                                              .clear();
-                                          _textEditingControllerLoadingAmount
-                                              .clear();
-                                          _textEditingControllerReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerConfrimReceiverWalletNo
-                                              .clear();
-                                          _textEditingControllerAmount.clear();
-                                          _textEditingControllerEventID.clear();
-                                        });
-                                      }),
-                                )),
+                                      contentPadding: EdgeInsets.all(0),
+                                      dense: false,
+                                      title: const Text('Others ',
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.w600)),
+                                      leading: Radio<int?>(
+                                          value: 2,
+                                          groupValue: selectedRadioValue,
+                                          onChanged: (v) {
+                                            setState(() {
+                                              selectedRadioValue = v ?? 2;
+                                              isLoadMyWallet = false;
+                                              _textEditingControllerLoadingAmount
+                                                  .clear();
+                                              _textEditingControllerLoadingAmount
+                                                  .clear();
+                                              _textEditingControllerReceiverWalletNo
+                                                  .clear();
+                                              _textEditingControllerConfrimReceiverWalletNo
+                                                  .clear();
+                                              _textEditingControllerAmount.clear();
+                                              _textEditingControllerEventID.clear();
+                                            });
+                                          }),
+                                    )),
                                 // Expanded(
                                 //     child: ListTile(
                                 //   contentPadding: EdgeInsets.all(0),
@@ -1214,207 +1229,207 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                             ),
                             selectedRadioValue == 1
                                 ? Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          "Enter the amount to be loaded to your wallet",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: TextFormField(
-                                          autovalidateMode: AutovalidateMode
-                                              .onUserInteraction,
-                                          validator: (v) {
-                                            int? amountValue = int.tryParse(
-                                                _textEditingControllerLoadingAmount
-                                                    .value.text
-                                                    .trim());
-                                            if (_textEditingControllerLoadingAmount
-                                                .value.text.isEmpty) {
-                                              return "Amount cannot be empty";
-                                            } else if (amountValue == 0) {
-                                              return "Enter an amount greater than zero";
-                                            }
-                                          },
-                                          decoration: InputDecoration(
-                                              prefixText: "${rupeeSymbol}"),
-                                          controller:
-                                              _textEditingControllerLoadingAmount,
-                                          keyboardType: TextInputType.number,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 60, right: 60),
-                                        child: ElevatedButton(
-                                            onPressed: () {
-                                              int? loadingAmount = int.tryParse(
-                                                  _textEditingControllerLoadingAmount
-                                                      .value.text
-                                                      .trim());
-                                              if (_textEditingControllerLoadingAmount
-                                                  .value.text.isEmpty) {
-                                                toastMessage(
-                                                    "Please enter a valid amount");
-                                              } else if (loadingAmount == 0) {
-                                                toastMessage(
-                                                    "Enter an amount greater than zero");
-                                              } else {
-                                                showPaymentConfirmationDialog(context,loadingAmount.toString(),"");
-                                                // _validate(
-                                                //   type: "self",
-                                                //   amountTyped:
-                                                //       loadingAmount.toString(),
-                                                // );
-                                              }
-                                            },
-                                            child: Text("Load Money")),
-                                      )
-                                    ],
-                                  )
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "Enter the amount to be loaded to your wallet",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    autovalidateMode: AutovalidateMode
+                                        .onUserInteraction,
+                                    validator: (v) {
+                                      int? amountValue = int.tryParse(
+                                          _textEditingControllerLoadingAmount
+                                              .value.text
+                                              .trim());
+                                      if (_textEditingControllerLoadingAmount
+                                          .value.text.isEmpty) {
+                                        return "Amount cannot be empty";
+                                      } else if (amountValue == 0) {
+                                        return "Enter an amount greater than zero";
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                        prefixText: "${rupeeSymbol}"),
+                                    controller:
+                                    _textEditingControllerLoadingAmount,
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 60, right: 60),
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        int? loadingAmount = int.tryParse(
+                                            _textEditingControllerLoadingAmount
+                                                .value.text
+                                                .trim());
+                                        if (_textEditingControllerLoadingAmount
+                                            .value.text.isEmpty) {
+                                          toastMessage(
+                                              "Please enter a valid amount");
+                                        } else if (loadingAmount == 0) {
+                                          toastMessage(
+                                              "Enter an amount greater than zero");
+                                        } else {
+                                          showPaymentConfirmationDialog(context,loadingAmount.toString(),"");
+                                          // _validate(
+                                          //   type: "self",
+                                          //   amountTyped:
+                                          //       loadingAmount.toString(),
+                                          // );
+                                        }
+                                      },
+                                      child: Text("Load Money")),
+                                )
+                              ],
+                            )
                                 : selectedRadioValue == 3
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Enter the Event Id",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 18),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: TextFormField(
-                                              autovalidateMode: AutovalidateMode
-                                                  .onUserInteraction,
-                                              validator: (v) {
-                                                int? amountValue = int.tryParse(
-                                                    _textEditingControllerEventID
-                                                        .value.text
-                                                        .trim());
-                                                if (_textEditingControllerEventID
-                                                    .value.text.isEmpty) {
-                                                  return "Enter an Event Id";
-                                                }
-                                              },
-                                              controller:
-                                                  _textEditingControllerEventID,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                    : Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Enter the PhoneNo/Wallet Number",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 18),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: TextFormField(
-                                              autovalidateMode: AutovalidateMode
-                                                  .onUserInteraction,
-                                              validator: (val) {
-                                                if (_textEditingControllerReceiverWalletNo
-                                                    .value.text.isEmpty) {
-                                                  return "Wallet number cannot be empty";
-                                                }
-                                              },
-                                              obscureText: !_passwordVisible,
-                                              controller:
-                                                  _textEditingControllerReceiverWalletNo,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              decoration: InputDecoration(
-                                                  suffixIcon: IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _passwordVisible =
-                                                              !_passwordVisible;
-                                                        });
-                                                      },
-                                                      icon: Icon(
-                                                        _passwordVisible
-                                                            ? Icons.visibility
-                                                            : Icons
-                                                                .visibility_off,
-                                                      ))),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Text(
-                                              "Confirm  PhoneNo/WWallet Number",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 18),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: TextFormField(
-                                              obscureText: !_passwordVisible,
-                                              decoration: InputDecoration(
-                                                  suffixIcon: IconButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _passwordVisible =
-                                                              !_passwordVisible;
-                                                        });
-                                                      },
-                                                      icon: Icon(
-                                                        _passwordVisible
-                                                            ? Icons.visibility
-                                                            : Icons
-                                                                .visibility_off,
-                                                      ))),
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              autovalidateMode: AutovalidateMode
-                                                  .onUserInteraction,
-                                              controller:
-                                                  _textEditingControllerConfrimReceiverWalletNo,
-                                              validator: (value) {
-                                                if ((_textEditingControllerReceiverWalletNo
-                                                        .value.text
-                                                        .trim()) !=
-                                                    _textEditingControllerConfrimReceiverWalletNo
-                                                        .value.text
-                                                        .trim()) {
-                                                  return "Wallet number does not match";
-                                                } else if (_textEditingControllerConfrimReceiverWalletNo
-                                                    .value.text.isEmpty) {
-                                                  return "Wallet number cannot be empty";
-                                                } else {
-                                                  return null;
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                ? Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "Enter the Event Id",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextFormField(
+                                    autovalidateMode: AutovalidateMode
+                                        .onUserInteraction,
+                                    validator: (v) {
+                                      int? amountValue = int.tryParse(
+                                          _textEditingControllerEventID
+                                              .value.text
+                                              .trim());
+                                      if (_textEditingControllerEventID
+                                          .value.text.isEmpty) {
+                                        return "Enter an Event Id";
+                                      }
+                                    },
+                                    controller:
+                                    _textEditingControllerEventID,
+                                    keyboardType:
+                                    TextInputType.number,
+                                  ),
+                                )
+                              ],
+                            )
+                                : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "Enter the PhoneNo/Wallet Number",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    autovalidateMode: AutovalidateMode
+                                        .onUserInteraction,
+                                    validator: (val) {
+                                      if (_textEditingControllerReceiverWalletNo
+                                          .value.text.isEmpty) {
+                                        return "Wallet number cannot be empty";
+                                      }
+                                    },
+                                    obscureText: !_passwordVisible,
+                                    controller:
+                                    _textEditingControllerReceiverWalletNo,
+                                    keyboardType:
+                                    TextInputType.number,
+                                    decoration: InputDecoration(
+                                        suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _passwordVisible =
+                                                !_passwordVisible;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _passwordVisible
+                                                  ? Icons.visibility
+                                                  : Icons
+                                                  .visibility_off,
+                                            ))),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(
+                                    "Confirm  PhoneNo/WWallet Number",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 18),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextFormField(
+                                    obscureText: !_passwordVisible,
+                                    decoration: InputDecoration(
+                                        suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _passwordVisible =
+                                                !_passwordVisible;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              _passwordVisible
+                                                  ? Icons.visibility
+                                                  : Icons
+                                                  .visibility_off,
+                                            ))),
+                                    keyboardType:
+                                    TextInputType.number,
+                                    autovalidateMode: AutovalidateMode
+                                        .onUserInteraction,
+                                    controller:
+                                    _textEditingControllerConfrimReceiverWalletNo,
+                                    validator: (value) {
+                                      if ((_textEditingControllerReceiverWalletNo
+                                          .value.text
+                                          .trim()) !=
+                                          _textEditingControllerConfrimReceiverWalletNo
+                                              .value.text
+                                              .trim()) {
+                                        return "Wallet number does not match";
+                                      } else if (_textEditingControllerConfrimReceiverWalletNo
+                                          .value.text.isEmpty) {
+                                        return "Wallet number cannot be empty";
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
                             if (selectedRadioValue == 2 ||
                                 selectedRadioValue == 3)
                               Column(
@@ -1434,7 +1449,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                     padding: const EdgeInsets.all(10.0),
                                     child: TextFormField(
                                       autovalidateMode:
-                                          AutovalidateMode.onUserInteraction,
+                                      AutovalidateMode.onUserInteraction,
                                       validator: (v) {
                                         int? amountValue = int.tryParse(
                                             _textEditingControllerAmount
@@ -1501,10 +1516,10 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
 
   _validate(
       {String? receiverWalletNo,
-      String? confrimWalletNo,
-      String? amountTyped,
-      String? eventIdTyped,
-      String? type}) async {
+        String? confrimWalletNo,
+        String? amountTyped,
+        String? eventIdTyped,
+        String? type}) async {
     int? sendingAmount = int.tryParse(amountTyped!);
     print("laoding amount = ${amountTyped} and typevalue = ${type}");
     if (sendingAmount == null || sendingAmount == 0) {
@@ -1526,7 +1541,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       }
     } else {
       CommonResponse validateWalletData =
-          await _walletBloc.validateWalletNumber(
+      await _walletBloc.validateWalletNumber(
         accountId: User.userId,
         walletNumber: receiverWalletNo ?? "",
         type: type,
@@ -1596,7 +1611,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             TextButton(
               onPressed: () async{
                 await getupcard(amount,phnno);
-             //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
+                //   Get.offAll(() => WalletHomeScreen(isToLoadMoney: false,));
                 // Perform the payment logic here
                 // For example, you can call a function to initiate the payment
                 // If the payment is successful, you can close the dialog
@@ -1628,12 +1643,12 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   Future<paymentupiResponse?> getupcard(String amount,phno) async {
     try {
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
-        '${Apis.upilink}',
-        data:
-        {
-          "amount": amount,
-          "type": typeMapping[selectedRadioValue],
-        }
+          '${Apis.upilink}',
+          data:
+          {
+            "amount": amount,
+            "type": typeMapping[selectedRadioValue],
+          }
       );
 
       paymentupiResponse getupiResponse =
@@ -1669,7 +1684,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
         '${Apis.upilink}',
         data:
 
-  {
+        {
           "amount":amount,
           "type":typeMapping[selectedRadioValue],
           "wallet_number":phno,
@@ -1707,14 +1722,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     try {
 
       final response = await ApiProviderPrepaidCards().getJsonInstancecard().post(
-        '${Apis.upistatus}',
-        data:
-        {
-          "txn_tbl_id": taxid,
-          "entity_id":_walletBloc.walletDetailsData!.entityId!,
-          "type":"self"
+          '${Apis.upistatus}',
+          data:
+          {
+            "txn_tbl_id": taxid,
+            "entity_id":_walletBloc.walletDetailsData!.entityId!,
+            "type":"self"
 
-        }
+          }
 
       );
 
@@ -1868,7 +1883,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             TextButton(
               onPressed: () async{
                 Get.to(WalletHomeScreen());
-               // await  getupisucess(getamount);
+                // await  getupisucess(getamount);
               },
               child: Text('OK'),
             ),
@@ -1887,7 +1902,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             TextButton(
               onPressed: () async{
                 Get.to(WalletHomeScreen());
-               // await  getupiotherssucess(getamount);
+                // await  getupiotherssucess(getamount);
               },
               child: Text('OK'),
             ),
@@ -1901,11 +1916,11 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Payment Status'),
-          content: Text(message),
+          content: Text(message+ "Try Again"),
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-              Get.to(WalletHomeScreen());
+                Get.offAll(WalletHomeScreen());
               },
               child: Text('OK'),
             ),

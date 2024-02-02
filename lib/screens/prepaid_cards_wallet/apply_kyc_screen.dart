@@ -1908,7 +1908,7 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
       print("Response${response.data}");
       if (response.statusCode == 200) {
         toastMessage(response.message);
-        print(response.data);
+       // print(response.message);
         Get.offAll(() => WalletHomeScreen(
               isToLoadMoney: false,
             ));
@@ -1916,6 +1916,9 @@ class _ApplyKycScreenState extends State<ApplyKycScreen> {
         if (response.statusCode == 400 && response.success == false) {
           // Here, response.message will contain the error message
           toastMessage(response.message);
+          Get.offAll(() => WalletHomeScreen(
+            isToLoadMoney: false,
+          ));
         } else {
           // Handle other error scenarios
           toastMessage('Error: ${response.message}');

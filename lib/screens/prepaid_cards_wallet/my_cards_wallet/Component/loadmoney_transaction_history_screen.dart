@@ -121,7 +121,7 @@ if(transactionData!.isEmpty){
   _item(title: "Type: ",value: "${transactionData[index].type}")
   : _item(title: "Description: ",value: "${transactionData[index].description}"),
    SizedBox(height: 5,),
-   _item(title: "Event ID: ",value: "${transactionData[index].eventId }"),
+   _item(title: "${transactionData[index].eventId==null?"":"Event ID" } ",value: "${transactionData[index].eventId==null?"":transactionData[index].eventId }"),
    SizedBox(height: 5,),
   _item(title: "Amount: ",value: "${rupeeSymbol} ${transactionData[index].amount}"),
    SizedBox(height: 5,),

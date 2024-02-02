@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:event_app/bloc/profile_bloc.dart';
 import 'package:event_app/bloc/wallet_bloc.dart';
 import 'package:event_app/models/common_response.dart';
 import 'package:event_app/models/wallet&prepaid_cards/available_card_list_response.dart';
@@ -58,12 +59,13 @@ class ApplyPrepaidCardListScreen extends StatefulWidget {
   final int currentCardId;
   final bool? isFromSignUp;
   final String? signupCouponCode;
-   final String? signupReferralCode;
+  final String? signupReferralCode;
 }
 
 class _ApplyPrepaidCardListScreenState
     extends State<ApplyPrepaidCardListScreen> {
   WalletBloc _walletBloc = WalletBloc();
+  ProfileBloc _profileBloc = ProfileBloc();
   String viewExpand = "More";
 
   late Razorpay _razorPay;
@@ -74,6 +76,8 @@ class _ApplyPrepaidCardListScreenState
   bool get isUpgradeScreen => widget.isUpgrade;
   PaymentSuccessResponse? paymentSuccessResponse;
   String globalRefReferralCode = '';
+  bool? prepaidCardUserOrNot;
+  bool? prepaidCardUserOrNotToken;
 
   final Country _country = Country(
     isoCode: "IN",
@@ -85,6 +89,9 @@ class _ApplyPrepaidCardListScreenState
   @override
   void initState() {
     super.initState();
+    getPrepaidCardUserOrNotToken();
+    getPrepaidCardUserOrNot();
+    _profileBloc = ProfileBloc();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.isFromSignUp ?? false ?  Navigator.pushReplacement(context, _applyCardApplyCouponCode(enteredCouponCode: widget.signupCouponCode,enteredReferralCode: widget.signupReferralCode)) :null;
       if (isUpgradeScreen) {
@@ -102,6 +109,15 @@ class _ApplyPrepaidCardListScreenState
       }
       return null;
     });
+  }
+  getPrepaidCardUserOrNotToken() async {
+    prepaidCardUserOrNotToken = await _profileBloc.tokencard(User.userId);
+    setState(() {});
+  }
+
+  getPrepaidCardUserOrNot() async {
+    prepaidCardUserOrNot = await _profileBloc.confirmWalletUser(User.userId);
+    setState(() {});
   }
 
   @override
@@ -157,11 +173,11 @@ class _ApplyPrepaidCardListScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:CommonAppBarWidget(
-              onPressedFunction: (){
-                Get.back();
-              },
-              image: User.userImageUrl,
-            ),
+        onPressedFunction: (){
+          Get.back();
+        },
+        image: User.userImageUrl,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -215,7 +231,7 @@ class _ApplyPrepaidCardListScreenState
                           return CommonApiLoader();
                         case Status.COMPLETED:
                           GetAllAvailableCardListResponse response =
-                              snapshot.data!.data!;
+                          snapshot.data!.data!;
                           return ListView.builder(
                               shrinkWrap: true,
                               itemCount: response.data!.length,
@@ -248,26 +264,26 @@ class _ApplyPrepaidCardListScreenState
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: CachedNetworkImage(
-                    // fit: BoxFit.fill,
-                    // width: double.infinity,
-                    // height: 230,
-                    imageUrl: '${cardDetailsData.imageUrl ?? ""}',
-                    placeholder: (context, url) => Center(
-                      child: SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                        ),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: CachedNetworkImage(
+                  // fit: BoxFit.fill,
+                  // width: double.infinity,
+                  // height: 230,
+                  imageUrl: '${cardDetailsData.imageUrl ?? ""}',
+                  placeholder: (context, url) => Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
                       ),
                     ),
-                    errorWidget: (context, url, error) => SizedBox(
-                      child: Image.asset('assets/images/no_image.png'),
-                    ),
-                  )),
+                  ),
+                  errorWidget: (context, url, error) => SizedBox(
+                    child: Image.asset('assets/images/no_image.png'),
+                  ),
+                )),
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: Row(
@@ -328,11 +344,11 @@ class _ApplyPrepaidCardListScreenState
             ),
             (viewExpand != 'More')
                 ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: HtmlWidget(
-                      cardDetailsData.longDescription!,
-                    ),
-                  )
+              padding: const EdgeInsets.all(8.0),
+              child: HtmlWidget(
+                cardDetailsData.longDescription!,
+              ),
+            )
                 : Container(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -362,27 +378,27 @@ class _ApplyPrepaidCardListScreenState
             GestureDetector(
               onTap: () {
                 Get.to(() => PrepaidCardOfferListScreen(
-                      cardId: cardDetailsData.id!,
-                    ));
+                  cardId: cardDetailsData.id!,
+                ));
               },
               child: Container(
                 width: screenWidth - 30,
                 height: 50,
                 decoration: BoxDecoration(
-                   gradient: LinearGradient(
-                        colors: [primaryColor, secondaryColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
+                    gradient: LinearGradient(
+                      colors: [primaryColor, secondaryColor],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
                     borderRadius: BorderRadius.circular(10)),
                 child: Center(
                     child: Text(
-                  "Deals & Offers",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white),
-                )),
+                      "Deals & Offers",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white),
+                    )),
               ),
             ),
             SizedBox(
@@ -390,64 +406,64 @@ class _ApplyPrepaidCardListScreenState
             ),
             isUpgradeScreen
                 ? GestureDetector(
-                    onTap: () {
-                      selectedCard = cardDetailsData;
-                      //_upgradeApplyCouponCode();
-                      touchpointRemeber();
-                    },
-                    child: Container(
-                      height: 50,
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                        colors: [primaryColor, secondaryColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                        child: Text(
-                          "Upgrade",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white),
-                        ),
-                      ),
+              onTap: () {
+                selectedCard = cardDetailsData;
+                //_upgradeApplyCouponCode();
+                touchpointRemeber();
+              },
+              child: Container(
+                height: 50,
+                width: screenWidth,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [primaryColor, secondaryColor],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
-                  )
-                : GestureDetector(
-                    onTap: () {
-
-                      if (User.apiToken.isEmpty) {
-                        Get.to(() => LoginScreen(isFromWoohoo: false));
-                      } else {
-                        selectedCard = cardDetailsData;
-                      _applyCardCheckWalletCreationAndPayment();
-                // Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,));
-                      }
-                    },
-                    child: Container(
-                      height: 50,
-                      width: screenWidth,
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                        colors: [primaryColor, secondaryColor],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                        child: Text(
-                          "Apply Card",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Center(
+                  child: Text(
+                    "Upgrade",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white),
                   ),
+                ),
+              ),
+            )
+                : GestureDetector(
+              onTap: () {
+
+                if (User.apiToken.isEmpty) {
+                  Get.to(() => LoginScreen(isFromWoohoo: false));
+                } else {
+                  selectedCard = cardDetailsData;
+                _applyCardCheckWalletCreationAndPayment();
+                 //  Get.to(() => ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,));
+                }
+              },
+              child: Container(
+                height: 50,
+                width: screenWidth,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [primaryColor, secondaryColor],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Center(
+                  child: Text(
+                    "Apply Card",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -458,8 +474,8 @@ class _ApplyPrepaidCardListScreenState
     try {
       AppDialogs.loading();
       WalletCreationAndPaymentStatus response =
-          await _walletBloc.walletCreationAndPaymentStatus(
-              User.userId, selectedCard!.id.toString());
+      await _walletBloc.walletCreationAndPaymentStatus(
+          User.userId, selectedCard!.id.toString());
       Get.back();
       print("f->${response}");
       if (response.success!) {
@@ -474,11 +490,11 @@ class _ApplyPrepaidCardListScreenState
           // }
         } else if (response.data!.walletStatus != true) {
           Get.to(() => ApplyKycScreen(
-              razorPayId: response.data!.razorpayId!.toString(),
-              cardId: response.data!.cardId!.toString(),
-              panNumber: response.data?.panNumber ?? '',
-              firstName: response.data?.firstName ?? '',
-              lastName: response.data?.lastName ?? '', tx_id: 0,));
+            razorPayId: response.data!.razorpayId!.toString(),
+            cardId: response.data!.cardId!.toString(),
+            panNumber: response.data?.panNumber ?? '',
+            firstName: response.data?.firstName ?? '',
+            lastName: response.data?.lastName ?? '', tx_id: 0,));
         } else {
           Get.to(() => WalletHomeScreen(isToLoadMoney: false,));
         }
@@ -539,7 +555,7 @@ class _ApplyPrepaidCardListScreenState
   scratchCodeBottomSheet() async {
     final Rx<TextFieldControl> _textFieldControlScartchCode =
         TextFieldControl().obs;
-          final Rx<TextFieldControl> _textFieldControlReferralCode =
+    final Rx<TextFieldControl> _textFieldControlReferralCode =
         TextFieldControl().obs;
     Get.bottomSheet(
       Container(
@@ -582,7 +598,7 @@ class _ApplyPrepaidCardListScreenState
             SizedBox(
               height: 30,
             ),
-             Text("Enter Referral Code",
+            Text("Enter Referral Code",
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
@@ -616,31 +632,31 @@ class _ApplyPrepaidCardListScreenState
               padding: const EdgeInsets.symmetric(horizontal: 40.0),
               child: ElevatedButton(
                   onPressed: () async {
-                    
+
                     try {
                       FocusScope.of(context).unfocus();
                       String scratchCode =
                           _textFieldControlScartchCode.value.controller.text;
-                          String typedReferralCode = _textFieldControlReferralCode.value.controller.text;
+                      String typedReferralCode = _textFieldControlReferralCode.value.controller.text;
                       CheckScratchcardValidOrNotModel? scratchValidOrNot =
-                          await WalletBloc().getScratchCodeValidOrNot(
-                              User.userId, selectedCard!.id.toString(), scratchCode,referralCode:typedReferralCode);
+                      await WalletBloc().getScratchCodeValidOrNot(
+                          User.userId, selectedCard!.id.toString(), scratchCode,referralCode:typedReferralCode);
 
-                             
-  if(scratchValidOrNot?.data?.type == "coupon"){
-    _applyCardApplyCouponCode(enteredCouponCode: scratchCode,enteredReferralCode: typedReferralCode);
-  }
-  else if(scratchValidOrNot?.statusCode == 500){
-    toastMessage("${scratchValidOrNot?.message}");
-  }
-                      else 
+
+                      if(scratchValidOrNot?.data?.type == "coupon"){
+                        _applyCardApplyCouponCode(enteredCouponCode: scratchCode,enteredReferralCode: typedReferralCode);
+                      }
+                      else if(scratchValidOrNot?.statusCode == 500){
+                        toastMessage("${scratchValidOrNot?.message}");
+                      }
+                      else
                       if (scratchValidOrNot != null) {
                         Get.offAll(() => ApplyKycScreen(
-                            razorPayId: scratchValidOrNot.data?.rzrPayId,
-                            cardId: scratchValidOrNot.data?.cardId ?? '',
-                            firstName: "",
-                            lastName: "",
-                            panNumber: "", tx_id: 0,));
+                          razorPayId: scratchValidOrNot.data?.rzrPayId,
+                          cardId: scratchValidOrNot.data?.cardId ?? '',
+                          firstName: "",
+                          lastName: "",
+                          panNumber: "", tx_id: 0,));
                       } else {
                         toastMessage("Entered Coupon code is invalid");
                       }
@@ -658,7 +674,7 @@ class _ApplyPrepaidCardListScreenState
     );
   }
 
-   _applyCardApplyCouponCode({String? enteredCouponCode,String? enteredReferralCode}) {
+  _applyCardApplyCouponCode({String? enteredCouponCode,String? enteredReferralCode}) {
     final TextFieldControl _textFieldControlEmail = TextFieldControl();
     final Rx<TextFieldControl> _textFieldControlFirstName =
         TextFieldControl().obs;
@@ -707,7 +723,7 @@ class _ApplyPrepaidCardListScreenState
                                 padding: const EdgeInsets.all(12.0),
                                 child: Column(
                                   crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     SizedBox(
                                       height: 4,
@@ -869,12 +885,12 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                             ],
                           ),
                           Obx(() => AppTextBox(
-                                textFieldControl:
-                                    _textFieldControlCouponCode.value,
-                                textCapitalization:
-                                    TextCapitalization.characters,
-                                hintText:enteredCouponCode == null? 'Coupon code' : "${enteredCouponCode}",
-                              )),
+                            textFieldControl:
+                            _textFieldControlCouponCode.value,
+                            textCapitalization:
+                            TextCapitalization.characters,
+                            hintText:enteredCouponCode == null? 'Coupon code' : "${enteredCouponCode}",
+                          )),
                           SizedBox(
                             height: 16,
                           ),
@@ -897,7 +913,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                                         padding: const EdgeInsets.all(8.0),
                                         child: Material(
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                          BorderRadius.circular(12),
                                           child: Padding(
                                             padding: const EdgeInsets.all(22),
                                             child: Column(
@@ -927,12 +943,12 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                               )
                             ],
                           ),
-              
+
                           Obx(
-                            () => AppTextBox(
+                                () => AppTextBox(
                               enabled: true,
                               textFieldControl:
-                                  _textFieldControlReferralCode.value,
+                              _textFieldControlReferralCode.value,
                               hintText: enteredReferralCode == null ?'Referral person code' : "${enteredReferralCode}",
                               textCapitalization: TextCapitalization.characters,
                             ),
@@ -1016,8 +1032,8 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
   _applyCardTaxBottomSheet(
       String couponCode, ApplyCardTaxInfoData taxData, List<States> states,
       {required String firstName,
-      required String lastName,
-      required String panNumber}) {
+        required String lastName,
+        required String panNumber}) {
     // States state = states[0];
 
     States state = states.firstWhere((element) => element.stateTitle.toString().toUpperCase() == 'KERALA');
@@ -1034,236 +1050,236 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
             padding: const EdgeInsets.all(12),
             child: StatefulBuilder(
                 builder: (BuildContext context, setState) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            'Payment',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Divider(
-                          height: 1,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              ListView(shrinkWrap: true, children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Amount',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Payment',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListView(shrinkWrap: true, children: [
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Amount',
+                                      style: TextStyle(
+                                        fontSize: 16,
                                       ),
-                                      Text(
-                                        rupeeSymbol + ' ${taxData.amount}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (taxData.discountPrice != null)
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 2),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Discount',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          '- ' +
-                                              rupeeSymbol +
-                                              ' ${taxData.discountPrice}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'GST',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${taxData.gst}%',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    rupeeSymbol + ' ${taxData.amount}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Payable Amount',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        rupeeSymbol +
-                                            ' ' +
-                                            (taxData.payableAmount ?? '0'),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]),
-                              SizedBox(
-                                height: 12,
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.black26)),
-                          child: DropdownButton<States>(
-                            value: state,
-                            isExpanded: true,
-                            menuMaxHeight: 300,
-                            underline: SizedBox(),
-                            onChanged: (States? data) {
-                              setState(() {
-                                state = data!;
-                              });
-                            },
-                            items:
-                                states.map<DropdownMenuItem<States>>((value) {
-                              return DropdownMenuItem<States>(
-                                value: value,
-                                child: Text(value.stateTitle ==null ? 'Select state':value.stateTitle.toString().toUpperCase()),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-
-                        //     Container(
-                        // padding: const EdgeInsets.all(8),
-                        // decoration: BoxDecoration(borderRadius: BorderRadius.circular(12),
-                        //     border: Border.all(color:Colors.black26)),
-                        // child: Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.stretch,
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     Text('State',style: TextStyle(color: Colors.black54),),
-                        //     DropdownButtonHideUnderline(
-                        //       child: DropdownButton(
-                        //         style: TextStyle(color: secondaryColor),
-                        //         alignment: AlignmentDirectional.centerStart,
-                        //         hint: Text(
-                        //           "Select State",
-                        //           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                        //         ),
-                        //         items: states.map((item) {
-                        //           return DropdownMenuItem(
-                        //               value: state,onTap: (){
-                        //             state = item;
-                        //             setState(() {});
-                        //           },
-                        //               child: Text(item.stateTitle!,
-                        //                   style: TextStyle(
-                        //                       fontWeight: FontWeight.w700,
-                        //                       color: Colors.black54,
-                        //                       fontSize: 16)));
-                        //         }).toList(),
-                        //         onChanged: (States? value) { },
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),),
-
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
                             ),
-                            onPressed: () async {
-                              bool b = await _walletBloc
-                                  .checkEventVaCreated(User.userId);
-
-                              if (b) {
-                                showPaymentConfirmationDialog(context,'${taxData.amount}');
-                                // _applyCardInitPayment(couponCode,
-                                //     taxData.amount.toString(), state,
-                                //     insTableId: taxData.insTableId ?? 0,
-                                //     panNumber: panNumber,
-                                //     firstName: firstName,
-                                //     lastName: lastName);
-                              } else {
-                                toastMessage(
-                                    "This phone number has already registered.Please use a different mobile number");
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                  'Pay  $rupeeSymbol${taxData.payableAmount ?? 0}'),
+                            if (taxData.discountPrice != null)
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Discount',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '- ' +
+                                          rupeeSymbol +
+                                          ' ${taxData.discountPrice}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'GST',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${taxData.gst}%',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Payable Amount',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    rupeeSymbol +
+                                        ' ' +
+                                        (taxData.payableAmount ?? '0'),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ]),
+                          SizedBox(
+                            height: 12,
                           ),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.black26)),
+                      child: DropdownButton<States>(
+                        value: state,
+                        isExpanded: true,
+                        menuMaxHeight: 300,
+                        underline: SizedBox(),
+                        onChanged: (States? data) {
+                          setState(() {
+                            state = data!;
+                          });
+                        },
+                        items:
+                        states.map<DropdownMenuItem<States>>((value) {
+                          return DropdownMenuItem<States>(
+                            value: value,
+                            child: Text(value.stateTitle ==null ? 'Select state':value.stateTitle.toString().toUpperCase()),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+
+                    //     Container(
+                    // padding: const EdgeInsets.all(8),
+                    // decoration: BoxDecoration(borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(color:Colors.black26)),
+                    // child: Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.stretch,
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: [
+                    //     Text('State',style: TextStyle(color: Colors.black54),),
+                    //     DropdownButtonHideUnderline(
+                    //       child: DropdownButton(
+                    //         style: TextStyle(color: secondaryColor),
+                    //         alignment: AlignmentDirectional.centerStart,
+                    //         hint: Text(
+                    //           "Select State",
+                    //           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    //         ),
+                    //         items: states.map((item) {
+                    //           return DropdownMenuItem(
+                    //               value: state,onTap: (){
+                    //             state = item;
+                    //             setState(() {});
+                    //           },
+                    //               child: Text(item.stateTitle!,
+                    //                   style: TextStyle(
+                    //                       fontWeight: FontWeight.w700,
+                    //                       color: Colors.black54,
+                    //                       fontSize: 16)));
+                    //         }).toList(),
+                    //         onChanged: (States? value) { },
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),),
+
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                      ],
-                    )),
+                        onPressed: () async {
+                          bool b = await _walletBloc
+                              .checkEventVaCreated(User.userId);
+
+                          if (b) {
+                            showPaymentConfirmationDialog(context,'${taxData.amount}');
+                            // _applyCardInitPayment(couponCode,
+                            //     taxData.amount.toString(), state,
+                            //     insTableId: taxData.insTableId ?? 0,
+                            //     panNumber: panNumber,
+                            //     firstName: firstName,
+                            //     lastName: lastName);
+                          } else {
+                            toastMessage(
+                                "This phone number has already registered.Please use a different mobile number");
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                              'Pay  $rupeeSymbol${taxData.payableAmount ?? 0}'),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
           );
         });
   }
@@ -1391,8 +1407,8 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
           actions: <Widget>[
             TextButton(
               onPressed: () async{
-               // await  getupisucess(getamount);
-                Navigator.pop(context);
+                // await  getupisucess(getamount);
+                Get.offAll(ApplyPrepaidCardListScreen(isUpgrade: false));
               },
               child: Text('OK'),
             ),
@@ -1402,9 +1418,9 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
   }
   _applyCardInitPayment(String couponCode, String amount, States? state,
       {required int insTableId,
-      required String firstName,
-      required String lastName,
-      required String panNumber}) async {
+        required String firstName,
+        required String lastName,
+        required String panNumber}) async {
     String key = await _getGatewayKey();
     if (key.isEmpty) {
       toastMessage('Unable to get payment key');
@@ -1418,49 +1434,49 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
         try {
           _razorPay = Razorpay();
           _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-              (PaymentSuccessResponse paymentSuccessResponse) async {
-            toastMessage('Payment successful');
+                  (PaymentSuccessResponse paymentSuccessResponse) async {
+                toastMessage('Payment successful');
 
-            Get.close(1);
-            Get.back();
+                Get.close(1);
+                Get.back();
 
-            Map<String, dynamic> paymentNotes = {
-              "type": "CARD",
-              "user_id": User.userId,
-              "card_id": selectedCard!.id,
-              'order_id': paymentOrderDetail?.orderId,
-              "amount": paymentOrderDetail?.convertedAmount,
-              "state_code": state?.stateId,
-              "coupon_code": paymentOrderDetail?.couponCode,
-              "coupon_value": paymentOrderDetail?.couponValue,
-              "discount_amount": paymentOrderDetail?.discountAmount,
-              "signature": paymentSuccessResponse.signature,
-              "payment_id": paymentSuccessResponse.paymentId,
-              "ins_table_id": '$insTableId',
-              "referral_code": globalRefReferralCode,
-            };
+                Map<String, dynamic> paymentNotes = {
+                  "type": "CARD",
+                  "user_id": User.userId,
+                  "card_id": selectedCard!.id,
+                  'order_id': paymentOrderDetail?.orderId,
+                  "amount": paymentOrderDetail?.convertedAmount,
+                  "state_code": state?.stateId,
+                  "coupon_code": paymentOrderDetail?.couponCode,
+                  "coupon_value": paymentOrderDetail?.couponValue,
+                  "discount_amount": paymentOrderDetail?.discountAmount,
+                  "signature": paymentSuccessResponse.signature,
+                  "payment_id": paymentSuccessResponse.paymentId,
+                  "ins_table_id": '$insTableId',
+                  "referral_code": globalRefReferralCode,
+                };
 
-            // Get.to(() => ApplyKycScreen( razorPayId: paymentSuccessResponse.paymentId,cardId: selectedCard!.id.toString(),
-            //         panNumber:panNumber,firstName:firstName,
-            //         lastName:lastName));
+                // Get.to(() => ApplyKycScreen( razorPayId: paymentSuccessResponse.paymentId,cardId: selectedCard!.id.toString(),
+                //         panNumber:panNumber,firstName:firstName,
+                //         lastName:lastName));
 
-            _walletBloc
-                .transactionStatusCheck(paymentNotes, "apply_card")
-                .then((b) {
-              if (b) {
-                Get.to(() => ApplyKycScreen(
-                    razorPayId: paymentSuccessResponse.paymentId,
-                    cardId: selectedCard!.id.toString(),
-                    panNumber: panNumber,
-                    firstName: firstName,
-                    lastName: lastName, tx_id: 0,));
-              }
-            });
-          });
+                _walletBloc
+                    .transactionStatusCheck(paymentNotes, "apply_card")
+                    .then((b) {
+                  if (b) {
+                    Get.to(() => ApplyKycScreen(
+                      razorPayId: paymentSuccessResponse.paymentId,
+                      cardId: selectedCard!.id.toString(),
+                      panNumber: panNumber,
+                      firstName: firstName,
+                      lastName: lastName, tx_id: 0,));
+                  }
+                });
+              });
           _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
-              (PaymentFailureResponse paymentFailureResponse) {
-            _onPaymentErrorFn(paymentFailureResponse);
-          });
+                  (PaymentFailureResponse paymentFailureResponse) {
+                _onPaymentErrorFn(paymentFailureResponse);
+              });
 
           _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
 
@@ -1508,21 +1524,21 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
 
   String? validatePANCard(String value) {
     return value.isEmpty ||
-            value.length != 10 ||
-            !FormatAndValidate.alphaRegExp.hasMatch(value.substring(0,
-                2)) //First three characters i.e. "XYZ" in the above PAN are alphabetic series running from AAA to ZZZ
-            ||
-            !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
-                3)) //Fourth character i.e. "P" stands for Individual status of applicant.
-            ||
-            !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
-                4)) //Fifth character i.e. "K" in the above PAN represents first character of the PAN holder's last name/surname.
-            ||
-            !FormatAndValidate.alphaRegExp.hasMatch(value.substring(4,
-                8)) //Next four characters i.e. "8200" in the above PAN are sequential number running from 0001 to 9999.
-            ||
-            !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
-                9)) //Last character i.e. "S" in the above PAN is an alphabetic check digit.
+        value.length != 10 ||
+        !FormatAndValidate.alphaRegExp.hasMatch(value.substring(0,
+            2)) //First three characters i.e. "XYZ" in the above PAN are alphabetic series running from AAA to ZZZ
+        ||
+        !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
+            3)) //Fourth character i.e. "P" stands for Individual status of applicant.
+        ||
+        !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
+            4)) //Fifth character i.e. "K" in the above PAN represents first character of the PAN holder's last name/surname.
+        ||
+        !FormatAndValidate.alphaRegExp.hasMatch(value.substring(4,
+            8)) //Next four characters i.e. "8200" in the above PAN are sequential number running from 0001 to 9999.
+        ||
+        !FormatAndValidate.alphaRegExp.hasMatch(value.substring(
+            9)) //Last character i.e. "S" in the above PAN is an alphabetic check digit.
         ? "Enter 10 digit valid PAN Card number"
         : null;
   }
@@ -1633,7 +1649,7 @@ At last, You will receive an OTP from the issuer to validate your mobile number.
                 ),
                 ElevatedButton(onPressed: (){
                   Get.back();
-_upgradeCardGetTaxInfo();
+                  _upgradeCardGetTaxInfo();
                 }, child: Text("Confirm"))
               ],
             ),
@@ -1672,164 +1688,164 @@ _upgradeCardGetTaxInfo();
             padding: const EdgeInsets.all(12),
             child: StatefulBuilder(
                 builder: (BuildContext context, setState) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            'Payment',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Divider(
-                          height: 1,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              ListView(shrinkWrap: true, children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Amount',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Payment',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListView(shrinkWrap: true, children: [
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Amount',
+                                      style: TextStyle(
+                                        fontSize: 16,
                                       ),
-                                      Text(
-                                        rupeeSymbol + ' ${taxData.amount}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (taxData.discountPrice!.isNotEmpty)
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 2),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            'Discount',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          '- ' +
-                                              rupeeSymbol +
-                                              ' ${taxData.discountPrice ?? 0}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
                                     ),
                                   ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'GST',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${taxData.gst}%',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    rupeeSymbol + ' ${taxData.amount}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'Payable Amount',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        rupeeSymbol +
-                                            ' ' +
-                                            (taxData.payableAmount ?? '0'),
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]),
-                              SizedBox(
-                                height: 12,
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
                             ),
-                            onPressed: () {
+                            if (taxData.discountPrice!.isNotEmpty)
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Discount',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      '- ' +
+                                          rupeeSymbol +
+                                          ' ${taxData.discountPrice ?? 0}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'GST',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${taxData.gst}%',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                              const EdgeInsets.symmetric(vertical: 2),
+                              child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Payable Amount',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    rupeeSymbol +
+                                        ' ' +
+                                        (taxData.payableAmount ?? '0'),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ]),
+                          SizedBox(
+                            height: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
 
-                              ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,);
-                              // _upgradeInitPayment(
-                              //     couponCode, taxData.amount.toString());
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                  'Pay  $rupeeSymbol${taxData.payableAmount ?? 0}'),
-                            ),
-                          ),
+                          ApplyKycScreen(razorPayId: '', firstName: '', lastName: '', panNumber: '', cardId: '', tx_id: 0,);
+                          // _upgradeInitPayment(
+                          //     couponCode, taxData.amount.toString());
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                              'Pay  $rupeeSymbol${taxData.payableAmount ?? 0}'),
                         ),
-                      ],
-                    )),
+                      ),
+                    ),
+                  ],
+                )),
           );
         });
   }
@@ -1848,38 +1864,38 @@ _upgradeCardGetTaxInfo();
         try {
           _razorPay = Razorpay();
           _razorPay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-              (PaymentSuccessResponse paymentSuccessResponse) {
-            toastMessage('Payment successful');
-            Get.close(2);
-            Get.back();
-            Get.to(() => WalletHomeScreen(isToLoadMoney: false,));
-            Future.delayed(Duration(milliseconds: 100), () async {
-              Map<String, dynamic> paymentNotes = {
-                "type": "CARD",
-                "user_id": User.userId,
-                "card_id": selectedCard!.id,
-                'order_id': paymentOrderDetail?.orderId,
-                "amount": paymentOrderDetail?.convertedAmount,
-                "coupon_code": paymentOrderDetail?.couponCode,
-                "coupon_value": paymentOrderDetail?.couponValue,
-                "discount_amount": paymentOrderDetail?.discountAmount,
-                "signature": paymentSuccessResponse.signature,
-                "payment_id": paymentSuccessResponse.paymentId,
-              };
+                  (PaymentSuccessResponse paymentSuccessResponse) {
+                toastMessage('Payment successful');
+                Get.close(2);
+                Get.back();
+                Get.to(() => WalletHomeScreen(isToLoadMoney: false,));
+                Future.delayed(Duration(milliseconds: 100), () async {
+                  Map<String, dynamic> paymentNotes = {
+                    "type": "CARD",
+                    "user_id": User.userId,
+                    "card_id": selectedCard!.id,
+                    'order_id': paymentOrderDetail?.orderId,
+                    "amount": paymentOrderDetail?.convertedAmount,
+                    "coupon_code": paymentOrderDetail?.couponCode,
+                    "coupon_value": paymentOrderDetail?.couponValue,
+                    "discount_amount": paymentOrderDetail?.discountAmount,
+                    "signature": paymentSuccessResponse.signature,
+                    "payment_id": paymentSuccessResponse.paymentId,
+                  };
 
-              // bool b = await _walletBloc.transactionStatusCheck(
-              //     paymentNotes, "upgrade_card");
+                  // bool b = await _walletBloc.transactionStatusCheck(
+                  //     paymentNotes, "upgrade_card");
 
-              // if (b) {
-              //   Get.offAll(() => WalletHomeScreen());
-              //   _upgradeSuccessDialog();
-              // }
-            });
-          });
+                  // if (b) {
+                  //   Get.offAll(() => WalletHomeScreen());
+                  //   _upgradeSuccessDialog();
+                  // }
+                });
+              });
           _razorPay.on(Razorpay.EVENT_PAYMENT_ERROR,
-              (PaymentFailureResponse paymentFailureResponse) {
-            _onPaymentErrorFn(paymentFailureResponse);
-          });
+                  (PaymentFailureResponse paymentFailureResponse) {
+                _onPaymentErrorFn(paymentFailureResponse);
+              });
 
           _razorPay.on(Razorpay.EVENT_EXTERNAL_WALLET, (e) {});
 
@@ -1972,7 +1988,7 @@ _upgradeCardGetTaxInfo();
           .getJsonInstance()
           .get(Apis.getRazorpayGateWayKey);
       GatewayKeyResponse _gatewayKeyResponse =
-          GatewayKeyResponse.fromJson(jsonDecode(response.data));
+      GatewayKeyResponse.fromJson(jsonDecode(response.data));
       Get.back();
       return _gatewayKeyResponse.apiKey ?? '';
     } catch (e, s) {
@@ -1990,7 +2006,7 @@ _upgradeCardGetTaxInfo();
       final response = await ApiProviderPrepaidCards().getJsonInstance().get(
           '${Apis.getWalletPaymentOrderDetails}?amount=$amount&coupon_code=$couponCode&referral_code=$globalRefReferralCode');
       WalletPaymentOrderDetails _gatewayKeyResponse =
-          WalletPaymentOrderDetails.fromJson(jsonDecode(response.data));
+      WalletPaymentOrderDetails.fromJson(jsonDecode(response.data));
 
       Get.back();
       return _gatewayKeyResponse;

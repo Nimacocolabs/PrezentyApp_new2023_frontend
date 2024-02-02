@@ -508,11 +508,10 @@ class _WoohooVoucherDetailsScreenState
                   woohooProductDetail: productDetail,
                   productId: widget.productId,
                   redeemData: widget.redeemData,
-              templates: templates?? [],
-                templateBaseUrl:templateBaseUrl?? "",
-                eventId: widget.eventId ?? "",
-
-                ),
+                  templates: templates?? [],
+                  templateBaseUrl:templateBaseUrl?? "",
+                  eventId: widget.eventId ?? "",
+                                         ),
             transition: Transition.fade);
       }
     }

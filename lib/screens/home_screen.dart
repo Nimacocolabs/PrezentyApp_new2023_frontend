@@ -86,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen>
       Map jsonResponse = json.decode(response.body);
       print("response.body==>${jsonResponse}");
       bank_info = jsonResponse["balance"]["balance"];
+      print("banace-->${bank_info = jsonResponse["balance"]["balance"]}");
 
       Get.back();
       if (response.statusCode == 200) {

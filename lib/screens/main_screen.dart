@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/bloc/auth_bloc.dart';
 import 'package:event_app/bloc/notifications_list_bloc.dart';
 import 'package:event_app/bloc/profile_bloc.dart';
 import 'package:event_app/interface/load_more_listener.dart';
 import 'package:event_app/repositories/notifications_list_repository.dart';
+import 'package:event_app/repositories/profile_repository.dart';
 import 'package:event_app/screens/drawer/happy_moments_screen.dart';
 import 'package:event_app/screens/drawer/notification_screen.dart';
 import 'package:event_app/screens/gifting_screen.dart';
@@ -26,6 +28,7 @@ import 'login/sign_up_completed_screen.dart';
 import 'login/sign_up_screen.dart';
 import 'profile/profile_screen.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
   final int showTab;
@@ -50,6 +53,33 @@ class _MainScreenState extends State<MainScreen> with LoadMoreListener{
   WalletBloc _walletBloc = WalletBloc();
    bool? prepaidCardUserOrNot;
    bool?prepaidCardUserOrNotToken;
+  String bank_info = "";
+  Future bankbalcInfo() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            "https://prezenty.in/prezentycards-live/public/api/prepaid/cards/wallet-balance"),
+        headers: {
+          "Authorization": "Bearer ${TokenPrepaidCard}",
+        },
+      );
+      Map jsonResponse = json.decode(response.body);
+      print("response.body==>${jsonResponse}");
+      bank_info = jsonResponse["balance"]["balance"];
+      print("banace-->${bank_info = jsonResponse["balance"]["balance"]}");
+
+      Get.back();
+      if (response.statusCode == 200) {
+        toastMessage(response.statusCode);
+      } else {
+        toastMessage('${response.statusCode}');
+      }
+    } catch (e, s) {
+      Completer().completeError(e, s);
+      Get.back();
+      toastMessage('Something went wrong. Please try again');
+    }
+  }
   @override
   void initState() {
     super.initState();
